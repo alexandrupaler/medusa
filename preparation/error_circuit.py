@@ -1,7 +1,12 @@
 import cirq
 import itertools
 from typing import List
+import cirq.circuits.circuit
 import numpy as np
+import random
+import stim
+from evaluation import evaluate
+import stimcirq
 
 
 class XError(cirq.Gate):
@@ -87,21 +92,12 @@ def error_at_moments(errors_string, location: List[ErrorLocation]):
             list(map(lambda a, b: helper2(a, b.qubit), errors_string, location))]
 
 
-def generate_input_error(circuit: cirq.Circuit, number_of_error: int, strategy="all"):
+def generate_input_error_with_flags(circuit: cirq.Circuit, number_of_error: int, strategy="all"):
     result = []
 
-    def next_to_a_flag(cir):
-        helper = cir.moments[0].operations[0].qubits
-        for q in helper:
-            q: cirq.NamedQubit
-            if 'f' in q.name:
-                return True
-        return False
+    # NEW!: errors also on flags
+    qubits = list(circuit.all_qubits())
 
-    qubits = list(filter(lambda q: 'f' not in q.name, circuit.all_qubits()))
-
-    if next_to_a_flag(circuit):
-        qubits = []
     locations = list(map(lambda q: ErrorLocation(q, 0), qubits))
     # location should always be 4
     combination_of_locations = list(itertools.combinations_with_replacement(list(locations), number_of_error))
@@ -121,12 +117,46 @@ def generate_input_error(circuit: cirq.Circuit, number_of_error: int, strategy="
     return result
 
 
-def generate_error_circuit(circuit: cirq.Circuit, number_of_error: int):
+def generate_input_error_without_flags(circuit: cirq.Circuit, number_of_error: int, strategy="all"):
+    result = []
+
+    def next_to_a_flag(cir: cirq.Circuit):
+        helper = cir.moments[0].operations[0].qubits
+        for q in helper:
+            q: cirq.NamedQubit
+            if 'f' in q.name:
+                return True
+        return False
+
+    qubits = list(filter(lambda q: 'f' not in q.name, circuit.all_qubits()))
+    if next_to_a_flag(circuit):
+        qubits = []
+
+    locations = list(map(lambda q: ErrorLocation(q, 0), qubits))
+    # location should always be 4
+    combination_of_locations = list(itertools.combinations_with_replacement(list(locations), number_of_error))
+    error_string = generate_error_string(number_of_error)
+    if strategy == "all":
+        for e in error_string:
+            for cl in combination_of_locations:
+                # ERROR_CIR AND ERROR CI2 IS basically the same
+                error_cir = cirq.Circuit()
+                error_cir2 = cirq.Circuit()
+                error1, error2 = error_at_moments(e, cl)
+                for m in error1:
+                    error_cir.append(m)
+                for m in error2:
+                    error_cir2.append(m)
+                result.append([error_cir + circuit, error_cir2 + circuit])
+    return result
+
+
+
+def generate_error_circuit_without_flags(circuit: cirq.Circuit, number_of_error: int):
     result = []
     moments = list(circuit.moments)
 
     def next_to_a_flag(cir):
-        print(cir)
         helper = cir.moments[0].operations[0].qubits
         for q in helper:
             q: cirq.NamedQubit
@@ -144,9 +174,95 @@ def generate_error_circuit(circuit: cirq.Circuit, number_of_error: int):
 
         circuit2 = cirq.Circuit()
         circuit2.append(second_part)
+
         # should I make some change so there will be more errors
         if not next_to_a_flag(circuit2):
-            circuit2 = generate_input_error(circuit2, number_of_error)
+            circuit2 = generate_input_error_without_flags(circuit2, number_of_error)
             for c in circuit2:
                 result.append([circuit1 + c[0], circuit1 + c[1]])
+            
     return result
+
+# new! adds errors also on flags
+def generate_error_circuit_with_flags(circuit: cirq.Circuit, number_of_error: int):
+    result = []
+    moments = list(circuit.moments)
+
+    for i in range(len(moments)):
+        # we divide the moment into two part
+        first_part = moments[:i]
+        second_part = moments[-len(moments) + i:]
+
+        circuit1 = cirq.Circuit()
+        circuit1.append(first_part)
+
+        circuit2 = cirq.Circuit()
+        circuit2.append(second_part)
+
+        circuit2 = generate_input_error_with_flags(circuit2, number_of_error)
+        for c in circuit2:
+            result.append([circuit1 + c[0], circuit1 + c[1]])
+            
+    return result
+            
+    # only supports error weights 1 and 2
+def find_possible_states(circuit: cirq.circuits.circuit.Circuit, error_weight, initial_state):
+
+    number_of_qubits = len(circuit.all_qubits())
+    states = []
+
+    # add error upto error_weight at the end of the circuit
+    for error in range(error_weight):
+        simulator = stim.TableauSimulator()
+        simulator = evaluate.prepare_tableau_from_string(simulator, initial_state)
+        stimcircuit = stimcirq.cirq_circuit_to_stim_circuit(circuit)
+        simulator.do_circuit(stimcircuit)
+
+        # split the qubits into chunks of the size of the error
+        if error_weight == 1:
+            for i in range(number_of_qubits):
+                simulator1 = simulator.copy()
+                simulator2 = simulator.copy()
+
+                # x error
+                simulator1.x(i)
+                states.append(simulator1.state_vector())
+
+                # z error
+                simulator2.z(i)
+                states.append(simulator2.state_vector())
+
+
+        else: #error_weight == 2
+            for i in range(number_of_qubits):
+                for j in range(i,number_of_qubits):
+                    
+                    simulator1 = simulator.copy()
+                    simulator2 = simulator.copy()
+                    simulator3 = simulator.copy()
+                    simulator4 = simulator.copy()
+
+                    # x errors
+                    simulator1.x(i)
+                    simulator1.x(j)
+                    states.append(simulator1.state_vector())
+
+                    # z errors
+                    simulator2.z(i)
+                    simulator2.z(j)
+                    states.append(simulator2.state_vector())
+
+                    # xz errors
+                    simulator3.x(i)
+                    simulator3.z(j)
+                    states.append(simulator3.state_vector())
+
+                    # zx errors
+                    simulator4.z(i)
+                    simulator4.x(j)
+                    states.append(simulator4.state_vector())
+
+    return states
+
+    
+
