@@ -278,20 +278,16 @@ def benchmark(flag_circuit: cirq.circuits.circuit.Circuit, error_rate, number_of
 
     return results #logical_error_rate_flag, logical_error_rate_flagless
 
-def random_noise_benchmark(flag_circuit, icm_circuit):
+def random_noise_benchmark(flag_circuit, icm_circuit, number_of_runs, error_rates):
 
     number_of_states = 100
-    number_of_runs = 100
-    error_rates = np.linspace(0.001, 0.01, 10) #0.001, 0.05, 20)
     results = np.zeros((len(error_rates),1))
     flagless_results = np.copy(results)
     limit = np.min([2**(len(icm_circuit.all_qubits())), number_of_states])
     state_results = np.zeros((limit,len(error_rates)))
     state_flagless_results = np.copy(state_results)
-    # flag_circuit = f_cir_random
 
-    # this assumes that ancillas are always added "before" the main qubits of the circuit
-    # thus we also assume that flag qubits always start out in state 0
+    # generate input states as bitstrings
     icm_states = generate_input_strings(icm_circuit, number_of_states)
 
     for e in range(0,len(error_rates)):
