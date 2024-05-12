@@ -111,7 +111,7 @@ def evaluate_flag_circuit(flag_circuit, icm_circuit, maximum_number_of_error, nu
     plt.ylabel("percentage of propagated errors")
     plt.legend()
     plt.title("Percentage of Propagated Errors From All Errors")
-    plt.show()
+    #plt.show()
     #plt.savefig('results.png')
 
 
@@ -331,10 +331,12 @@ def random_noise_benchmark(flag_circuit, icm_circuit, number_of_runs, error_rate
     # those runs with errors only on the flags count as error-free cases
 
     # plotting
-    plt.scatter(error_rates, results[:,0], label="flag circuit")
-    plt.scatter(error_rates, flagless_results[:,0], label="flagless circuit")
-    plt.xlabel('noise channel strength')
-    plt.ylabel('logical error rate')
-    plt.legend()
-    plt.show()
+    #plt.scatter(error_rates, results[:,0], label="flag circuit")
+    #plt.scatter(error_rates, flagless_results[:,0], label="flagless circuit")
+    #plt.xlabel('noise channel strength')
+    #plt.ylabel('logical error rate')
+    #plt.legend()
+    #plt.show()
     #plt.savefig('results.png')
+
+    return results, flagless_results
