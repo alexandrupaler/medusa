@@ -135,6 +135,8 @@ def generate_input_strings(icm_circuit: cirq.circuits.circuit.Circuit, states: i
         input_string = format(number, form)
         strings[i] = input_string
 
+    strings.sort()
+    
     return strings
 
 
