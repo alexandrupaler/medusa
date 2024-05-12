@@ -127,12 +127,12 @@ def generate_input_strings(icm_circuit: cirq.circuits.circuit.Circuit, states: i
     numbers = np.random.choice(2**icm_qubits, limit, replace=False)
 
     # output array
-    strings = np.empty(limit,dtype='<U5')
+    strings = np.empty(limit,dtype=np.dtypes.StrDType)
 
     for i in range(limit):
         number = numbers[i]
-        form = "0" + str(icm_qubits) + "b"
-        input_string = format(number, form)
+        #form = "0:0" + str(icm_qubits) + "b"
+        input_string = bin(number)[2:].zfill(icm_qubits) #format(number, form)
         strings[i] = input_string
 
     strings.sort()
@@ -158,29 +158,17 @@ def prepare_circuit_from_string(circuit: cirq.circuits.circuit.Circuit, input_st
         return q.name
     
     prepared_circuit = cirq.Circuit()
-    qubits = list(circuit.all_qubits())
+    # get all qubits which are not flags
+    qubits = list(filter(lambda q: 'f' not in q.name, circuit.all_qubits()))
+    # ensure consistent order
     qubits.sort(key=sortqubits)
 
     # {0, +} basis
-    j = 0
     for i in range(0,len(input_string)): # 0 / + basis
         if input_string[i] == '1':
-
-            """
-            # check if flag qubit
-            q = qubits[i]
-            q: cirq.NamedQubit
-
-            if 'f' in q.name:
-                j += 1
-            """
-            prepared_circuit.append(cirq.H(qubits[j]))
-            #print(qubits[j].name)
-            #print(qubits[j])
-            #print("")
+            prepared_circuit.append(cirq.H(qubits[i]))
         else:
-            prepared_circuit.append(cirq.identity_each(qubits[j]))
-        j += 1
+            prepared_circuit.append(cirq.identity_each(qubits[i]))
     
     prepared_circuit.append(circuit)
 
