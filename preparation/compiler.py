@@ -48,7 +48,7 @@ class FlagCompiler:
         import os
         os.system("julia icm_converter.jl")
 
-        cirq_circuit = cirq.read_json("output_cirq_icm_circuit.json")
+        cirq_circuit = cirq.read_json("test_out.json")
         return cirq_circuit
 
     def __is_moment_with_cnot__(self, momnet: cirq.Moment):
@@ -139,9 +139,9 @@ class FlagCompiler:
 
         elif strategy == "map":
             helper = moments_with_cnot_and_index[0][1]
-            print(helper)
+            #print(helper)
 
-            print(list(map(lambda m: m[1], moments_with_cnot_and_index)))
+            #print(list(map(lambda m: m[1], moments_with_cnot_and_index)))
             x_map, z_map = Error_Map(circuit).create_map()
             control_qbits = [key[0] for key, value in x_map.items() if len(value) > 1]
             target_qbits = [key[0] for key, value in z_map.items() if len(value) > 1]
@@ -149,12 +149,12 @@ class FlagCompiler:
             # change this into the most recent cnot..
             x_end_moments = [(key[1] + helper) for key, value in x_map.items() if len(value) > 1]
             z_end_moments = [(key[1] + helper) for key, value in z_map.items() if len(value) > 1]
-            print(x_end_moments)
+            #print(x_end_moments)
             for q, m in zip(control_qbits, x_end_moments):
                 m: cirq.Moment
                 cnot_on_this = list(filter(lambda m: q == m[0].operations[0].qubits[0], moments_with_cnot_and_index))
                 cnot_on_this = list(map(lambda m: m[1], cnot_on_this))
-                print(q)
+                # print(q)
                 # print(cnot_on_this)
                 current_index = cnot_on_this.index(m)
                 if current_index == 0:
@@ -165,7 +165,7 @@ class FlagCompiler:
                 m: cirq.Moment
                 cnot_on_this = list(filter(lambda m: q == m[0].operations[0].qubits[1], moments_with_cnot_and_index))
                 cnot_on_this = list(map(lambda m: m[1], cnot_on_this))
-                print(cnot_on_this)
+                #print(cnot_on_this)
                 current_index = cnot_on_this.index(m)
                 if current_index == 0:
                     z_start_moments.append(0)

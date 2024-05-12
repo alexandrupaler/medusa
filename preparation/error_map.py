@@ -66,8 +66,8 @@ class Error_Map:
 
                 self.X_map[tuple(original_error)] = propagated_x_error
                 self.Z_map[tuple(original_error)] = propagated_z_error
-            print("")
-            print("map for 1 error:")
+            #print("")
+            #print("map for 1 error:")
 
         for key, val in self.X_map.copy().items():
             if key not in distinct_x_error:
@@ -76,8 +76,8 @@ class Error_Map:
             if key not in distinct_z_error:
                 del self.Z_map[key]
 
-        for key, val in self.X_map.items():
-            print("moments:", key[1], val)
+        #for key, val in self.X_map.items():
+            #print("moments:", key[1], val)
         return [self.X_map, self.Z_map]
 
     def create_map_2(self, max_error):
@@ -94,10 +94,10 @@ class Error_Map:
 
             if len(value) > max_error:
                 result[tuple(keys)] = value
-        print("map for", max_error, " errors")
+        #print("map for", max_error, " errors")
 
         for key, val in result.items():
             h = list(map(lambda m: m[1], key))
-            print("moments:", h, "   ", val)
+            #print("moments:", h, "   ", val)
 
         return result
