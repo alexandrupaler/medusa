@@ -2,12 +2,12 @@ import cirq.circuits
 from preparation import compiler, test_circuits
 from evaluation import evaluate
 import cirq
+import numpy as np
 import stimcirq
 
 if __name__ == '__main__':
 
     # todo:
-    # - fix states being on wrong qubits with adder! (check if f in name?)
     # - run simulation
     # - check if there are any bugs
     # - prepare 3d plot: 
@@ -19,15 +19,12 @@ if __name__ == '__main__':
     # bugs:
     # - map heuristic has a bug: doesn't work with the adder circuit
 
-
-    adder2 = test_circuits.adder(2)
-    adder2 = test_circuits.change_measurement_and_resets(adder2)
-    print(adder2)
-
     c = compiler.FlagCompiler()
 
-    icm_circuit: cirq.Circuit = c.decompose_to_ICM(test_circuits.test_circuit2())
-    #icm_circuit: cirq.Circuit = c.decompose_to_ICM(adder2)
+    #icm_circuit: cirq.Circuit = c.decompose_to_ICM(test_circuits.test_circuit2())
+
+    adder2 = test_circuits.adder(2)
+    icm_circuit: cirq.Circuit = c.decompose_to_ICM(adder2)
 
     print(icm_circuit)
 
@@ -40,12 +37,13 @@ if __name__ == '__main__':
     print("\n")
 
     flag_circuit = f_cir_heuristic
-
     
     # plots the logical error rate of flagged and flagless circuit with different inpout states and error rates
     # the noise is randomized depolarising noise
     #
-    evaluate.random_noise_benchmark(flag_circuit, icm_circuit)
+    number_of_runs = 100
+    error_rates = np.linspace(0.001, 0.01, 10) #0.001, 0.05, 20)
+    evaluate.random_noise_benchmark(flag_circuit, icm_circuit, number_of_runs, error_rates)
 
     # calculates a error-propagation "failure" rate based on the weight of the errors for flagged and unflagged circuit
     # the errors are generated manually
