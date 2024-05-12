@@ -123,29 +123,17 @@ def generate_input_strings(icm_circuit: cirq.circuits.circuit.Circuit, states: i
     icm_qubits = len(icm_circuit.all_qubits())
     limit = np.min([states, 2**icm_qubits])
 
-    # output arrays
+    # generate random unique input strings
+    numbers = np.random.choice(2**icm_qubits, limit, replace=False)
+
+    # output array
     strings = np.empty(limit,dtype='<U5')
 
-    # this is for counting the flag circuit qubit indices
-    j = 0
     for i in range(limit):
-
-        while True:
-            # generate a random number of n bits and convert that to a string
-            number = 0
-            if(limit == states):
-                number = random.getrandbits(icm_qubits)
-            else:
-                number = i
-            form = "0" + str(icm_qubits) + "b"
-            input_string = format(number, form)
-
-            # check if same number has already been generated
-            if input_string in strings:
-                continue
-            else:
-                strings[i] = input_string
-                break
+        number = numbers[i]
+        form = "0" + str(icm_qubits) + "b"
+        input_string = format(number, form)
+        strings[i] = input_string
 
     return strings
 
@@ -206,15 +194,6 @@ def benchmark_run(flag_circuit: cirq.circuits.circuit.Circuit, error_rate, initi
     stim_circuit_errors = stimcirq.cirq_circuit_to_stim_circuit(circuit_with_errors)
     circuit_expected = prepare_circuit_from_string(flag_circuit, initial_state)
     stim_circuit_expected = stimcirq.cirq_circuit_to_stim_circuit(circuit_expected)
-
-    print("state:")
-    print(stim_circuit_errors)
-    print("done!:")
-    print("\n")
-    print("\n")
-    print("\n")
-
-
     
     simulator = stim.TableauSimulator()
     #simulator_expected = prepare_tableau_from_string(simulator, initial_state)
@@ -320,7 +299,7 @@ def benchmark(flag_circuit: cirq.circuits.circuit.Circuit, error_rate, number_of
 def random_noise_benchmark(flag_circuit, icm_circuit):
     # should we take into account that if we are working with +/- states the measurements should ahppen in the x basis ?
 
-    number_of_states = 10
+    number_of_states = 100
     number_of_runs = 100
     error_rates = np.linspace(0.001, 0.01, 10) #0.001, 0.05, 20)
     results = np.zeros((len(error_rates),1))
@@ -333,8 +312,6 @@ def random_noise_benchmark(flag_circuit, icm_circuit):
     # this assumes that ancillas are always added "after" the main qubits of the circuit
     # thus we also assume that flag qubits always tart out in state 0
     icm_states = generate_input_strings(icm_circuit, number_of_states)
-
-    print(icm_states)
 
     for e in range(0,len(error_rates)):
         print("error: " + str(error_rates[e]))
