@@ -136,11 +136,11 @@ def generate_input_strings(icm_circuit: cirq.circuits.circuit.Circuit, states: i
         strings[i] = input_string
 
     strings.sort()
-    
+
     return strings
 
 
-def prepare_tableau_from_string(simulator: stim.TableauSimulator, input_string): # basis determines if 0/1 or +/- state. True implies +/-
+def prepare_tableau_from_string(simulator: stim.TableauSimulator, input_string):
 
     # {0, +} basis
     for i in range(0,len(input_string)):
@@ -241,11 +241,6 @@ def benchmark_run(flag_circuit: cirq.circuits.circuit.Circuit, error_rate, initi
             correct_no_flag = 1
             result_string = "Flags succeeded"
     #    print("No errors/Errors cancelled out, " + result_string)
-
-    #if (error_rate == 0.001):
-    #    print("state vectors:")
-    #    print(final_state_errors)
-    #    print(final_state_expected)
     
     return error_occured, correct_flag, missed_flag, correct_no_flag, false_flag
 
@@ -293,13 +288,9 @@ def benchmark(flag_circuit: cirq.circuits.circuit.Circuit, error_rate, number_of
 
         results[k,:] = [logical_error_rate_flag, logical_error_rate_flagless]
 
-    #print("")
-    #print(results)
-
-    return results #missed_cases, correct_noflag_cases, cases_with_error
+    return results #logical_error_rate_flag, logical_error_rate_flagless
 
 def random_noise_benchmark(flag_circuit, icm_circuit):
-    # should we take into account that if we are working with +/- states the measurements should ahppen in the x basis ?
 
     number_of_states = 100
     number_of_runs = 100
@@ -311,14 +302,15 @@ def random_noise_benchmark(flag_circuit, icm_circuit):
     state_flagless_results = np.copy(state_results)
     # flag_circuit = f_cir_random
 
-    # this assumes that ancillas are always added "after" the main qubits of the circuit
-    # thus we also assume that flag qubits always tart out in state 0
+    # this assumes that ancillas are always added "before" the main qubits of the circuit
+    # thus we also assume that flag qubits always start out in state 0
     icm_states = generate_input_strings(icm_circuit, number_of_states)
 
     for e in range(0,len(error_rates)):
         print("error: " + str(error_rates[e]))
         error_rate = error_rates[e]
 
+        # run sim with flagged-circuit
         results_array = benchmark(flag_circuit, error_rate, number_of_runs, icm_states)
         logical_error_rates = results_array[:,0]
 
