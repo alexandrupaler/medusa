@@ -41,8 +41,8 @@ if __name__ == '__main__':
     # plots the logical error rate of flagged and flagless circuit with different inpout states and error rates
     # the noise is randomized depolarising noise
     #
-    number_of_runs = 100
-    error_rates = np.linspace(0.001, 0.01, 10) #0.001, 0.05, 20)
+    number_of_runs = 10
+    error_rates = np.linspace(0.001, 0.01, 3) #0.001, 0.05, 20)
     evaluate.random_noise_benchmark(flag_circuit, icm_circuit, number_of_runs, error_rates)
 
     # calculates a error-propagation "failure" rate based on the weight of the errors for flagged and unflagged circuit
