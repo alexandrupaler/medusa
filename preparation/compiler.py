@@ -1,5 +1,5 @@
 import cirq
-from julia.api import Julia
+#from julia.api import Julia
 import collections
 from itertools import dropwhile
 from .error_map import Error_Map
@@ -39,16 +39,16 @@ class FlagCompiler:
                                 )):
             return True
 
-    def decompose_to_ICM(self, circuit):
+    def decompose_to_ICM(self, circuit, i, j):
         json_string = cirq.to_json(cirq.Circuit(cirq.decompose(circuit, keep=self.keep_clifford_plus_T)))
-        with open("input_cirq_circuit.json", "w") as outfile:
+        with open("input_cirq_circuit" + str(i) + str(j) + ".json", "w") as outfile:
             outfile.write(json_string)
 
         # here is a hacky way to convert using jabalizer
         import os
-        os.system("julia icm_converter.jl")
+        os.system("julia icm_converter.jl " + str(i) + " " + str(j))
 
-        cirq_circuit = cirq.read_json("test_out.json")
+        cirq_circuit = cirq.read_json("output_cirq_icm_circuit" + str(i) + str(j) + ".json")
         return cirq_circuit
 
     def __is_moment_with_cnot__(self, momnet: cirq.Moment):
