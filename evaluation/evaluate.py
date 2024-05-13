@@ -5,11 +5,9 @@ import cirq
 import stim
 import stimcirq
 from preparation import error_circuit
-import preparation.compiler
 from . import state_vector_comparison
 import random
 import matplotlib.pyplot as plt
-import preparation
 
 
 def evaluate_flag_circuit(flag_circuit, icm_circuit, maximum_number_of_error, number_of_input_states):
