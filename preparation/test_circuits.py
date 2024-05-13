@@ -173,7 +173,14 @@ def prepare_adder_for_jabalizer(circuit: cirq.Circuit):
     circuit = circuit.map_operations(map_func)
 
     # transforming cleanqubits to named qubits
-    name_map =  {cirq.ops.CleanQubit(0): cirq.NamedQubit("c0")}
+    #name_map =  {cirq.ops.CleanQubit(0): cirq.NamedQubit("c0")}
+
+    def name_map(q):
+        if isinstance(q, cirq.ops.CleanQubit):
+            num = q.id
+            return cirq.NamedQubit("c" + str(num))
+        else:
+            return q
 
     def line_map(q: cirq.Qid):
         name = str(q)
