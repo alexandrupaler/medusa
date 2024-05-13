@@ -5,9 +5,11 @@ import cirq
 import stim
 import stimcirq
 from preparation import error_circuit
+import preparation.compiler
 from . import state_vector_comparison
 import random
 import matplotlib.pyplot as plt
+import preparation
 
 
 def evaluate_flag_circuit(flag_circuit, icm_circuit, maximum_number_of_error, number_of_input_states):
@@ -91,7 +93,7 @@ def evaluate_flag_circuit(flag_circuit, icm_circuit, maximum_number_of_error, nu
                     if True in flag_measurement:
                         number_of_fail_alarm += 1
 
-        print("state: ", statename)
+        #print("state: ", statename)
         #print("total cases: " + str(total_case))
         #print("good flags: " + str(number_success_case))
         #print("failed flags: " + str(number_fail_case))
@@ -122,18 +124,27 @@ def generate_input_strings(icm_circuit: cirq.circuits.circuit.Circuit, states: i
 
     icm_qubits = len(icm_circuit.all_qubits())
     limit = np.min([states, 2**icm_qubits])
+    largest_state = (1 << (icm_qubits)) - 1
 
-    # generate random unique input strings
-    numbers = np.random.choice(2**icm_qubits, limit, replace=False)
+    def random_number():
+        # generate random input strings
+        number = random.randint(0,largest_state)
+        return number
 
     # output array
     strings = np.empty(limit,dtype=np.dtypes.StrDType)
 
     for i in range(limit):
-        number = numbers[i]
-        #form = "0:0" + str(icm_qubits) + "b"
-        input_string = bin(number)[2:].zfill(icm_qubits) #format(number, form)
-        strings[i] = input_string
+        while True:
+            number = random_number()
+            #input_string = bin(number)[2:].zfill(icm_qubits)
+            form = "0" + str(icm_qubits) + "b"
+            input_string = format(number, form)
+            if input_string in strings:
+                continue
+            else:
+                strings[i] = input_string
+                break
 
     strings.sort()
 
@@ -291,7 +302,7 @@ def random_noise_benchmark(flag_circuit, icm_circuit, number_of_runs, error_rate
     icm_states = generate_input_strings(icm_circuit, number_of_states)
 
     for e in range(0,len(error_rates)):
-        print("error: " + str(error_rates[e]))
+        #print("error: " + str(error_rates[e]))
         error_rate = error_rates[e]
 
         # run sim with flagged-circuit
