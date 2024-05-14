@@ -10,7 +10,7 @@ import random
 import matplotlib.pyplot as plt
 
 
-def evaluate_flag_circuit(flag_circuit, icm_circuit, maximum_number_of_error, number_of_input_states):
+def evaluate_flag_circuit(flag_circuit, icm_circuit, maximum_number_of_error, number_of_input_states, plotting, output_file="results.png"):
     
     input_state_strings = generate_input_strings(icm_circuit, number_of_input_states)
     error_range=list(range(1, maximum_number_of_error + 1))
@@ -101,18 +101,22 @@ def evaluate_flag_circuit(flag_circuit, icm_circuit, maximum_number_of_error, nu
         flagged_propagation_rate[s] = number_fail_case / (total_case_flagged - number_of_fail_alarm - number_success_case)
         unflagged_propagation_rate[s] = number_of_time_error_propagate / total_case_flagless
 
-    x = np.arange(len(input_state_strings)) #range(len(input_state_strings))
-    #plt.figure(figsize=(10,10))
-    plt.style.use('tableau-colorblind10')
-    width = 0.3
-    plt.bar(x-(width/2), flagged_propagation_rate, width=width, align='center', label="with flags")
-    plt.bar(x+(width/2), unflagged_propagation_rate, width=width, align='center', label="without flags")
-    plt.xlabel("state number")
-    plt.ylabel("percentage of propagated errors")
-    plt.legend()
-    plt.title("Percentage of Propagated Errors From All Errors")
-    #plt.show()
-    #plt.savefig('results.png')
+
+    if plotting:
+        x = np.arange(len(input_state_strings)) #range(len(input_state_strings))
+        #plt.figure(figsize=(10,10))
+        plt.style.use('tableau-colorblind10')
+        width = 0.3
+        plt.bar(x-(width/2), flagged_propagation_rate, width=width, align='center', label="with flags")
+        plt.bar(x+(width/2), unflagged_propagation_rate, width=width, align='center', label="without flags")
+        plt.xlabel("state number")
+        plt.ylabel("percentage of propagated errors")
+        plt.legend()
+        plt.title("Percentage of Propagated Errors From All Errors")
+        #plt.show()
+        plt.savefig(output_file)
+
+    return flagged_propagation_rate, unflagged_propagation_rate
 
 
 
@@ -259,6 +263,12 @@ def benchmark(flag_circuit: cirq.circuits.circuit.Circuit, error_rate, number_of
         false_cases = 0
         correct_noflag_cases = 0
 
+        print("\n")
+        print(len(flag_circuit.all_qubits()))
+        print(intial_state)
+        print("\n")
+
+
         for n in range(0,number_of_runs):
             #print("run: ", n)
             res = benchmark_run(flag_circuit, error_rate, intial_state)
@@ -287,7 +297,7 @@ def benchmark(flag_circuit: cirq.circuits.circuit.Circuit, error_rate, number_of
 
     return results #logical_error_rate_flag, logical_error_rate_flagless
 
-def random_noise_benchmark(flag_circuit, icm_circuit, number_of_runs, error_rates):
+def random_noise_benchmark(flag_circuit, icm_circuit, number_of_runs, error_rates, plotting, output_file="results.png"):
 
     number_of_states = 100
     results = np.zeros((len(error_rates),1))
@@ -300,7 +310,7 @@ def random_noise_benchmark(flag_circuit, icm_circuit, number_of_runs, error_rate
     icm_states = generate_input_strings(icm_circuit, number_of_states)
 
     for e in range(0,len(error_rates)):
-        #print("error: " + str(error_rates[e]))
+        print("error: " + str(error_rates[e]))
         error_rate = error_rates[e]
 
         # run sim with flagged-circuit
@@ -339,13 +349,14 @@ def random_noise_benchmark(flag_circuit, icm_circuit, number_of_runs, error_rate
     # when trying to determine the "flagless" error rate, 
     # those runs with errors only on the flags count as error-free cases
 
-    # plotting
-    #plt.scatter(error_rates, results[:,0], label="flag circuit")
-    #plt.scatter(error_rates, flagless_results[:,0], label="flagless circuit")
-    #plt.xlabel('noise channel strength')
-    #plt.ylabel('logical error rate')
-    #plt.legend()
-    #plt.show()
-    #plt.savefig('results.png')
+    if plotting:
+        # plotting
+        plt.scatter(error_rates, results[:,0], label="flag circuit")
+        plt.scatter(error_rates, flagless_results[:,0], label="flagless circuit")
+        plt.xlabel('noise channel strength')
+        plt.ylabel('logical error rate')
+        plt.legend()
+        #plt.show()
+        plt.savefig(output_file)
 
     return results, flagless_results

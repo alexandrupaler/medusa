@@ -39,7 +39,7 @@ class FlagCompiler:
                                 )):
             return True
 
-    def decompose_to_ICM(self, circuit, i, j):
+    def decompose_to_ICM(self, circuit, i=0, j=0):
         json_string = cirq.to_json(cirq.Circuit(cirq.decompose(circuit, keep=self.keep_clifford_plus_T)))
         with open("input_cirq_circuit" + str(i) + str(j) + ".json", "w") as outfile:
             outfile.write(json_string)
