@@ -5,4 +5,4 @@
 #SBATCH --time=10:00:00         # Time in HH:MM:SS or DD-HH of your job. the maximum is 120 hours or 5 days.
 module load mamba
 source activate fqc
-python main.py
+python main_hadamard.py
