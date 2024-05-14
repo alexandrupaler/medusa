@@ -48,7 +48,7 @@ def logical_hadamard_1_noflags():
     q1, q2, q3, q4, q5, q6, q7 = [cirq.LineQubit(i) for i in range(7)]
     
     s1 = cirq.LineQubit(8888)
-    f1 = cirq.LineQubit(9999)
+    f1 = cirq.LineQubit(7777)
 
     circuit = cirq.Circuit()
 
@@ -126,7 +126,9 @@ def add_flags_to_test_hadamard(circuit: cirq.Circuit):
     # measure
     for q in qubits:
         # if flag
-        if "8888" in q.name or "9999" in q.name:
+        #if "8888" in q.name or "7777" in q.name:
+        #    circuit.append(cirq.measure(q))
+        if "7777" in q.name:
             circuit.append(cirq.measure(q))
 
     return circuit
@@ -166,11 +168,16 @@ def map_func(op: cirq.Operation) -> cirq.OP_TREE:
 def cla_map(op: cirq.Operation) -> cirq.OP_TREE:
     yield op.without_classical_controls()
 
+def replace_t_with_Z_map(op: cirq.Operation) -> cirq.OP_TREE:
+    if not isinstance(op.gate, cirq.ZPowGate) and not (op.gate.exponent == 0.25):
+        yield op
+
 def prepare_adder_for_jabalizer(circuit: cirq.Circuit):
 
     # no classical, cz -> h cx h, remove m & r
     circuit = circuit.map_operations(cla_map)
     circuit = circuit.map_operations(map_func)
+    circuit = circuit.map_operations(replace_t_with_Z_map)
 
     # transforming cleanqubits to named qubits
     #name_map =  {cirq.ops.CleanQubit(0): cirq.NamedQubit("c0")}
