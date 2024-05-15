@@ -8,7 +8,7 @@ from preparation import error_circuit
 from . import state_vector_comparison
 import random
 import matplotlib.pyplot as plt
-
+import warnings
 
 def evaluate_flag_circuit(flag_circuit, icm_circuit, maximum_number_of_error, number_of_input_states, plotting, output_file="results.png"):
     
@@ -263,12 +263,6 @@ def benchmark(flag_circuit: cirq.circuits.circuit.Circuit, error_rate, number_of
         false_cases = 0
         correct_noflag_cases = 0
 
-        print("\n")
-        print(len(flag_circuit.all_qubits()))
-        print(intial_state)
-        print("\n")
-
-
         for n in range(0,number_of_runs):
             #print("run: ", n)
             res = benchmark_run(flag_circuit, error_rate, intial_state)
@@ -310,7 +304,10 @@ def random_noise_benchmark(flag_circuit, icm_circuit, number_of_runs, error_rate
     icm_states = generate_input_strings(icm_circuit, number_of_states)
 
     for e in range(0,len(error_rates)):
-        print("error: " + str(error_rates[e]))
+        #print("error: " + str(error_rates[e]))
+        # warning because triton
+        warnings.warn("error: " + str(error_rates[e]))
+        
         error_rate = error_rates[e]
 
         # run sim with flagged-circuit
