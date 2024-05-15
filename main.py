@@ -20,23 +20,27 @@ if __name__ == '__main__':
 
     icm_circuit: cirq.Circuit = c.decompose_to_ICM(test_circuits.test_circuit2())
 
+    print("\n")
+    print("Decompose done!")
+    print("\n")
+
     print(icm_circuit)
 
     #f_cir_map = c.add_flag(icm_circuit, strategy="map")
     #f_cir_random = c.add_flag(icm_circuit,number_of_x_flag=3,number_of_z_flag=3)
     f_cir_heuristic = c.add_flag(icm_circuit, strategy="heuristic")
 
-    #print("\n")
-    #print("Flags inserted!")
-    #print("\n")
+    print("\n")
+    print("Flags inserted!")
+    print("\n")
 
     flag_circuit = f_cir_heuristic
     
     # plots the logical error rate of flagged and flagless circuit with different inpout states and error rates
     # the noise is randomized depolarising noise
     #
-    number_of_runs = 10
-    error_rates = np.linspace(0.001, 0.01, 5) #0.001, 0.05, 20)
+    number_of_runs = 100
+    error_rates = np.linspace(0.001, 0.01, 10)
     evaluate.random_noise_benchmark(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "heuristic_random_results.png")
 
     # calculates a error-propagation "failure" rate based on the weight of the errors for flagged and unflagged circuit

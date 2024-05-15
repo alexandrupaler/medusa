@@ -36,16 +36,16 @@ if __name__ == '__main__':
         a = adders[i]
         adder = test_circuits.adder(a)
 
-        icm_circuit: cirq.Circuit = c.decompose_to_ICM(adder,i,0)#c.decompose_to_ICM(adder2)
+        icm_circuit: cirq.Circuit = c.decompose_to_ICM(adder,i,0)
 
         # number of flags
         for j in range(len(flags)):
 
             f = flags[j]
-            flag_circuit = c.add_flag(icm_circuit, strategy="heuristic")#number_of_x_flag=f,number_of_z_flag=f)
+            flag_circuit = c.add_flag(icm_circuit, number_of_x_flag=f,number_of_z_flag=f)
 
             number_of_runs = 1
-            error_rates = np.linspace(0.001, 0.01, 2) # 1% and 10%
+            error_rates = np.linspace(0.001, 0.01, 2) # 0.1% and 1%
             results, flagless_results = evaluate.random_noise_benchmark(flag_circuit, icm_circuit, number_of_runs, error_rates, plotting=False)
             res_flag0[i,j] = results[0,0]
             res_flag1[i,j] = results[1,0]
@@ -65,6 +65,7 @@ if __name__ == '__main__':
     plt.title("error: 0.1%")
     plt.colorbar(surface, shrink=0.5, aspect=5)
 
+    #plt.show()
     plt.savefig("results_1.png")
 
     fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
@@ -76,6 +77,7 @@ if __name__ == '__main__':
     plt.title("error: 1%")
     plt.colorbar(surface, shrink=0.5, aspect=5)
 
+    #plt.show()
     plt.savefig("results_10.png")
 
     # save as csv
