@@ -10,6 +10,7 @@ import warnings
 from multiprocessing import Pool, shared_memory
 import itertools
 import pandas as pd
+import time
 
 
 if __name__ == '__main__':    
@@ -46,6 +47,8 @@ if __name__ == '__main__':
     
     def parallel_noise(params):
 
+        start = time.time()
+
         exist_flag0 = shared_memory.SharedMemory(name=name_flag0)
         exist_flag1 = shared_memory.SharedMemory(name=name_flag1)
         exist_flagless0 = shared_memory.SharedMemory(name=name_flagless0)
@@ -70,10 +73,10 @@ if __name__ == '__main__':
         # icm_circuit = c.decompose_to_ICM(test_circuits.test_circuit2(),i,j)
 
         # warning because triton
-        warnings.warn("compilation done for i & j, " + str(i) + " & " + str(j))
+        #warnings.warn("compilation done for i & j, " + str(i) + " & " + str(j))
         
         f = flags[j]
-        flag_circuit = c.add_flag(icm_circuit,strategy="heuristic")#number_of_x_flag=f,number_of_z_flag=f)
+        flag_circuit = c.add_flag(icm_circuit,number_of_x_flag=f,number_of_z_flag=f)
 
         number_of_runs = 3
         error_rates = np.linspace(0.001, 0.01, 2) # 1% and 10%
@@ -85,7 +88,9 @@ if __name__ == '__main__':
         mid_flagless1[i,j] = flagless_results[1,0]
 
         # warning because triton
-        warnings.warn("run i & j, " + str(i) + " & " + str(j) + ", is done")
+        end = time.time()
+        duration = end - start
+        warnings.warn("run i & j, " + str(i) + " & " + str(j) + ", is done. Time it took: " + str(duration))
 
         exist_flag0.close()
         exist_flag1.close()
