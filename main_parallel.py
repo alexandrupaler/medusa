@@ -69,9 +69,6 @@ if __name__ == '__main__':
 
         icm_circuit: cirq.Circuit = c.decompose_to_ICM(adder,i,j)
 
-        # for testing
-        # icm_circuit = c.decompose_to_ICM(test_circuits.test_circuit2(),i,j)
-
         # warning because triton
         #warnings.warn("compilation done for i & j, " + str(i) + " & " + str(j))
         
@@ -79,7 +76,7 @@ if __name__ == '__main__':
         flag_circuit = c.add_flag(icm_circuit,number_of_x_flag=f,number_of_z_flag=f)
 
         number_of_runs = 3
-        error_rates = np.linspace(0.001, 0.01, 2) # 1% and 10%
+        error_rates = np.linspace(0.001, 0.01, 2) # 0.1% and 1%
         results, flagless_results = evaluate.random_noise_benchmark(flag_circuit, icm_circuit, number_of_runs, error_rates, False)
         
         mid_flag0[i,j] = results[0,0]
@@ -101,7 +98,6 @@ if __name__ == '__main__':
     # run the above in parallel
     ij = range(len(adders))
     paramlist = list(itertools.product(ij,ij))
-    #print(paramlist)
 
     pool = Pool(processes=4)
     pool.map(parallel_noise, paramlist)
