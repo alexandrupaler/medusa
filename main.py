@@ -35,11 +35,13 @@ if __name__ == '__main__':
     print("\n")
 
     flag_circuit = f_cir_heuristic
+
+    print(flag_circuit)
     
     # plots the logical error rate of flagged and flagless circuit with different inpout states and error rates
     # the noise is randomized depolarising noise
     #
-    number_of_runs = 100
+    number_of_runs = 10
     error_rates = np.linspace(0.001, 0.01, 10)
     evaluate.random_noise_benchmark(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "heuristic_random_results.png")
 

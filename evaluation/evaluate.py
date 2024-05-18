@@ -247,8 +247,6 @@ def benchmark_run(flag_circuit: cirq.circuits.circuit.Circuit, error_rate, initi
 
 def benchmark(flag_circuit: cirq.circuits.circuit.Circuit, error_rate, number_of_runs: int, states):
 
-    number_of_qubits = len(flag_circuit.all_qubits())
-
     # each row represents the results for one binary input string 
     # the columns are: error rate is ciruit is flagged, error rate is circuit is unflagged
     results = np.zeros((len(states), 2))
@@ -304,9 +302,6 @@ def random_noise_benchmark(flag_circuit, icm_circuit, number_of_runs, error_rate
     icm_states = generate_input_strings(icm_circuit, number_of_states)
 
     for e in range(0,len(error_rates)):
-        #print("error: " + str(error_rates[e]))
-        # warning because triton
-        warnings.warn("error: " + str(error_rates[e]))
         
         error_rate = error_rates[e]
 
@@ -324,8 +319,6 @@ def random_noise_benchmark(flag_circuit, icm_circuit, number_of_runs, error_rate
         flagless_error_rates = results_array[:,1]
         state_flagless_results[:,e] = flagless_error_rates
         flagless_results[e,0] = np.average(flagless_error_rates)
-
-        
 
     # plotting for each state
     #plt.figure(figsize=(15,20))
@@ -350,6 +343,208 @@ def random_noise_benchmark(flag_circuit, icm_circuit, number_of_runs, error_rate
         # plotting
         plt.scatter(error_rates, results[:,0], label="flag circuit")
         plt.scatter(error_rates, flagless_results[:,0], label="flagless circuit")
+        plt.xlabel('noise channel strength')
+        plt.ylabel('logical error rate')
+        plt.legend()
+        #plt.show()
+        plt.savefig(output_file)
+
+    return results, flagless_results
+
+def random_noise_on_error_circuit(flag_circuit, icm_circuit, number_of_runs, error_rates, plotting, output_file="results.png"):
+
+    # generate input states as bitstrings
+    number_of_states = 100
+    icm_states = generate_input_strings(icm_circuit, number_of_states)
+
+    # circuits with individual errors + error-free circuit
+    error_circuits = error_circuit.generate_handlable_error_circuits(flag_circuit)
+    error_circuits.append(flag_circuit)
+
+    results = np.zeros((len(error_rates), len(error_circuits), len(icm_states)))
+    flagless_results = np.zeros((len(error_rates),))
+
+    for c in range(len(error_circuits)):
+        flag_circuit = error_circuits[c]
+
+        for s in range(len(icm_states)):
+            initial_state = icm_states[s]
+
+            # all possible final states
+            possible_states = state_vector_comparison.possible_error_states(error_circuits, initial_state)
+
+            # prep icm circuit for comparison with flagless circuit
+            expected_circuit = prepare_circuit_from_string(icm_circuit, initial_state)
+            stim_circuit_expected = stimcirq.cirq_circuit_to_stim_circuit(expected_circuit)
+
+            for e in range(len(error_rates)):
+                error_rate = error_rates[e]
+
+                # flagless circuit
+                flagless_circuit = icm_circuit.with_noise(cirq.depolarize(p=error_rate))
+                flagless_circuit = prepare_circuit_from_string(flagless_circuit, initial_state)
+                flagless_stim_circuit = stimcirq.cirq_circuit_to_stim_circuit(flagless_circuit)
+
+                # use cirq to generate errors and prepare state
+                circuit_with_errors = flag_circuit.with_noise(cirq.depolarize(p=error_rate))
+                circuit_with_errors = prepare_circuit_from_string(circuit_with_errors, initial_state)
+                stim_circuit_errors = stimcirq.cirq_circuit_to_stim_circuit(circuit_with_errors)
+
+                total_cases = number_of_runs
+                total_cases_flagless = number_of_runs
+                error_occured = 0
+                correct_flag = 0
+                missed_flag = 0
+                false_flag = 0
+                correct_no_flag = 0
+
+                for n in range(number_of_runs):
+
+                    # use stim to run simulation
+                    simulator = stim.TableauSimulator()
+                    simulator.do_circuit(stim_circuit_errors)
+                    flag_measurement = simulator.current_measurement_record()
+                    final_state = simulator.state_vector()
+
+                    if state_vector_comparison.have_error_propagated(final_state, possible_states):
+                        if True in flag_measurement:
+                            correct_flag += 1
+                        else:
+                            missed_flag += 1
+                    else:
+                        if True in flag_measurement:
+                            false_flag += 1
+                        else:
+                            correct_no_flag += 1    
+
+                    # same for the flagless circuit
+                    simulator = stim.TableauSimulator()
+                    simulator_expected = simulator.copy()
+                    simulator.do_circuit(flagless_stim_circuit)
+                    final_state = simulator.state_vector()
+                    simulator_expected.do_circuit(stim_circuit_expected)
+                    final_state_expected = simulator_expected.state_vector()
+
+                    if not np.array_equal(final_state, final_state_expected):
+                        error_occured += 1
+                        
+                log_error = (correct_no_flag + missed_flag) and missed_flag / (correct_no_flag + missed_flag) or None
+                results[e,c,s] = log_error
+                flagless_log_error = error_occured / total_cases_flagless 
+                flagless_results[e] += flagless_log_error
+
+    # normalize
+    results = np.nanmean(results, axis=(1,2)) 
+    flagless_results = flagless_results / (len(icm_states) * len(error_circuits))
+
+    if plotting:
+        # plotting
+        plt.scatter(error_rates, results, label="flag circuit")
+        plt.scatter(error_rates, flagless_results, label="flagless circuit")
+        plt.xlabel('noise channel strength')
+        plt.ylabel('logical error rate')
+        plt.legend()
+        #plt.show()
+        plt.savefig(output_file)
+
+    return results, flagless_results
+
+
+
+
+
+
+
+
+
+def random_noise_on_error_circuit_alt(flag_circuit, icm_circuit, number_of_runs, error_rates, plotting, output_file="results.png"):
+
+    # generate input states as bitstrings
+    number_of_states = 100
+    icm_states = generate_input_strings(icm_circuit, number_of_states)
+
+    # circuits with individual errors + error-free circuit
+    error_circuits = error_circuit.generate_handlable_error_circuits(flag_circuit)
+    error_circuits.append(flag_circuit)
+
+    results = np.zeros((len(error_rates), len(icm_states)))
+    flagless_results = np.zeros((len(error_rates),))
+
+
+    for s in range(len(icm_states)):
+        initial_state = icm_states[s]
+
+        # all possible final states
+        possible_states = state_vector_comparison.possible_error_states(error_circuits, initial_state)
+
+        # prep icm circuit for comparison with flagless circuit
+        expected_circuit = prepare_circuit_from_string(icm_circuit, initial_state)
+        stim_circuit_expected = stimcirq.cirq_circuit_to_stim_circuit(expected_circuit)
+
+        for e in range(len(error_rates)):
+            error_rate = error_rates[e]
+
+            # flagless circuit
+            flagless_circuit = icm_circuit.with_noise(cirq.depolarize(p=error_rate))
+            flagless_circuit = prepare_circuit_from_string(flagless_circuit, initial_state)
+            flagless_stim_circuit = stimcirq.cirq_circuit_to_stim_circuit(flagless_circuit)
+
+            # use cirq to generate errors and prepare state
+            circuit_with_errors = flag_circuit.with_noise(cirq.depolarize(p=error_rate))
+            circuit_with_errors = prepare_circuit_from_string(circuit_with_errors, initial_state)
+            stim_circuit_errors = stimcirq.cirq_circuit_to_stim_circuit(circuit_with_errors)
+
+            total_cases = number_of_runs
+            total_cases_flagless = number_of_runs
+            error_occured = 0
+            correct_flag = 0
+            missed_flag = 0
+            false_flag = 0
+            correct_no_flag = 0
+
+            for n in range(number_of_runs):
+
+                # use stim to run simulation
+                simulator = stim.TableauSimulator()
+                simulator.do_circuit(stim_circuit_errors)
+                flag_measurement = simulator.current_measurement_record()
+                final_state = simulator.state_vector()
+
+                if state_vector_comparison.have_error_propagated(final_state, possible_states):
+                    if True in flag_measurement:
+                        correct_flag += 1
+                    else:
+                        missed_flag += 1
+                else:
+                    if True in flag_measurement:
+                        false_flag += 1
+                    else:
+                        correct_no_flag += 1    
+
+                # same for the flagless circuit
+                simulator = stim.TableauSimulator()
+                simulator_expected = simulator.copy()
+                simulator.do_circuit(flagless_stim_circuit)
+                final_state = simulator.state_vector()
+                simulator_expected.do_circuit(stim_circuit_expected)
+                final_state_expected = simulator_expected.state_vector()
+
+                if not np.array_equal(final_state, final_state_expected):
+                    error_occured += 1
+                    
+            log_error = (correct_no_flag + missed_flag) and missed_flag / (correct_no_flag + missed_flag) or None
+            results[e,s] = log_error
+            flagless_log_error = error_occured / total_cases_flagless 
+            flagless_results[e] += flagless_log_error
+
+    # normalize
+    results = np.nanmean(results, axis=(1)) 
+    flagless_results = flagless_results / len(icm_states)
+
+    if plotting:
+        # plotting
+        plt.scatter(error_rates, results, label="flag circuit")
+        plt.scatter(error_rates, flagless_results, label="flagless circuit")
         plt.xlabel('noise channel strength')
         plt.ylabel('logical error rate')
         plt.legend()
