@@ -206,3 +206,97 @@ def generate_error_circuit_with_flags(circuit: cirq.Circuit, number_of_error: in
     return result
     
 
+def generate_handlable_error_circuits(circuit: cirq.Circuit):
+    result = []
+    moments = list(circuit.moments)
+        
+    # find flags' target qubits
+    x_flag_targets = []
+    z_flag_targets = []
+    x_flag_cnots = []
+    z_flag_cnots = []
+    for i in range(len(moments)):
+        m = moments[i]
+        op = m.operations[0]
+        if isinstance(op.gate, cirq.CXPowGate):
+            qubit1 = op.qubits[0]
+            qubit2 = op.qubits[1]
+            if "xf" in qubit1.name:
+                x_flag_targets.append(qubit2)
+                tup = (qubit1, i, qubit2)
+                x_flag_cnots.append(tup)
+
+            elif "zf" in qubit1.name:
+                z_flag_targets.append(qubit2)
+                tup = (qubit1, i, qubit2)
+                z_flag_cnots.append(tup)
+
+            elif "xf" in qubit2.name:
+                x_flag_targets.append(qubit1)
+                tup = (qubit2, i, qubit1)
+                x_flag_cnots.append(tup)
+
+            elif "zf" in qubit2.name:
+                z_flag_targets.append(qubit1)
+                tup = (qubit2, i, qubit1)
+                z_flag_cnots.append(tup)
+
+    # group by flag qubit to get flag end and start moment
+    x_flag_cnots.sort(key = lambda a: a[0])
+    x_flag_grouped = itertools.groupby(x_flag_cnots, lambda a: a[0])
+
+    z_flag_cnots.sort(key = lambda a: a[0])
+    z_flag_grouped = itertools.groupby(z_flag_cnots, lambda a: a[0])
+
+    # create all error circuits that the flags are able to handle:
+    for k, g in x_flag_grouped:
+        f = k
+        indices = [item for item in g]
+        i = indices[0][1]
+        j = indices[1][1]
+        ij = j - i # assuming j is bigger
+        q = indices[0][2]
+
+        # divide moments
+        for s in range(ij):
+            first_part = moments[:(i + s + 1)]
+            second_part = moments[(j - (ij - s) + 1):]
+
+            circuit1 = cirq.Circuit()
+            circuit1.append(first_part)
+
+            circuit2 = cirq.Circuit()
+            circuit2.append(second_part)
+
+            # insert error on target
+            circuit1.append(cirq.X(q))
+
+            circuit1.append(circuit2)
+            result.append(circuit1)
+
+    for k, g in z_flag_grouped:
+        f = k
+        indices = [item for item in g]
+        i = indices[0][1]
+        j = indices[1][1]
+        ij = j - i # assuming j is bigger
+        q = indices[0][2]
+
+        # divide moments
+        for s in range(ij):
+            first_part = moments[:(i + s + 1)]
+            second_part = moments[(j - (ij - s) + 1):]
+
+            circuit1 = cirq.Circuit()
+            circuit1.append(first_part)
+
+            circuit2 = cirq.Circuit()
+            circuit2.append(second_part)
+
+            # insert error on target
+            circuit1.append(cirq.Z(q))
+            
+            circuit1.append(circuit2)
+            result.append(circuit1)
+
+    return result

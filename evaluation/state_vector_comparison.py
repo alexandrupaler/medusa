@@ -100,3 +100,15 @@ def possible_state_vector_without_flags(circuit: cirq.Circuit, number_of_error: 
 
 def have_error_propagated(state_vector, possible_state_vectors):
     return not any(np.array_equal(state_vector, possible_vector) for possible_vector in possible_state_vectors)
+
+def possible_error_states(error_circuits, initial_state):
+    final_states = []
+    for c in range(len(error_circuits)):
+        circuit: cirq.Circuit = error_circuits[c]
+        circuit = evaluate.prepare_circuit_from_string(circuit, initial_state)
+        stim_circuit = stimcirq.cirq_circuit_to_stim_circuit(circuit)
+        simulator = stim.TableauSimulator()
+        simulator.do_circuit(stim_circuit)
+        final_state = simulator.state_vector()
+        final_states.append(final_state)
+    return final_states
