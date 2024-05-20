@@ -109,6 +109,18 @@ def possible_error_states(error_circuits, initial_state):
         stim_circuit = stimcirq.cirq_circuit_to_stim_circuit(circuit)
         simulator = stim.TableauSimulator()
         simulator.do_circuit(stim_circuit)
-        final_state = simulator.state_vector()
+        final_state =  evaluate.measure_stabilizers(simulator)#simulator.state_vector()
         final_states.append(final_state)
     return final_states
+
+def equal_stabilizers(state: list[stim.PauliString], possible_states: list[list[stim.PauliString]]):
+    state_found_in_possible_states = np.full((len(possible_states),),True)
+    for j in range(len(possible_states)):
+        pstate = possible_states[j]
+        stabilizer_is_equal = np.full((len(state),), True)
+        for i in range(len(pstate)):
+            stabilizer_is_equal[i] = (state[i] == pstate[i])
+        state_found_in_possible_states[j] = False not in stabilizer_is_equal
+    
+    ret = True in state_found_in_possible_states
+    return ret
