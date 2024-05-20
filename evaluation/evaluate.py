@@ -367,6 +367,9 @@ def random_noise_on_error_circuit(flag_circuit, icm_circuit, number_of_runs, err
     for c in range(len(error_circuits)):
         flag_circuit = error_circuits[c]
 
+        # warnings because triton
+        warnings.warn("error circuit: " + str(c))
+
         for s in range(len(icm_states)):
             initial_state = icm_states[s]
 
@@ -476,6 +479,9 @@ def random_noise_on_error_circuit_alt(flag_circuit, icm_circuit, number_of_runs,
 
         # all possible final states
         possible_states = state_vector_comparison.possible_error_states(error_circuits, initial_state)
+        #if s == 3:
+        #    print(possible_states)
+        #    print("final states:")
 
         # prep icm circuit for comparison with flagless circuit
         expected_circuit = prepare_circuit_from_string(icm_circuit, initial_state)
@@ -508,9 +514,12 @@ def random_noise_on_error_circuit_alt(flag_circuit, icm_circuit, number_of_runs,
                 simulator = stim.TableauSimulator()
                 simulator.do_circuit(stim_circuit_errors)
                 flag_measurement = simulator.current_measurement_record()
-                final_state = simulator.state_vector()
+                final_state =  measure_stabilizers(simulator) #simulator.state_vector()
 
-                if state_vector_comparison.have_error_propagated(final_state, possible_states):
+                #if s == 3 and e == 0:
+                #    print(final_state)
+
+                if not state_vector_comparison.equal_stabilizers(final_state, possible_states):
                     if True in flag_measurement:
                         correct_flag += 1
                     else:
@@ -525,11 +534,11 @@ def random_noise_on_error_circuit_alt(flag_circuit, icm_circuit, number_of_runs,
                 simulator = stim.TableauSimulator()
                 simulator_expected = simulator.copy()
                 simulator.do_circuit(flagless_stim_circuit)
-                final_state = simulator.state_vector()
+                final_state = measure_stabilizers(simulator) #simulator.state_vector()
                 simulator_expected.do_circuit(stim_circuit_expected)
-                final_state_expected = simulator_expected.state_vector()
+                final_state_expected =  measure_stabilizers(simulator_expected) #simulator_expected.state_vector()
 
-                if not np.array_equal(final_state, final_state_expected):
+                if not state_vector_comparison.equal_stabilizers(final_state, [final_state_expected]):
                     error_occured += 1
                     
             log_error = (correct_no_flag + missed_flag) and missed_flag / (correct_no_flag + missed_flag) or None
@@ -552,3 +561,10 @@ def random_noise_on_error_circuit_alt(flag_circuit, icm_circuit, number_of_runs,
         plt.savefig(output_file)
 
     return results, flagless_results
+
+def measure_stabilizers(simulator: stim.TableauSimulator):
+    
+    # maybe this ? two simulator will only return equal stabilizers if their quantum states are equal
+    stabilizers = simulator.canonical_stabilizers()
+
+    return stabilizers

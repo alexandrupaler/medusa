@@ -22,34 +22,34 @@ if __name__ == '__main__':
     # bugs:
     # - map heuristic has a bug: doesn't work with the adder circuit
 
-    #c = compiler.FlagCompiler()
+    c = compiler.FlagCompiler()
 
-    #icm_circuit: cirq.Circuit = c.decompose_to_ICM(test_circuits.test_circuit2())
+    icm_circuit: cirq.Circuit = c.decompose_to_ICM(test_circuits.test_circuit2())
 
-    #print("\n")
-    #print("Decompose done!")
-    #print("\n")
+    print("\n")
+    print("Decompose done!")
+    print("\n")
 
-    #print(icm_circuit)
+    print(icm_circuit)
 
     #f_cir_map = c.add_flag(icm_circuit, strategy="map")
     #f_cir_random = c.add_flag(icm_circuit,number_of_x_flag=3,number_of_z_flag=3)
-    #f_cir_heuristic = c.add_flag(icm_circuit, strategy="heuristic")
+    f_cir_heuristic = c.add_flag(icm_circuit, strategy="heuristic")
 
-    #print("\n")
-    #print("Flags inserted!")
-    #print("\n")
+    print("\n")
+    print("Flags inserted!")
+    print("\n")
 
-    #flag_circuit = f_cir_heuristic
+    flag_circuit = f_cir_heuristic
 
-    #print(flag_circuit)
+    print(flag_circuit)
     
-    #number_of_runs = 100
-    #error_rates = np.linspace(0.001, 0.01, 5)
+    number_of_runs = 1000
+    error_rates = np.linspace(0.001, 0.01, 5)
     #evaluate.random_noise_on_error_circuit(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "error_results.png")
-    #evaluate.random_noise_on_error_circuit_alt(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "error_results_alt.png")
+    evaluate.random_noise_on_error_circuit_alt(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "results_stabilizers.png")
 
-
+    """
     # 3D PLOT WITH ADDERS, PARALLEL
 
     #def adders_3d_parallel():
@@ -109,19 +109,19 @@ if __name__ == '__main__':
         icm_circuit: cirq.Circuit = c.decompose_to_ICM(adder,i,j)
 
         # warning because triton
-        #warnings.warn("compilation done for i & j, " + str(i) + " & " + str(j))
+        warnings.warn("compilation done for i & j, " + str(i) + " & " + str(j))
         
         f = flags[j]
         flag_circuit = c.add_flag(icm_circuit,number_of_x_flag=f,number_of_z_flag=f)
 
-        number_of_runs = 3
+        number_of_runs = 1
         error_rates = np.linspace(0.001, 0.01, 2) # 0.1% and 1%
         results, flagless_results = evaluate.random_noise_on_error_circuit(flag_circuit, icm_circuit, number_of_runs, error_rates, False)
         
-        mid_flag0[i,j] = results[0,0]
-        mid_flag1[i,j] = results[1,0]
-        mid_flagless0[i,j] = flagless_results[0,0]
-        mid_flagless1[i,j] = flagless_results[1,0]
+        mid_flag0[i,j] = results[0]
+        mid_flag1[i,j] = results[1]
+        mid_flagless0[i,j] = flagless_results[0]
+        mid_flagless1[i,j] = flagless_results[1]
 
         # warning because triton
         end = time.time()
@@ -133,15 +133,18 @@ if __name__ == '__main__':
         exist_flagless0.close()
         exist_flagless1.close()
 
-        
+      
     # run the above in parallel
     ij = range(len(adders))
     paramlist = list(itertools.product(ij,ij))
 
-    pool = Pool()
-    pool.map(parallel_noise, paramlist)
-    pool.close()
-    pool.join()
+    #pool = Pool()
+    #pool.map(parallel_noise, paramlist)
+    #pool.close()
+    #pool.join()
+
+    for p in paramlist:
+        parallel_noise(p)
 
     # plotting
     fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
@@ -186,3 +189,4 @@ if __name__ == '__main__':
     shared_flagless1.close()
 
     #adders_3d_parallel()
+    """
