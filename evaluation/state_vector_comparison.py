@@ -101,7 +101,7 @@ def possible_state_vector_without_flags(circuit: cirq.Circuit, number_of_error: 
 def have_error_propagated(state_vector, possible_state_vectors):
     return not any(np.array_equal(state_vector, possible_vector) for possible_vector in possible_state_vectors)
 
-def possible_error_states(error_circuits, initial_state):
+def possible_error_states(error_circuits, initial_state, stabilizers):
     final_states = []
     for c in range(len(error_circuits)):
         circuit: cirq.Circuit = error_circuits[c]
@@ -109,7 +109,7 @@ def possible_error_states(error_circuits, initial_state):
         stim_circuit = stimcirq.cirq_circuit_to_stim_circuit(circuit)
         simulator = stim.TableauSimulator()
         simulator.do_circuit(stim_circuit)
-        final_state =  evaluate.measure_stabilizers(simulator)#simulator.state_vector()
+        final_state =  evaluate.measure_stabilizers(simulator, stabilizers)#simulator.state_vector()
         final_states.append(final_state)
     return final_states
 
@@ -124,3 +124,6 @@ def equal_stabilizers(state: list[stim.PauliString], possible_states: list[list[
     
     ret = True in state_found_in_possible_states
     return ret
+
+def equal_stabilizer_measurements(state: list[bool], possible_states: list[list[bool]]):
+    return any(np.array_equal(state, possible_vector) for possible_vector in possible_states)    
