@@ -47,7 +47,7 @@ if __name__ == '__main__':
     number_of_runs = 1000
     error_rates = np.linspace(0.001, 0.01, 5)
     #evaluate.random_noise_on_error_circuit(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "error_results.png")
-    evaluate.random_noise_on_error_circuit_alt(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "results_stabilizers.png")
+    evaluate.random_noise_on_error_circuit_alt(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "results_test.png")
 
     """
     # 3D PLOT WITH ADDERS, PARALLEL
