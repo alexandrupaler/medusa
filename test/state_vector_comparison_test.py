@@ -37,28 +37,30 @@ if __name__ == '__main__':
     i_simulator = simulator.copy()
 
     simulator.do_circuit(stim_circuit)
-    final_state = evaluate.measure_stabilizers(simulator) #simulator.state_vector()
+    final_state = evaluate.find_stabilizers(simulator) #simulator.state_vector()
 
     x_simulator.do_circuit(x_stim_circuit)
-    x_final_state = evaluate.measure_stabilizers(x_simulator) #simulator.state_vector()
+    x_final_state = evaluate.find_stabilizers(x_simulator) #simulator.state_vector()
 
     i_simulator.do_circuit(i_stim_circuit)
-    i_final_state = evaluate.measure_stabilizers(i_simulator) #simulator.state_vector()
+    i_final_state = evaluate.find_stabilizers(i_simulator) #simulator.state_vector()
 
-    print("correct state:")
-    print(final_state)
+    #print("correct state:")
+    #print(final_state)
 
-    print("equivalent state:")
-    print(i_final_state)
+    #print("equivalent state:")
+    #print(i_final_state)
 
-    print("wrong state:")
-    print(x_final_state)
+    #print("wrong state:")
+    #print(x_final_state)
 
+    print("\n")
     print("Test equal_stabilizer:")
     possible_states = [final_state]
     print("Should print true: ", state_vector_comparison.equal_stabilizers(i_final_state, possible_states))
     print("Should print false: ", state_vector_comparison.equal_stabilizers(x_final_state, possible_states))
 
+    """
     # try out how measuring the stabilizers works
     results = np.empty((len(final_state),))
     x_results = np.empty((len(final_state),))
@@ -76,8 +78,26 @@ if __name__ == '__main__':
     print("wrong results:")
     print(x_results)
 
+    print("\n")
     print("Should print true: ", np.all(np.equal(results, i_results)))
     print("Should print false: ", np.all(np.equal(results, x_results)))
+    """
+
+    # try using measure_stabilizers
+    res = evaluate.measure_stabilizers(simulator, final_state)
+    i_res = evaluate.measure_stabilizers(i_simulator, final_state)
+    x_res = evaluate.measure_stabilizers(x_simulator, final_state)
+
+    #print(res)
+    #print(i_res)
+    #print(x_res)
+
+    print("\n")
+    print("Test equal_stabilizer_measurements:")
+    print("Should print true: ", state_vector_comparison.equal_stabilizer_measurements(i_res, [res]))
+    print("Should print false: ", state_vector_comparison.equal_stabilizer_measurements(x_res, [res]))
+    print("Should print true: ", state_vector_comparison.equal_stabilizer_measurements(i_res, [res, x_res]))
+
 
 
 
