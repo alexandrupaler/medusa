@@ -22,9 +22,11 @@ if __name__ == '__main__':
     # bugs:
     # - map heuristic has a bug: doesn't work with the adder circuit
 
+    
+
     c = compiler.FlagCompiler()
 
-    icm_circuit: cirq.Circuit = c.decompose_to_ICM(test_circuits.test_circuit2())
+    icm_circuit: cirq.Circuit = c.decompose_to_ICM(test_circuits.adder(2))
 
     print("\n")
     print("Decompose done!")
@@ -47,15 +49,15 @@ if __name__ == '__main__':
     number_of_runs = 1000
     error_rates = np.linspace(0.001, 0.01, 5)
     #evaluate.random_noise_on_error_circuit(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "error_results.png")
-    evaluate.random_noise_on_error_circuit_alt(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "results_test.png")
+    evaluate.random_noise_on_error_circuit_alt(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "results_stabilizers_adder5.png")
 
     """
     # 3D PLOT WITH ADDERS, PARALLEL
 
     #def adders_3d_parallel():
         
-    adders = [2, 3, 4]
-    flags = [1, 2, 3]
+    adders = [2, 3]
+    flags = [1, 2]
     n = len(adders)
 
     init_flag0 = np.zeros((n, n))
@@ -114,9 +116,10 @@ if __name__ == '__main__':
         f = flags[j]
         flag_circuit = c.add_flag(icm_circuit,number_of_x_flag=f,number_of_z_flag=f)
 
-        number_of_runs = 1
+        number_of_runs = 20
         error_rates = np.linspace(0.001, 0.01, 2) # 0.1% and 1%
-        results, flagless_results = evaluate.random_noise_on_error_circuit(flag_circuit, icm_circuit, number_of_runs, error_rates, False)
+        filename = "results_stabilizers" + str(i) + str(j) + ".png"
+        results, flagless_results = evaluate.random_noise_on_error_circuit_alt(flag_circuit, icm_circuit, number_of_runs, error_rates, True, filename)
         
         mid_flag0[i,j] = results[0]
         mid_flag1[i,j] = results[1]
@@ -188,5 +191,4 @@ if __name__ == '__main__':
     shared_flagless0.close()
     shared_flagless1.close()
 
-    #adders_3d_parallel()
     """
