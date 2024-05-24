@@ -22,11 +22,11 @@ if __name__ == '__main__':
     # bugs:
     # - map heuristic has a bug: doesn't work with the adder circuit
 
-    
+    """
 
     c = compiler.FlagCompiler()
 
-    icm_circuit: cirq.Circuit = c.decompose_to_ICM(test_circuits.adder(2))
+    icm_circuit: cirq.Circuit = c.decompose_to_ICM(test_circuits.test_circuit2())
 
     print("\n")
     print("Decompose done!")
@@ -49,15 +49,15 @@ if __name__ == '__main__':
     number_of_runs = 1000
     error_rates = np.linspace(0.001, 0.01, 5)
     #evaluate.random_noise_on_error_circuit(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "error_results.png")
-    evaluate.random_noise_on_error_circuit_alt(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "results_stabilizers_adder5.png")
+    evaluate.random_noise_on_error_circuit_alt(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "results_test.png")
 
     """
     # 3D PLOT WITH ADDERS, PARALLEL
 
     #def adders_3d_parallel():
         
-    adders = [2, 3]
-    flags = [1, 2]
+    adders = [2, 3, 4, 5, 6]
+    flags = [1, 2, 3, 4, 5]
     n = len(adders)
 
     init_flag0 = np.zeros((n, n))
@@ -116,7 +116,7 @@ if __name__ == '__main__':
         f = flags[j]
         flag_circuit = c.add_flag(icm_circuit,number_of_x_flag=f,number_of_z_flag=f)
 
-        number_of_runs = 20
+        number_of_runs = 100
         error_rates = np.linspace(0.001, 0.01, 2) # 0.1% and 1%
         filename = "results_stabilizers" + str(i) + str(j) + ".png"
         results, flagless_results = evaluate.random_noise_on_error_circuit_alt(flag_circuit, icm_circuit, number_of_runs, error_rates, True, filename)
@@ -141,13 +141,13 @@ if __name__ == '__main__':
     ij = range(len(adders))
     paramlist = list(itertools.product(ij,ij))
 
-    #pool = Pool()
-    #pool.map(parallel_noise, paramlist)
-    #pool.close()
-    #pool.join()
+    pool = Pool()
+    pool.map(parallel_noise, paramlist)
+    pool.close()
+    pool.join()
 
-    for p in paramlist:
-        parallel_noise(p)
+    #for p in paramlist:
+    #    parallel_noise(p)
 
     # plotting
     fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
@@ -190,5 +190,3 @@ if __name__ == '__main__':
     shared_flag1.close()
     shared_flagless0.close()
     shared_flagless1.close()
-
-    """
