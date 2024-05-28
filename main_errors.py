@@ -57,7 +57,7 @@ if __name__ == '__main__':
     #def adders_3d_parallel():
         
     adders = [2, 3, 4, 5, 6]
-    flags = [1, 2, 3, 4, 5]
+    flags = [2, 3, 4, 5, 6]
     n = len(adders)
 
     init_flag0 = np.zeros((n, n))
@@ -114,7 +114,10 @@ if __name__ == '__main__':
         warnings.warn("compilation done for i & j, " + str(i) + " & " + str(j))
         
         f = flags[j]
-        flag_circuit = c.add_flag(icm_circuit,number_of_x_flag=f,number_of_z_flag=f)
+        xf = f // 2
+        zf = f - xf
+
+        flag_circuit = c.add_flag(icm_circuit,number_of_x_flag=xf,number_of_z_flag=zf)
 
         number_of_runs = 100
         error_rates = np.linspace(0.001, 0.01, 2) # 0.1% and 1%
