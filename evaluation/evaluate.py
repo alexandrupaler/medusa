@@ -592,12 +592,6 @@ def stabilizers_benchmark_logical_error(flag_circuit: cirq.Circuit, icm_circuit:
 
     for e in range(len(error_rates)):
         error_rate = error_rates[e]
-        
-        # add noise to circuits
-        # for flag circuit
-        noisy_circuit = flag_circuit.with_noise(cirq.depolarize(p=error_rate))
-        # for icm circuit
-        noisy_circuit_icm = icm_circuit.with_noise(cirq.depolarize(p=error_rate))
 
         error_occured = 0
         correct_flags = 0
@@ -627,6 +621,13 @@ def stabilizers_benchmark_logical_error(flag_circuit: cirq.Circuit, icm_circuit:
 
 
             for n in range(number_of_runs):
+
+                # add noise to circuits
+                # for flag circuit
+                noisy_circuit = flag_circuit.with_noise(cirq.depolarize(p=error_rate))
+                # for icm circuit
+                noisy_circuit_icm = icm_circuit.with_noise(cirq.depolarize(p=error_rate))
+
                 # run simulations
                 # for flag circuit
                 prepared_circuit = prepare_circuit_from_string(noisy_circuit, state)
@@ -687,18 +688,15 @@ def stabilizers_benchmark_robustness(flag_circuit: cirq.Circuit, icm_circuit: ci
 
     for e in range(len(error_rates)):
         error_rate = error_rates[e]
-        
-        # add noise to circuits
-        # for flag circuit
-        noisy_circuit = flag_circuit.with_noise(cirq.depolarize(p=error_rate))
-        # for icm circuit
-        noisy_circuit_icm = icm_circuit.with_noise(cirq.depolarize(p=error_rate))
 
         error_occured = 0
         correct_flags = 0
         missed_flags = 0
         false_flags = 0
         no_flag = 0
+
+        faulty_stabilizers = 0
+        faulty_stabilizers_icm = 0
 
         for s in range(len(input_states)):
 
@@ -722,6 +720,13 @@ def stabilizers_benchmark_robustness(flag_circuit: cirq.Circuit, icm_circuit: ci
 
 
             for n in range(number_of_runs):
+
+                # add noise to circuits
+                # for flag circuit
+                noisy_circuit = flag_circuit.with_noise(cirq.depolarize(p=error_rate))
+                # for icm circuit
+                noisy_circuit_icm = icm_circuit.with_noise(cirq.depolarize(p=error_rate))
+
                 # run simulations
                 # for flag circuit
                 prepared_circuit = prepare_circuit_from_string(noisy_circuit, state)
@@ -742,7 +747,8 @@ def stabilizers_benchmark_robustness(flag_circuit: cirq.Circuit, icm_circuit: ci
                     if True in flag_measurements:
                         correct_flags += 1
                     # if flags missed error
-                    else:
+                    else:            
+                        faulty_stabilizers += stabilizer_measurements.sum()
                         missed_flags += 1
 
                 # for icm circuit
@@ -754,10 +760,12 @@ def stabilizers_benchmark_robustness(flag_circuit: cirq.Circuit, icm_circuit: ci
             
                 if np.any(stabilizer_measurements_icm):
                     error_occured += 1
+                    faulty_stabilizers_icm += stabilizer_measurements_icm.sum()
+
 
         # update results
-        results[e] = missed_flags / ((no_flag + missed_flags) * len(input_states))
-        results_icm[e] = error_occured / (number_of_runs * len(input_states))
+        results[e] = faulty_stabilizers / (len(stabilizers) * (no_flag + missed_flags) * len(input_states))
+        results_icm[e] = faulty_stabilizers_icm / (len(stabilizers_icm) * number_of_runs * len(input_states))
 
 
     if plotting:
@@ -765,9 +773,9 @@ def stabilizers_benchmark_robustness(flag_circuit: cirq.Circuit, icm_circuit: ci
         plt.scatter(error_rates, results, label="flag circuit")
         plt.scatter(error_rates, results_icm, label="flagless circuit")
         plt.xlabel('noise channel strength')
-        plt.ylabel('logical error rate')
+        plt.ylabel('percentage of errors on stabilizers')
         plt.legend()
-        plt.show()
-        #plt.savefig(output_file)
+        #plt.show()
+        plt.savefig(output_file)
             
     return results, results_icm

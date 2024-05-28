@@ -40,4 +40,4 @@ if __name__ == '__main__':
     number_of_runs = 100
     error_rates = np.linspace(0.001, 0.01, 5)
     evaluate.stabilizers_benchmark_logical_error(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "results_stabilizers_logical_error_testcircuit2.png")
-    #evaluate.stabilizers_benchmark_robustness(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "results_test.png")
+    #evaluate.stabilizers_benchmark_robustness(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "results_stabilizers_robustness_testcircuit2.png")
