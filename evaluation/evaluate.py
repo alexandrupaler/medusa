@@ -610,14 +610,12 @@ def stabilizers_benchmark_logical_error(flag_circuit: cirq.Circuit, icm_circuit:
             simulator_expected = stim.TableauSimulator()
             simulator_expected.do_circuit(expected_stim)
             stabilizers = simulator_expected.canonical_stabilizers()
-            expected_stabilizers = measure_stabilizers(simulator_expected, stabilizers)
             # for icm circuit
             prepared_circuit_icm = prepare_circuit_from_string(icm_circuit, state)
             expected_stim_icm = stimcirq.cirq_circuit_to_stim_circuit(prepared_circuit_icm)
             simulator_expected_icm = stim.TableauSimulator()
             simulator_expected_icm.do_circuit(expected_stim_icm)
             stabilizers_icm = simulator_expected_icm.canonical_stabilizers()
-            expected_stabilizers_icm = measure_stabilizers(simulator_expected_icm, stabilizers_icm)
 
 
             for n in range(number_of_runs):
@@ -675,18 +673,24 @@ def stabilizers_benchmark_logical_error(flag_circuit: cirq.Circuit, icm_circuit:
         plt.legend()
         #plt.show()
         plt.savefig(output_file)
+        plt.close()
             
     return results, results_icm
 
 
-def stabilizers_benchmark_robustness(flag_circuit: cirq.Circuit, icm_circuit: cirq.Circuit, number_of_runs, error_rates, plotting, output_file="results.png"):
-    
+def stabilizers_robustness_and_logical_error(flag_circuit: cirq.Circuit, icm_circuit: cirq.Circuit, number_of_runs, error_rates, plotting, plot_title):
     results = np.zeros((len(error_rates),))
     results_icm = np.zeros((len(error_rates),))
+    results_rob = np.zeros((len(error_rates),))
+    results_rob_icm = np.zeros((len(error_rates),))
+
     number_of_input_states = 100
     input_states = generate_input_strings(icm_circuit, number_of_input_states)
 
     for e in range(len(error_rates)):
+
+        warnings.warn("error rate number: " + str(e))
+
         error_rate = error_rates[e]
 
         error_occured = 0
@@ -709,14 +713,131 @@ def stabilizers_benchmark_robustness(flag_circuit: cirq.Circuit, icm_circuit: ci
             simulator_expected = stim.TableauSimulator()
             simulator_expected.do_circuit(expected_stim)
             stabilizers = simulator_expected.canonical_stabilizers()
-            expected_stabilizers = measure_stabilizers(simulator_expected, stabilizers)
             # for icm circuit
             prepared_circuit_icm = prepare_circuit_from_string(icm_circuit, state)
             expected_stim_icm = stimcirq.cirq_circuit_to_stim_circuit(prepared_circuit_icm)
             simulator_expected_icm = stim.TableauSimulator()
             simulator_expected_icm.do_circuit(expected_stim_icm)
             stabilizers_icm = simulator_expected_icm.canonical_stabilizers()
-            expected_stabilizers_icm = measure_stabilizers(simulator_expected_icm, stabilizers_icm)
+
+
+            for n in range(number_of_runs):
+
+                # add noise to circuits
+                # for flag circuit
+                noisy_circuit = flag_circuit.with_noise(cirq.depolarize(p=error_rate))
+                # for icm circuit
+                noisy_circuit_icm = icm_circuit.with_noise(cirq.depolarize(p=error_rate))
+
+                # run simulations
+                # for flag circuit
+                prepared_circuit = prepare_circuit_from_string(noisy_circuit, state)
+                noisy_stim = stimcirq.cirq_circuit_to_stim_circuit(prepared_circuit)
+                simulator = stim.TableauSimulator()
+                simulator.do_circuit(noisy_stim)
+                flag_measurements = simulator.current_measurement_record()
+                stabilizer_measurements = measure_stabilizers(simulator, stabilizers)
+
+                if not np.any(stabilizer_measurements):
+                    # if no error but flag went off
+                    if True in flag_measurements:
+                        false_flags += 1
+                    else:
+                        no_flag += 1
+                else:
+                    # if flags caught error
+                    if True in flag_measurements:
+                        correct_flags += 1
+                    # if flags missed error
+                    else:
+                        faulty_stabilizers += stabilizer_measurements.sum()
+                        missed_flags += 1
+
+                # for icm circuit
+                prepared_circuit_icm = prepare_circuit_from_string(noisy_circuit_icm, state)
+                noisy_stim_icm = stimcirq.cirq_circuit_to_stim_circuit(prepared_circuit_icm)
+                simulator_icm = stim.TableauSimulator()
+                simulator_icm.do_circuit(noisy_stim_icm)
+                stabilizer_measurements_icm = measure_stabilizers(simulator_icm, stabilizers_icm)
+            
+                if np.any(stabilizer_measurements_icm):
+                    error_occured += 1
+                    faulty_stabilizers_icm += stabilizer_measurements.sum()
+
+
+        # update results
+        results[e] = missed_flags / ((no_flag + missed_flags) * len(input_states))
+        results_icm[e] = error_occured / (number_of_runs * len(input_states))
+        results_rob[e] = faulty_stabilizers / (len(stabilizers) * (no_flag + missed_flags) * len(input_states))
+        results_rob_icm[e] = faulty_stabilizers_icm / (len(stabilizers_icm) * (number_of_runs) * len(input_states))
+
+
+    if plotting:
+        # plotting
+        plt.title(plot_title)
+        plt.loglog(error_rates, results, '.', label="flag circuit")
+        plt.loglog(error_rates, results_icm, '.', label="flagless circuit")
+        plt.xlabel('noise channel strength')
+        plt.ylabel('logical error rate')
+        plt.legend()
+        #plt.show()
+        filename = "res_logical_error_" + plot_title.replace(" ", "") + ".png"
+        plt.savefig(filename)
+        plt.close()
+
+        plt.title(plot_title)
+        plt.loglog(error_rates, results_rob, '.', label="flag circuit")
+        plt.loglog(error_rates, results_rob_icm, '.', label="flagless circuit")
+        plt.xlabel('noise channel strength')
+        plt.ylabel('stabilizers with errors, %')
+        plt.legend()
+        #plt.show()
+        filename = "res_results_robustness_" + plot_title.replace(" ", "") + ".png"
+        plt.savefig(filename)
+        plt.close()
+
+
+
+def stabilizers_benchmark_robustness(flag_circuit: cirq.Circuit, icm_circuit: cirq.Circuit, number_of_runs, error_rates, plotting, output_file="results.png"):
+    
+    number_of_input_states = 100
+    input_states = generate_input_strings(icm_circuit, number_of_input_states)
+    results = np.zeros((len(error_rates)))
+    results_icm = np.zeros((len(error_rates),))
+    results_error = np.zeros((len(error_rates)))
+    results_error_icm = np.zeros((len(error_rates),))
+
+    for s in range(len(input_states)):
+
+        warnings.warn("state: " + str(s))
+
+        state = input_states[s]
+
+        # the expected results 
+        # for flag circuit
+        prepared_circuit = prepare_circuit_from_string(flag_circuit, state)
+        expected_stim = stimcirq.cirq_circuit_to_stim_circuit(prepared_circuit)
+        simulator_expected = stim.TableauSimulator()
+        simulator_expected.do_circuit(expected_stim)
+        stabilizers = simulator_expected.canonical_stabilizers()
+        # for icm circuit
+        prepared_circuit_icm = prepare_circuit_from_string(icm_circuit, state)
+        expected_stim_icm = stimcirq.cirq_circuit_to_stim_circuit(prepared_circuit_icm)
+        simulator_expected_icm = stim.TableauSimulator()
+        simulator_expected_icm.do_circuit(expected_stim_icm)
+        stabilizers_icm = simulator_expected_icm.canonical_stabilizers()
+
+        for e in range(len(error_rates)):
+            error_rate = error_rates[e]
+
+            error_occured = 0
+            correct_flags = 0
+            missed_flags = 0
+            false_flags = 0
+            no_flag = 0
+
+            faulty_stabilizers = 0
+            faulty_stabilizers_icm = 0
 
 
             for n in range(number_of_runs):
@@ -762,20 +883,105 @@ def stabilizers_benchmark_robustness(flag_circuit: cirq.Circuit, icm_circuit: ci
                     error_occured += 1
                     faulty_stabilizers_icm += stabilizer_measurements_icm.sum()
 
+            # update results
+            #results[e] += faulty_stabilizers / (len(stabilizers) * (no_flag + missed_flags) * len(input_states))
+            robust = (len(stabilizers) * (no_flag + missed_flags)) and faulty_stabilizers / (len(stabilizers) * (no_flag + missed_flags)) or None
+            results[e,s] = robust
+            results_icm[e] = faulty_stabilizers_icm / (len(stabilizers_icm) * number_of_runs * len(input_states))
 
-        # update results
-        results[e] = faulty_stabilizers / (len(stabilizers) * (no_flag + missed_flags) * len(input_states))
-        results_icm[e] = faulty_stabilizers_icm / (len(stabilizers_icm) * number_of_runs * len(input_states))
-
+    results = np.nanmean(results, axis=(1)) 
 
     if plotting:
         # plotting
-        plt.scatter(error_rates, results, label="flag circuit")
-        plt.scatter(error_rates, results_icm, label="flagless circuit")
+        plt.loglog(error_rates, results, label="flag circuit")
+        plt.loglog(error_rates, results_icm, label="flagless circuit")
         plt.xlabel('noise channel strength')
-        plt.ylabel('percentage of errors on stabilizers')
+        plt.ylabel('stabilizers with errors, %')
         plt.legend()
         #plt.show()
         plt.savefig(output_file)
+        plt.close()
             
     return results, results_icm
+
+
+def stabilizers_benchmark_with_timesteps(flag_circuit: cirq.Circuit, icm_circuit: cirq.Circuit, number_of_runs, error_rate, plotting, output_file="results.png"):
+    number_of_input_states = 100
+    input_states = generate_input_strings(icm_circuit, number_of_input_states)
+
+    results = run_time_steps(flag_circuit, number_of_runs, error_rate, input_states)
+
+    """
+    if plotting:
+        # plotting
+        plt.scatter(list(range(time_steps)), results, label="flag circuit")
+        plt.xlabel('time step')
+        plt.ylabel('robustness')
+        plt.legend()
+        plt.show()
+        #plt.savefig(output_file)
+    """
+
+    return results
+
+def run_time_steps(circuit: cirq.Circuit, number_of_runs, error_rate, input_states):
+    moments = list(circuit.moments)
+    max_times_steps = 10
+    time_steps = np.min([len(moments), max_times_steps])
+    step_size = len(moments) // time_steps
+    results = np.zeros((time_steps,))
+
+    for m in range(time_steps):
+
+        error_occured = 0
+        correct_flags = 0
+        missed_flags = 0
+        false_flags = 0
+        no_flag = 0
+        faulty_stabilizers = 0
+
+        for s in range(len(input_states)):
+            state = input_states[s]
+            prepared_circuit = prepare_circuit_from_string(circuit, state)
+            split_circuit = cirq.Circuit(list(prepared_circuit.moments)[:m])
+            expected_stim = stimcirq.cirq_circuit_to_stim_circuit(prepared_circuit)
+            simulator_expected = stim.TableauSimulator()
+            simulator_expected.do_circuit(expected_stim)
+            stabilizers = find_stabilizers(simulator_expected)
+
+            for n in range(number_of_runs):
+
+                noisy_circuit = prepared_circuit.with_noise(cirq.depolarize(p=error_rate))
+                noisy_stim = stimcirq.cirq_circuit_to_stim_circuit(noisy_circuit)
+                simulator = stim.TableauSimulator()
+                simulator.do_circuit(noisy_stim)
+                flag_measurements = simulator.current_measurement_record()
+                stabilizer_measurements = measure_stabilizers(simulator, stabilizers)
+
+                if not np.any(stabilizer_measurements):
+                    # if no error but flag went off
+                    if True in flag_measurements:
+                        false_flags += 1
+                    else:
+                        no_flag += 1
+                        rev = np.logical_not(stabilizer_measurements)
+                        #print(rev)
+                else:
+                    # if flags caught error
+                    if True in flag_measurements:
+                        correct_flags += 1
+                    # if flags missed error
+                    else:            
+                        faulty_stabilizers += stabilizer_measurements.sum()
+                        missed_flags += 1
+            
+        results[m] = faulty_stabilizers / (len(stabilizers) * (no_flag + missed_flags) * len(input_states))
+    #plt.yscale("log")   
+    plt.xscale("log")
+    plt.scatter(list(range(time_steps)), results, label="flag circuit")
+    plt.xlabel('time step')
+    plt.ylabel('robustness')
+    plt.legend()
+    plt.show()
+    #plt.savefig(output_file)   
+    return results
