@@ -42,13 +42,99 @@ if __name__ == '__main__':
         error_rates = [0.0001, 0.0002, 0.0004, 0.0008, 0.001, 0.00125, 0.0025, 0.005, 0.01]
 
         start = time.time()
-        evaluate.stabilizers_robustness_and_logical_error(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "Adder " + str(i))
+        results, results_icm, results_rob, results_rob_icm = evaluate.stabilizers_robustness_and_logical_error(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "Adder " + str(i))
         end = time.time()
         print("time it took: " + str(end - start))
 
+        # save as csvs
+        res_df = pd.DataFrame(results)
+        res_icm_df = pd.DataFrame(results_icm)
+        res_rob_df = pd.DataFrame(results_rob)
+        res_rob_icm_df = pd.DataFrame(results_rob_icm)
+        res_df.to_csv("results_" + str(i) + ".csv",index=False)
+        res_icm_df.to_csv("results_icm_" + str(i) + ".csv",index=False)
+        res_rob_df.to_csv("results_rob_" + str(i) + ".csv",index=False)
+        res_rob_icm_df.to_csv("results_rob_icm_" + str(i) + ".csv",index=False)
+
     paramlist = [2,3,4,5,6,7]
+    error_rates = [0.0001, 0.0002, 0.0004, 0.0008, 0.001, 0.00125, 0.0025, 0.005, 0.01]
     pool = Pool()
     pool.map(parallel_simulation, paramlist)
     pool.close()
     pool.join()
+
+    # plotting
+    plt.title("Logical Error Rate, 2 Flags")
+    for p in paramlist:
+        results = pd.read_csv("results_" + str(p) + ".csv")
+        print(results)
+        results_icm = pd.read_csv("results_icm_" + str(p) + ".csv")
+
+        flag_circuit_name = "adder " + str(p)
+        icm_circuit_name = "flagless adder " + str(p)
+
+        plt.loglog(error_rates, results, label=flag_circuit_name)
+        #plt.loglog(error_rates, results_icm, label=icm_circuit_name)
+    
+    plt.xlabel('noise channel strength')
+    plt.ylabel('logical error rate')
+    plt.legend()
+    filename = "logical_error_2_flags.png"
+    plt.savefig(filename)
+    plt.close()
+    
+    plt.title("Logical Error Rate, No Flags")
+    for p in paramlist:
+        results = pd.read_csv("results_" + str(p) + ".csv")
+        print(results)
+        results_icm = pd.read_csv("results_icm_" + str(p) + ".csv")
+
+        flag_circuit_name = "flagged adder " + str(p)
+        icm_circuit_name = "adder " + str(p)
+
+        #plt.loglog(error_rates, results, label=flag_circuit_name)
+        plt.loglog(error_rates, results_icm, label=icm_circuit_name)
+
+    plt.xlabel('noise channel strength')
+    plt.ylabel('logical error rate')
+    plt.legend()
+    filename = "logical_error_no_flags.png"
+    plt.savefig(filename)
+    plt.close()
+
+    plt.title("Robustness, 2 Flags")
+    for p in paramlist:
+        results = pd.read_csv("results_rob_" + str(p) + ".csv")
+        results_icm = pd.read_csv("results_rob_icm_" + str(p) + ".csv")
+
+        flag_circuit_name = "adder " + str(p)
+        icm_circuit_name = "flagless adder " + str(p)
+
+        plt.loglog(error_rates, results, label=flag_circuit_name)
+        #plt.loglog(error_rates, results_icm, label=icm_circuit_name)
+
+    plt.xlabel('noise channel strength')
+    plt.ylabel('stabilizers with errors, %')
+    plt.legend()
+    filename = "robustness_2_flags.png"
+    plt.savefig(filename)
+    plt.close()
+    
+    plt.title("Robustness, No Flags")
+    for p in paramlist:
+        results = pd.read_csv("results_rob_" + str(p) + ".csv")
+        results_icm = pd.read_csv("results_rob_icm_" + str(p) + ".csv")
+
+        flag_circuit_name = "flagged adder " + str(p)
+        icm_circuit_name = "adder " + str(p)
+
+        #plt.loglog(error_rates, results, label=flag_circuit_name)
+        plt.loglog(error_rates, results_icm, label=icm_circuit_name)
+
+    plt.xlabel('noise channel strength')
+    plt.ylabel('stabilizers with errors, %')
+    plt.legend()
+    filename = "robustness_no_flags.png"
+    plt.savefig(filename)
+    plt.close()
 
