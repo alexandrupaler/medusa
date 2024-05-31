@@ -795,6 +795,7 @@ def stabilizers_robustness_and_logical_error(flag_circuit: cirq.Circuit, icm_cir
         filename = "res_results_robustness_" + plot_title.replace(" ", "") + ".png"
         plt.savefig(filename)
         plt.close()
+    return results, results_icm, results_rob, results_rob_icm
 
 
 
