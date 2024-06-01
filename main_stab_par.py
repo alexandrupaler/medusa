@@ -22,6 +22,7 @@ if __name__ == '__main__':
 
         icm_circuit: cirq.Circuit = c.decompose_to_ICM(test_circuits.adder(i), i=i)
 
+        """
         warnings.warn("decompose done for adder with " + str(len(list(icm_circuit.all_qubits()))) + " qubits")
 
         print("\n")
@@ -35,6 +36,11 @@ if __name__ == '__main__':
         print("\n")
         print("Flags inserted!")
         print("\n")
+
+        """
+        # "flag_circuit_adder" + str(i) + ".json"
+        flag_circuit_file = "flag_circuit_adder" + str(i) + ".json"
+        flag_circuit = cirq.read_json(flag_circuit_file)
 
         print(flag_circuit)
         
