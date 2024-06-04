@@ -683,6 +683,7 @@ def stabilizers_robustness_and_logical_error(flag_circuit: cirq.Circuit, icm_cir
     results_icm = np.zeros((len(error_rates),))
     results_rob = np.zeros((len(error_rates),))
     results_rob_icm = np.zeros((len(error_rates),))
+    acceptance = np.zeros((len(error_rates),))
 
     number_of_input_states = 100
     input_states = generate_input_strings(icm_circuit, number_of_input_states)
@@ -770,6 +771,7 @@ def stabilizers_robustness_and_logical_error(flag_circuit: cirq.Circuit, icm_cir
         results_icm[e] = error_occured / (number_of_runs * len(input_states))
         results_rob[e] = faulty_stabilizers / (len(stabilizers) * (no_flag + missed_flags) * len(input_states))
         results_rob_icm[e] = faulty_stabilizers_icm / (len(stabilizers_icm) * (number_of_runs) * len(input_states))
+        acceptance[e] = no_flag / (number_of_runs * len(input_states))
 
 
     if plotting:
@@ -795,7 +797,7 @@ def stabilizers_robustness_and_logical_error(flag_circuit: cirq.Circuit, icm_cir
         filename = "res_results_robustness_" + plot_title.replace(" ", "") + ".png"
         plt.savefig(filename)
         plt.close()
-    return results, results_icm, results_rob, results_rob_icm
+    return results, results_icm, results_rob, results_rob_icm, acceptance
 
 
 
