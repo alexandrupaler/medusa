@@ -771,7 +771,7 @@ def stabilizers_robustness_and_logical_error(flag_circuit: cirq.Circuit, icm_cir
         results_icm[e] = error_occured / (number_of_runs * len(input_states))
         results_rob[e] = faulty_stabilizers / (len(stabilizers) * (no_flag + missed_flags) * len(input_states))
         results_rob_icm[e] = faulty_stabilizers_icm / (len(stabilizers_icm) * (number_of_runs) * len(input_states))
-        acceptance[e] = no_flag / (number_of_runs * len(input_states))
+        acceptance[e] = (no_flag + missed_flags) / (number_of_runs * len(input_states))
 
 
     if plotting:

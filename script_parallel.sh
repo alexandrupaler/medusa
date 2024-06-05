@@ -4,5 +4,6 @@
 #SBATCH --output=test_output_par.out     # The output file for the job
 #SBATCH --time=10:00:00         # Time in HH:MM:SS or DD-HH of your job. the maximum is 120 hours or 5 days.
 module load mamba
+module load julia
 source activate fqc
 python main_parallel.py
