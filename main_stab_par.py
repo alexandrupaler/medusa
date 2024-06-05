@@ -102,7 +102,7 @@ if __name__ == '__main__':
         flag_circuit_name = "adder " + str(p)
         plt.loglog(error_rates, results, label=flag_circuit_name)
     plt.xlabel('noise channel strength')
-    plt.ylabel('stabilizers with errors, %')
+    plt.ylabel('stabilizers with errors')
     plt.legend()
     filename = "robustness_2_flags.png"
     plt.savefig(filename)
@@ -114,7 +114,7 @@ if __name__ == '__main__':
         icm_circuit_name = "adder " + str(p)
         plt.loglog(error_rates, results_icm, label=icm_circuit_name)
     plt.xlabel('noise channel strength')
-    plt.ylabel('stabilizers with errors, %')
+    plt.ylabel('stabilizers with errors')
     plt.legend()
     filename = "robustness_no_flags.png"
     plt.savefig(filename)
@@ -124,9 +124,9 @@ if __name__ == '__main__':
     for p in paramlist:
         results_icm = pd.read_csv("acceptance_" + str(p) + ".csv")
         icm_circuit_name = "adder " + str(p)
-        plt.loglog(error_rates, results_icm, label=icm_circuit_name)
+        plt.semilogx(error_rates, results_icm, label=icm_circuit_name)
     plt.xlabel('noise channel strength')
-    plt.ylabel('stabilizers with errors, %')
+    plt.ylabel('acceptance rate')
     plt.legend()
     filename = "acceptance_rate.png"
     plt.savefig(filename)
