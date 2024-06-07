@@ -3,17 +3,18 @@ import cirq
 import stim
 import stimcirq
 import itertools
-
-from functools import reduce
 from preparation import error_circuit
 from evaluation import evaluate
+
+#
+# USING STATE VECTORS:
+#
 
 def expected_state_vector(circuit: cirq.Circuit):
     stim_circuit = stimcirq.cirq_circuit_to_stim_circuit(circuit)
     simulator = stim.TableauSimulator()
     simulator.do_circuit(stim_circuit)
     return simulator.state_vector()
-
 
 # should do st that help me visualize
 def possible_state_vector_with_flags(circuit: cirq.Circuit, number_of_error: int, initial_state):
@@ -58,7 +59,6 @@ def possible_state_vector_with_flags(circuit: cirq.Circuit, number_of_error: int
     result.append(correct_state_vector)
     return result
 
-
 def possible_state_vector_without_flags(circuit: cirq.Circuit, number_of_error: int, initial_state):
     result = []
 
@@ -97,9 +97,13 @@ def possible_state_vector_without_flags(circuit: cirq.Circuit, number_of_error: 
     result.append(correct_state_vector)
     return result
 
-
 def have_error_propagated(state_vector, possible_state_vectors):
     return not any(np.array_equal(state_vector, possible_vector) for possible_vector in possible_state_vectors)
+
+
+#
+# USING STABILIZER MEASUREMENTS:
+#
 
 def possible_error_states(error_circuits, initial_state, stabilizers):
     final_states = []
@@ -109,7 +113,7 @@ def possible_error_states(error_circuits, initial_state, stabilizers):
         stim_circuit = stimcirq.cirq_circuit_to_stim_circuit(circuit)
         simulator = stim.TableauSimulator()
         simulator.do_circuit(stim_circuit)
-        final_state =  evaluate.measure_stabilizers(simulator, stabilizers)#simulator.state_vector()
+        final_state =  evaluate.measure_stabilizers(simulator, stabilizers) #used to be simulator.state_vector()
         final_states.append(final_state)
     return final_states
 

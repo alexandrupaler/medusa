@@ -1,7 +1,4 @@
 import cirq
-#from julia.api import Julia
-import collections
-from itertools import dropwhile
 from .error_map import Error_Map
 
 
