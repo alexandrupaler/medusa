@@ -1,17 +1,12 @@
 import cirq.circuits
-from preparation import compiler, test_circuits, error_circuit
-from evaluation import evaluate
 import cirq
-import numpy as np
-import stimcirq
 import matplotlib.pyplot as plt
-from matplotlib import cm
 import warnings
-from multiprocessing import Pool
-import itertools
-from multiprocessing import Pool, shared_memory
 import time
 import pandas as pd
+from multiprocessing import Pool
+from preparation import compiler, test_circuits
+from evaluation import evaluate
 
 
 
@@ -25,9 +20,11 @@ if __name__ == '__main__':
 
         icm_circuit: cirq.Circuit = c.decompose_to_ICM(test_circuits.adder(i), i=i)
 
-        """
+        # warning because triton
         warnings.warn("decompose done for adder with " + str(len(list(icm_circuit.all_qubits()))) + " qubits")
 
+        # uncomment the below part if main_find_flag_circuits.py has not been run before
+        """
         print("\n")
         print("Decompose done!")
         print("\n")
@@ -39,9 +36,8 @@ if __name__ == '__main__':
         print("\n")
         print("Flags inserted!")
         print("\n")
-
         """
-        # "flag_circuit_adder" + str(i) + ".json"
+
         flag_circuit_file = "flag_circuit_adder" + str(i) + ".json"
         flag_circuit = cirq.read_json(flag_circuit_file)
 

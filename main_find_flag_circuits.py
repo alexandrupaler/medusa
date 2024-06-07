@@ -1,18 +1,10 @@
 import cirq.circuits
-from preparation import compiler, test_circuits, error_circuit
-from evaluation import evaluate
 import cirq
 import numpy as np
-import stimcirq
-import matplotlib.pyplot as plt
-from matplotlib import cm
 import warnings
 from multiprocessing import Pool
-import itertools
-from multiprocessing import Pool, shared_memory
-import time
-import pandas as pd
-
+from preparation import compiler, test_circuits
+from evaluation import evaluate
 
 
 if __name__ == '__main__':
@@ -38,6 +30,8 @@ if __name__ == '__main__':
 
             results, results_icm, results_rob, results_rob_icm = evaluate.stabilizers_robustness_and_logical_error(flag_circuit, icm_circuit, number_of_runs, [error_rate], False, "Adder ")
             res[run] = np.average(results)
+
+        # warning because triton
         warnings.warn("done: " + str(i))
         
         # find best flag configuration
