@@ -601,13 +601,7 @@ def stabilizers_robustness_and_logical_error(flag_circuit: cirq.Circuit, icm_cir
         plt.close()
     return results, results_icm, results_rob, results_rob_icm, acceptance
 
-
-
-
-
-
-# WIP BELOW
-
+# calculated error at different moments using stabilizer measurements
 def stabilizers_benchmark_with_timesteps(flag_circuit: cirq.Circuit, icm_circuit: cirq.Circuit, number_of_runs, error_rate, plotting, output_file="results.png"):
     number_of_input_states = 100
     input_states = generate_input_strings(icm_circuit, number_of_input_states)
