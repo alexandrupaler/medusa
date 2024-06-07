@@ -17,6 +17,9 @@ import pandas as pd
 
 if __name__ == '__main__':
 
+    # triton cpus:
+    # - 6
+
     def parallel_simulation(i):
         c = compiler.FlagCompiler()
 

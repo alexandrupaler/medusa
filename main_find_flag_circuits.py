@@ -17,6 +17,9 @@ import pandas as pd
 
 if __name__ == '__main__':
 
+    # triton cpus:
+    # - 6
+
     def parallel_simulation(i):
         
         number_of_flag_configurations = 5
@@ -45,7 +48,7 @@ if __name__ == '__main__':
         with open("flag_circuit_adder" + str(i) + ".json", "w") as outfile:
             outfile.write(json_string)
 
-    paramlist = [2,3,4,5,6,7]
+    paramlist = [3,4,5,6,7] #[2,3,4,5,6,7]
     pool = Pool()
     pool.map(parallel_simulation, paramlist)
     pool.close()

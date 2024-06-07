@@ -15,6 +15,9 @@ import time
 
 if __name__ == '__main__':    
 
+    # triton cpus:
+    # - 10
+
     adders = [2, 3, 4]
     flags = [1, 2, 3]
     n = len(adders)
