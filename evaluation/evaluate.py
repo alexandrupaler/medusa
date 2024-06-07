@@ -10,6 +10,7 @@ import random
 import matplotlib.pyplot as plt
 import warnings
 
+# how do the error weights change & propagate
 def evaluate_flag_circuit(flag_circuit, icm_circuit, maximum_number_of_error, number_of_input_states, plotting, output_file="results.png"):
     
     input_state_strings = generate_input_strings(icm_circuit, number_of_input_states)
@@ -121,7 +122,7 @@ def evaluate_flag_circuit(flag_circuit, icm_circuit, maximum_number_of_error, nu
 
 
 
-
+# helper used to prepare different states
 def generate_input_strings(icm_circuit: cirq.circuits.circuit.Circuit, states: int):
 
     icm_qubits = len(icm_circuit.all_qubits())
@@ -152,7 +153,7 @@ def generate_input_strings(icm_circuit: cirq.circuits.circuit.Circuit, states: i
 
     return strings
 
-
+# another helper that could be used to prepare different states
 def prepare_tableau_from_string(simulator: stim.TableauSimulator, input_string):
 
     # {0, +} basis
@@ -164,7 +165,7 @@ def prepare_tableau_from_string(simulator: stim.TableauSimulator, input_string):
 
     return simulator
 
-
+# another helper used to prepare different states
 def prepare_circuit_from_string(circuit: cirq.circuits.circuit.Circuit, input_string): 
 
     def sortqubits(q):
@@ -188,108 +189,110 @@ def prepare_circuit_from_string(circuit: cirq.circuits.circuit.Circuit, input_st
     return prepared_circuit
 
        
-
-def benchmark_run(flag_circuit: cirq.circuits.circuit.Circuit, error_rate, initial_state):
-
-    # use cirq to generate errors and prepare state
-    circuit_with_errors = flag_circuit.with_noise(cirq.depolarize(p=error_rate))
-    circuit_with_errors = prepare_circuit_from_string(circuit_with_errors, initial_state)
-    stim_circuit_errors = stimcirq.cirq_circuit_to_stim_circuit(circuit_with_errors)
-    circuit_expected = prepare_circuit_from_string(flag_circuit, initial_state)
-    stim_circuit_expected = stimcirq.cirq_circuit_to_stim_circuit(circuit_expected)
-    
-    simulator = stim.TableauSimulator()
-    #simulator_expected = prepare_tableau_from_string(simulator, initial_state)
-    simulator_expected = simulator.copy()
-    simulator_error = simulator_expected.copy()
-
-    # use stim to run simulation on expected circuit
-    simulator_expected.do_circuit(stim_circuit_expected)
-    flag_measurement_expected = simulator_expected.current_measurement_record()
-    final_state_expected = simulator_expected.state_vector()
-
-
-    # similarly for the error state
-    simulator_error.do_circuit(stim_circuit_errors)
-    flag_measurement_errors = simulator_error.current_measurement_record()
-    final_state_errors = simulator_error.state_vector()
-
-    # return values
-    error_occured = 0
-    correct_flag = 0
-    missed_flag = 0
-    correct_no_flag = 0
-    false_flag = 0
-
-    # if there was an error
-    if not np.array_equal(final_state_errors, final_state_expected):
-        error_occured = 1
-        result_string = ""
-        if True in flag_measurement_errors:
-            correct_flag = 1
-            result_string = "Flags succeeded"
-        else:
-            missed_flag = 1
-            result_string = "Flags failed"
-    #    print("Error(s) occured, " + result_string)
-    # if there were no errors OR the errors cancelled each other out
-    else:
-        result_string = ""
-        if True in flag_measurement_errors:
-            false_flag = 1
-            result_string = "Flags failed"
-        else:
-            correct_no_flag = 1
-            result_string = "Flags succeeded"
-    #    print("No errors/Errors cancelled out, " + result_string)
-    
-    return error_occured, correct_flag, missed_flag, correct_no_flag, false_flag
-
-def benchmark(flag_circuit: cirq.circuits.circuit.Circuit, error_rate, number_of_runs: int, states):
-
-    # each row represents the results for one binary input string 
-    # the columns are: error rate is ciruit is flagged, error rate is circuit is unflagged
-    results = np.zeros((len(states), 2))
-
-    for k in range(len(states)):
-
-        intial_state = states[k]
-        total_cases = number_of_runs
-        cases_with_error = 0
-        correct_flagged_cases = 0
-        missed_cases = 0
-        false_cases = 0
-        correct_noflag_cases = 0
-
-        for n in range(0,number_of_runs):
-            #print("run: ", n)
-            res = benchmark_run(flag_circuit, error_rate, intial_state)
-            error_occured, correct_flag, missed_flag, correct_no_flag, false_flag = res
-            cases_with_error += error_occured
-            correct_flagged_cases += correct_flag
-            missed_cases += missed_flag
-            false_cases += false_flag
-            correct_noflag_cases += correct_no_flag
-
-        # to ignore exceptions check: b and a / b or 0
-        logical_error_rate_flag = (missed_cases + correct_noflag_cases) and missed_cases / (missed_cases + correct_noflag_cases) or None
-        logical_error_rate_flagless = cases_with_error / total_cases
-
-        """
-        print("total number of cases: " + str(total_cases))
-        print("number of cases with errors: " + str(cases_with_error))
-        print("number of correct flags: " + str(correct_flagged_cases))
-        print("number of missed flags: " + str(missed_cases))
-        print("number of false flags: " + str(false_cases))
-        print("number of correct unflagged cases: " + str(correct_noflag_cases))
-        print("success rate: " +  str(success_rate))
-        """
-
-        results[k,:] = [logical_error_rate_flag, logical_error_rate_flagless]
-
-    return results #logical_error_rate_flag, logical_error_rate_flagless
-
 def random_noise_benchmark(flag_circuit, icm_circuit, number_of_runs, error_rates, plotting, output_file="results.png"):
+
+    # helper
+    def benchmark_run(flag_circuit: cirq.circuits.circuit.Circuit, error_rate, initial_state):
+
+        # use cirq to generate errors and prepare state
+        circuit_with_errors = flag_circuit.with_noise(cirq.depolarize(p=error_rate))
+        circuit_with_errors = prepare_circuit_from_string(circuit_with_errors, initial_state)
+        stim_circuit_errors = stimcirq.cirq_circuit_to_stim_circuit(circuit_with_errors)
+        circuit_expected = prepare_circuit_from_string(flag_circuit, initial_state)
+        stim_circuit_expected = stimcirq.cirq_circuit_to_stim_circuit(circuit_expected)
+        
+        simulator = stim.TableauSimulator()
+        #simulator_expected = prepare_tableau_from_string(simulator, initial_state)
+        simulator_expected = simulator.copy()
+        simulator_error = simulator_expected.copy()
+
+        # use stim to run simulation on expected circuit
+        simulator_expected.do_circuit(stim_circuit_expected)
+        flag_measurement_expected = simulator_expected.current_measurement_record()
+        final_state_expected = simulator_expected.state_vector()
+
+
+        # similarly for the error state
+        simulator_error.do_circuit(stim_circuit_errors)
+        flag_measurement_errors = simulator_error.current_measurement_record()
+        final_state_errors = simulator_error.state_vector()
+
+        # return values
+        error_occured = 0
+        correct_flag = 0
+        missed_flag = 0
+        correct_no_flag = 0
+        false_flag = 0
+
+        # if there was an error
+        if not np.array_equal(final_state_errors, final_state_expected):
+            error_occured = 1
+            result_string = ""
+            if True in flag_measurement_errors:
+                correct_flag = 1
+                result_string = "Flags succeeded"
+            else:
+                missed_flag = 1
+                result_string = "Flags failed"
+        #    print("Error(s) occured, " + result_string)
+        # if there were no errors OR the errors cancelled each other out
+        else:
+            result_string = ""
+            if True in flag_measurement_errors:
+                false_flag = 1
+                result_string = "Flags failed"
+            else:
+                correct_no_flag = 1
+                result_string = "Flags succeeded"
+        #    print("No errors/Errors cancelled out, " + result_string)
+        
+        return error_occured, correct_flag, missed_flag, correct_no_flag, false_flag
+
+    # another helper
+    def benchmark(flag_circuit: cirq.circuits.circuit.Circuit, error_rate, number_of_runs: int, states):
+
+        # each row represents the results for one binary input string 
+        # the columns are: error rate is ciruit is flagged, error rate is circuit is unflagged
+        results = np.zeros((len(states), 2))
+
+        for k in range(len(states)):
+
+            intial_state = states[k]
+            total_cases = number_of_runs
+            cases_with_error = 0
+            correct_flagged_cases = 0
+            missed_cases = 0
+            false_cases = 0
+            correct_noflag_cases = 0
+
+            for n in range(0,number_of_runs):
+                #print("run: ", n)
+                res = benchmark_run(flag_circuit, error_rate, intial_state)
+                error_occured, correct_flag, missed_flag, correct_no_flag, false_flag = res
+                cases_with_error += error_occured
+                correct_flagged_cases += correct_flag
+                missed_cases += missed_flag
+                false_cases += false_flag
+                correct_noflag_cases += correct_no_flag
+
+            # to ignore exceptions check: b and a / b or 0
+            logical_error_rate_flag = (missed_cases + correct_noflag_cases) and missed_cases / (missed_cases + correct_noflag_cases) or None
+            logical_error_rate_flagless = cases_with_error / total_cases
+
+            """
+            print("total number of cases: " + str(total_cases))
+            print("number of cases with errors: " + str(cases_with_error))
+            print("number of correct flags: " + str(correct_flagged_cases))
+            print("number of missed flags: " + str(missed_cases))
+            print("number of false flags: " + str(false_cases))
+            print("number of correct unflagged cases: " + str(correct_noflag_cases))
+            print("success rate: " +  str(success_rate))
+            """
+
+            results[k,:] = [logical_error_rate_flag, logical_error_rate_flagless]
+
+        return results #logical_error_rate_flag, logical_error_rate_flagless
+
 
     number_of_states = 100
     results = np.zeros((len(error_rates),1))
@@ -361,107 +364,6 @@ def random_noise_on_error_circuit(flag_circuit, icm_circuit, number_of_runs, err
     error_circuits = error_circuit.generate_handlable_error_circuits(flag_circuit)
     error_circuits.append(flag_circuit)
 
-    results = np.zeros((len(error_rates), len(error_circuits), len(icm_states)))
-    flagless_results = np.zeros((len(error_rates),))
-
-    for c in range(len(error_circuits)):
-        flag_circuit = error_circuits[c]
-
-        # warnings because triton
-        warnings.warn("error circuit: " + str(c))
-
-        for s in range(len(icm_states)):
-            initial_state = icm_states[s]
-
-            # all possible final states
-            possible_states = state_vector_comparison.possible_error_states(error_circuits, initial_state)
-
-            # prep icm circuit for comparison with flagless circuit
-            expected_circuit = prepare_circuit_from_string(icm_circuit, initial_state)
-            stim_circuit_expected = stimcirq.cirq_circuit_to_stim_circuit(expected_circuit)
-
-            for e in range(len(error_rates)):
-                error_rate = error_rates[e]
-
-                # flagless circuit
-                flagless_circuit = icm_circuit.with_noise(cirq.depolarize(p=error_rate))
-                flagless_circuit = prepare_circuit_from_string(flagless_circuit, initial_state)
-                flagless_stim_circuit = stimcirq.cirq_circuit_to_stim_circuit(flagless_circuit)
-
-                # use cirq to generate errors and prepare state
-                circuit_with_errors = flag_circuit.with_noise(cirq.depolarize(p=error_rate))
-                circuit_with_errors = prepare_circuit_from_string(circuit_with_errors, initial_state)
-                stim_circuit_errors = stimcirq.cirq_circuit_to_stim_circuit(circuit_with_errors)
-
-                total_cases = number_of_runs
-                total_cases_flagless = number_of_runs
-                error_occured = 0
-                correct_flag = 0
-                missed_flag = 0
-                false_flag = 0
-                correct_no_flag = 0
-
-                for n in range(number_of_runs):
-
-                    # use stim to run simulation
-                    simulator = stim.TableauSimulator()
-                    simulator.do_circuit(stim_circuit_errors)
-                    flag_measurement = simulator.current_measurement_record()
-                    final_state = simulator.state_vector()
-
-                    if state_vector_comparison.have_error_propagated(final_state, possible_states):
-                        if True in flag_measurement:
-                            correct_flag += 1
-                        else:
-                            missed_flag += 1
-                    else:
-                        if True in flag_measurement:
-                            false_flag += 1
-                        else:
-                            correct_no_flag += 1    
-
-                    # same for the flagless circuit
-                    simulator = stim.TableauSimulator()
-                    simulator_expected = simulator.copy()
-                    simulator.do_circuit(flagless_stim_circuit)
-                    final_state = simulator.state_vector()
-                    simulator_expected.do_circuit(stim_circuit_expected)
-                    final_state_expected = simulator_expected.state_vector()
-
-                    if not np.array_equal(final_state, final_state_expected):
-                        error_occured += 1
-                        
-                log_error = (correct_no_flag + missed_flag) and missed_flag / (correct_no_flag + missed_flag) or None
-                results[e,c,s] = log_error
-                flagless_log_error = error_occured / total_cases_flagless 
-                flagless_results[e] += flagless_log_error
-
-    # normalize
-    results = np.nanmean(results, axis=(1,2)) 
-    flagless_results = flagless_results / (len(icm_states) * len(error_circuits))
-
-    if plotting:
-        # plotting
-        plt.scatter(error_rates, results, label="flag circuit")
-        plt.scatter(error_rates, flagless_results, label="flagless circuit")
-        plt.xlabel('noise channel strength')
-        plt.ylabel('logical error rate')
-        plt.legend()
-        #plt.show()
-        plt.savefig(output_file)
-
-    return results, flagless_results
-
-def random_noise_on_error_circuit_alt(flag_circuit, icm_circuit, number_of_runs, error_rates, plotting, output_file="results.png"):
-
-    # generate input states as bitstrings
-    number_of_states = 100
-    icm_states = generate_input_strings(icm_circuit, number_of_states)
-
-    # circuits with individual errors + error-free circuit
-    error_circuits = error_circuit.generate_handlable_error_circuits(flag_circuit)
-    error_circuits.append(flag_circuit)
-
     results = np.zeros((len(error_rates), len(icm_states)))
     flagless_results = np.zeros((len(error_rates),))
 
@@ -476,7 +378,7 @@ def random_noise_on_error_circuit_alt(flag_circuit, icm_circuit, number_of_runs,
         # flagless stabilizers
         simulator = stim.TableauSimulator()
         simulator.do_circuit(stim_circuit_flagless_expected)
-        flagless_stabilizers = find_stabilizers(simulator)
+        flagless_stabilizers = simulator.canonical_stabilizers()
 
         # stabilizers
         flag_expected_circuit = prepare_circuit_from_string(icm_circuit, initial_state)
@@ -485,7 +387,7 @@ def random_noise_on_error_circuit_alt(flag_circuit, icm_circuit, number_of_runs,
         # flagless stabilizers
         simulator = stim.TableauSimulator()
         simulator.do_circuit(stim_circuit_flag_expected)
-        stabilizers = find_stabilizers(simulator)
+        stabilizers = simulator.canonical_stabilizers()
 
         # all possible final states
         possible_states = state_vector_comparison.possible_error_states(error_circuits, initial_state, stabilizers)
@@ -566,13 +468,7 @@ def random_noise_on_error_circuit_alt(flag_circuit, icm_circuit, number_of_runs,
 
     return results, flagless_results
 
-def find_stabilizers(simulator: stim.TableauSimulator):
-    
-    # maybe this ? two simulator will only return equal stabilizers if their quantum states are equal
-    stabilizers = simulator.canonical_stabilizers()
-
-    return stabilizers
-
+# helper used to measure all the stabilizers of a circuit
 def measure_stabilizers(simulator: stim.TableauSimulator, stabilizers: list[stim.PauliString]):
     res = np.full((len(stabilizers),),True)
 
@@ -583,101 +479,7 @@ def measure_stabilizers(simulator: stim.TableauSimulator, stabilizers: list[stim
 
     return res
 
-def stabilizers_benchmark_logical_error(flag_circuit: cirq.Circuit, icm_circuit: cirq.Circuit, number_of_runs, error_rates, plotting, output_file="results.png"):
-    
-    results = np.zeros((len(error_rates),))
-    results_icm = np.zeros((len(error_rates),))
-    number_of_input_states = 100
-    input_states = generate_input_strings(icm_circuit, number_of_input_states)
-
-    for e in range(len(error_rates)):
-        error_rate = error_rates[e]
-
-        error_occured = 0
-        correct_flags = 0
-        missed_flags = 0
-        false_flags = 0
-        no_flag = 0
-
-        for s in range(len(input_states)):
-
-            state = input_states[s]
-
-            # the expected results 
-            # for flag circuit
-            prepared_circuit = prepare_circuit_from_string(flag_circuit, state)
-            expected_stim = stimcirq.cirq_circuit_to_stim_circuit(prepared_circuit)
-            simulator_expected = stim.TableauSimulator()
-            simulator_expected.do_circuit(expected_stim)
-            stabilizers = simulator_expected.canonical_stabilizers()
-            # for icm circuit
-            prepared_circuit_icm = prepare_circuit_from_string(icm_circuit, state)
-            expected_stim_icm = stimcirq.cirq_circuit_to_stim_circuit(prepared_circuit_icm)
-            simulator_expected_icm = stim.TableauSimulator()
-            simulator_expected_icm.do_circuit(expected_stim_icm)
-            stabilizers_icm = simulator_expected_icm.canonical_stabilizers()
-
-
-            for n in range(number_of_runs):
-
-                # add noise to circuits
-                # for flag circuit
-                noisy_circuit = flag_circuit.with_noise(cirq.depolarize(p=error_rate))
-                # for icm circuit
-                noisy_circuit_icm = icm_circuit.with_noise(cirq.depolarize(p=error_rate))
-
-                # run simulations
-                # for flag circuit
-                prepared_circuit = prepare_circuit_from_string(noisy_circuit, state)
-                noisy_stim = stimcirq.cirq_circuit_to_stim_circuit(prepared_circuit)
-                simulator = stim.TableauSimulator()
-                simulator.do_circuit(noisy_stim)
-                flag_measurements = simulator.current_measurement_record()
-                stabilizer_measurements = measure_stabilizers(simulator, stabilizers)
-
-                if not np.any(stabilizer_measurements):
-                    # if no error but flag went off
-                    if True in flag_measurements:
-                        false_flags += 1
-                    else:
-                        no_flag += 1
-                else:
-                    # if flags caught error
-                    if True in flag_measurements:
-                        correct_flags += 1
-                    # if flags missed error
-                    else:
-                        missed_flags += 1
-
-                # for icm circuit
-                prepared_circuit_icm = prepare_circuit_from_string(noisy_circuit_icm, state)
-                noisy_stim_icm = stimcirq.cirq_circuit_to_stim_circuit(prepared_circuit_icm)
-                simulator_icm = stim.TableauSimulator()
-                simulator_icm.do_circuit(noisy_stim_icm)
-                stabilizer_measurements_icm = measure_stabilizers(simulator_icm, stabilizers_icm)
-            
-                if np.any(stabilizer_measurements_icm):
-                    error_occured += 1
-
-        # update results
-        results[e] = missed_flags / ((no_flag + missed_flags) * len(input_states))
-        results_icm[e] = error_occured / (number_of_runs * len(input_states))
-
-
-    if plotting:
-        # plotting
-        plt.scatter(error_rates, results, label="flag circuit")
-        plt.scatter(error_rates, results_icm, label="flagless circuit")
-        plt.xlabel('noise channel strength')
-        plt.ylabel('logical error rate')
-        plt.legend()
-        #plt.show()
-        plt.savefig(output_file)
-        plt.close()
-            
-    return results, results_icm
-
-
+# simulation which uses stabilizer measurements, calculates both robustness and logical error
 def stabilizers_robustness_and_logical_error(flag_circuit: cirq.Circuit, icm_circuit: cirq.Circuit, number_of_runs, error_rates, plotting, plot_title):
     results = np.zeros((len(error_rates),))
     results_icm = np.zeros((len(error_rates),))
@@ -801,112 +603,10 @@ def stabilizers_robustness_and_logical_error(flag_circuit: cirq.Circuit, icm_cir
 
 
 
-def stabilizers_benchmark_robustness(flag_circuit: cirq.Circuit, icm_circuit: cirq.Circuit, number_of_runs, error_rates, plotting, output_file="results.png"):
-    
-    number_of_input_states = 100
-    input_states = generate_input_strings(icm_circuit, number_of_input_states)
-    results = np.zeros((len(error_rates)))
-    results_icm = np.zeros((len(error_rates),))
-    results_error = np.zeros((len(error_rates)))
-    results_error_icm = np.zeros((len(error_rates),))
-
-    for s in range(len(input_states)):
-
-        warnings.warn("state: " + str(s))
-
-        state = input_states[s]
-
-        # the expected results 
-        # for flag circuit
-        prepared_circuit = prepare_circuit_from_string(flag_circuit, state)
-        expected_stim = stimcirq.cirq_circuit_to_stim_circuit(prepared_circuit)
-        simulator_expected = stim.TableauSimulator()
-        simulator_expected.do_circuit(expected_stim)
-        stabilizers = simulator_expected.canonical_stabilizers()
-        # for icm circuit
-        prepared_circuit_icm = prepare_circuit_from_string(icm_circuit, state)
-        expected_stim_icm = stimcirq.cirq_circuit_to_stim_circuit(prepared_circuit_icm)
-        simulator_expected_icm = stim.TableauSimulator()
-        simulator_expected_icm.do_circuit(expected_stim_icm)
-        stabilizers_icm = simulator_expected_icm.canonical_stabilizers()
-
-        for e in range(len(error_rates)):
-            error_rate = error_rates[e]
-
-            error_occured = 0
-            correct_flags = 0
-            missed_flags = 0
-            false_flags = 0
-            no_flag = 0
-
-            faulty_stabilizers = 0
-            faulty_stabilizers_icm = 0
 
 
-            for n in range(number_of_runs):
 
-                # add noise to circuits
-                # for flag circuit
-                noisy_circuit = flag_circuit.with_noise(cirq.depolarize(p=error_rate))
-                # for icm circuit
-                noisy_circuit_icm = icm_circuit.with_noise(cirq.depolarize(p=error_rate))
-
-                # run simulations
-                # for flag circuit
-                prepared_circuit = prepare_circuit_from_string(noisy_circuit, state)
-                noisy_stim = stimcirq.cirq_circuit_to_stim_circuit(prepared_circuit)
-                simulator = stim.TableauSimulator()
-                simulator.do_circuit(noisy_stim)
-                flag_measurements = simulator.current_measurement_record()
-                stabilizer_measurements = measure_stabilizers(simulator, stabilizers)
-
-                if not np.any(stabilizer_measurements):
-                    # if no error but flag went off
-                    if True in flag_measurements:
-                        false_flags += 1
-                    else:
-                        no_flag += 1
-                else:
-                    # if flags caught error
-                    if True in flag_measurements:
-                        correct_flags += 1
-                    # if flags missed error
-                    else:            
-                        faulty_stabilizers += stabilizer_measurements.sum()
-                        missed_flags += 1
-
-                # for icm circuit
-                prepared_circuit_icm = prepare_circuit_from_string(noisy_circuit_icm, state)
-                noisy_stim_icm = stimcirq.cirq_circuit_to_stim_circuit(prepared_circuit_icm)
-                simulator_icm = stim.TableauSimulator()
-                simulator_icm.do_circuit(noisy_stim_icm)
-                stabilizer_measurements_icm = measure_stabilizers(simulator_icm, stabilizers_icm)
-            
-                if np.any(stabilizer_measurements_icm):
-                    error_occured += 1
-                    faulty_stabilizers_icm += stabilizer_measurements_icm.sum()
-
-            # update results
-            #results[e] += faulty_stabilizers / (len(stabilizers) * (no_flag + missed_flags) * len(input_states))
-            robust = (len(stabilizers) * (no_flag + missed_flags)) and faulty_stabilizers / (len(stabilizers) * (no_flag + missed_flags)) or None
-            results[e,s] = robust
-            results_icm[e] = faulty_stabilizers_icm / (len(stabilizers_icm) * number_of_runs * len(input_states))
-
-    results = np.nanmean(results, axis=(1)) 
-
-    if plotting:
-        # plotting
-        plt.loglog(error_rates, results, label="flag circuit")
-        plt.loglog(error_rates, results_icm, label="flagless circuit")
-        plt.xlabel('noise channel strength')
-        plt.ylabel('stabilizers with errors, %')
-        plt.legend()
-        #plt.show()
-        plt.savefig(output_file)
-        plt.close()
-            
-    return results, results_icm
-
+# WIP BELOW
 
 def stabilizers_benchmark_with_timesteps(flag_circuit: cirq.Circuit, icm_circuit: cirq.Circuit, number_of_runs, error_rate, plotting, output_file="results.png"):
     number_of_input_states = 100
@@ -950,7 +650,7 @@ def run_time_steps(circuit: cirq.Circuit, number_of_runs, error_rate, input_stat
             expected_stim = stimcirq.cirq_circuit_to_stim_circuit(prepared_circuit)
             simulator_expected = stim.TableauSimulator()
             simulator_expected.do_circuit(expected_stim)
-            stabilizers = find_stabilizers(simulator_expected)
+            stabilizers = simulator_expected.canonical_stabilizers()
 
             for n in range(number_of_runs):
 

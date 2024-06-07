@@ -3,10 +3,6 @@ import itertools
 from typing import List
 import cirq.circuits.circuit
 import numpy as np
-import random
-import stim
-from evaluation import evaluate
-import stimcirq
 
 
 class XError(cirq.Gate):
