@@ -1,16 +1,15 @@
 import cirq.circuits
-from preparation import compiler, test_circuits
-from evaluation import evaluate
 import cirq
 import numpy as np
-import stimcirq
 import matplotlib.pyplot as plt
-from matplotlib import cm
 import warnings
-from multiprocessing import Pool, shared_memory
 import itertools
 import pandas as pd
 import time
+from multiprocessing import Pool, shared_memory
+from matplotlib import cm
+from preparation import compiler, test_circuits
+from evaluation import evaluate
 
 
 if __name__ == '__main__':    
@@ -71,9 +70,6 @@ if __name__ == '__main__':
         adder = test_circuits.adder(a)
 
         icm_circuit: cirq.Circuit = c.decompose_to_ICM(adder,i,j)
-
-        # warning because triton
-        #warnings.warn("compilation done for i & j, " + str(i) + " & " + str(j))
         
         f = flags[j]
         flag_circuit = c.add_flag(icm_circuit,number_of_x_flag=f,number_of_z_flag=f)

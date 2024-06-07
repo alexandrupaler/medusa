@@ -1,22 +1,17 @@
 import cirq.circuits
-from preparation import compiler, test_circuits
-from evaluation import evaluate
 import cirq
 import numpy as np
-import stimcirq
 import matplotlib.pyplot as plt
-from matplotlib import cm
 import warnings
-from multiprocessing import Pool
-import itertools
 import pandas as pd
+from matplotlib import cm
+from preparation import compiler, test_circuits
+from evaluation import evaluate
 
 
 if __name__ == '__main__':    
 
-    #
     # 3D PLOT WITH ADDERS
-    #
 
     adders = [2,3,4]
     flags = [1,2,3]
