@@ -41,13 +41,18 @@ if __name__ == '__main__':
     # plots the logical error rate of flagged and flagless circuit with different inpout states and error rates
     # the noise is randomized depolarising noise
     #
-    number_of_runs = 10
+    number_of_runs = 100
     error_rates = np.linspace(0.001, 0.01, 10)
     evaluate.random_noise_benchmark(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "heuristic_random_results.png")
 
     # calculates a error-propagation "failure" rate based on the weight of the errors for flagged and unflagged circuit
     # the errors are generated manually
     #
-    #evaluate.evaluate_flag_circuit(flag_circuit, icm_circuit, 3, 100, True, "heuristic_propagation_results.png")
+    evaluate.evaluate_flag_circuit(flag_circuit, icm_circuit, 3, 100, True, "heuristic_propagation_results.png")
+
+    # calculates logical error at different moments of the flag and icm circuit
+    # the noise is randomized depolarising noise
+    #
+    evaluate.stabilizers_benchmark_with_timesteps(flag_circuit, icm_circuit, number_of_runs, error_rates[0], True, "results_timesteps.png")
 
 

@@ -612,79 +612,114 @@ def stabilizers_benchmark_with_timesteps(flag_circuit: cirq.Circuit, icm_circuit
     number_of_input_states = 100
     input_states = generate_input_strings(icm_circuit, number_of_input_states)
 
-    results = run_time_steps(flag_circuit, number_of_runs, error_rate, input_states)
+    def run_time_steps_flag(circuit: cirq.Circuit, number_of_runs, error_rate, input_states):
+        moments = list(circuit.moments)
+        max_times_steps = 10
+        time_steps = np.min([len(moments), max_times_steps])
+        step_size = len(moments) // time_steps
+        results = np.zeros((time_steps,))
 
-    """
-    if plotting:
-        # plotting
-        plt.scatter(list(range(time_steps)), results, label="flag circuit")
-        plt.xlabel('time step')
-        plt.ylabel('robustness')
-        plt.legend()
-        plt.show()
-        #plt.savefig(output_file)
-    """
+        for m in range(time_steps):
 
-    return results
+            step = m * step_size
 
-def run_time_steps(circuit: cirq.Circuit, number_of_runs, error_rate, input_states):
-    moments = list(circuit.moments)
-    max_times_steps = 10
-    time_steps = np.min([len(moments), max_times_steps])
-    step_size = len(moments) // time_steps
-    results = np.zeros((time_steps,))
+            error_occured = 0
+            correct_flags = 0
+            missed_flags = 0
+            false_flags = 0
+            no_flag = 0
 
-    for m in range(time_steps):
+            for s in range(len(input_states)):
+                state = input_states[s]
+                prepared_circuit = prepare_circuit_from_string(circuit, state)
+                split_circuit = cirq.Circuit(list(prepared_circuit.moments)[:step])
+                expected_stim = stimcirq.cirq_circuit_to_stim_circuit(split_circuit)
+                simulator_expected = stim.TableauSimulator()
+                simulator_expected.do_circuit(expected_stim)
+                stabilizers = simulator_expected.canonical_stabilizers()
 
-        error_occured = 0
-        correct_flags = 0
-        missed_flags = 0
-        false_flags = 0
-        no_flag = 0
-        faulty_stabilizers = 0
+                for n in range(number_of_runs):
 
-        for s in range(len(input_states)):
-            state = input_states[s]
-            prepared_circuit = prepare_circuit_from_string(circuit, state)
-            split_circuit = cirq.Circuit(list(prepared_circuit.moments)[:m])
-            expected_stim = stimcirq.cirq_circuit_to_stim_circuit(prepared_circuit)
-            simulator_expected = stim.TableauSimulator()
-            simulator_expected.do_circuit(expected_stim)
-            stabilizers = simulator_expected.canonical_stabilizers()
+                    noisy_circuit = split_circuit.with_noise(cirq.depolarize(p=error_rate))
+                    noisy_stim = stimcirq.cirq_circuit_to_stim_circuit(noisy_circuit)
+                    simulator = stim.TableauSimulator()
+                    simulator.do_circuit(noisy_stim)
+                    flag_measurements = simulator.current_measurement_record()
+                    stabilizer_measurements = measure_stabilizers(simulator, stabilizers)
 
-            for n in range(number_of_runs):
-
-                noisy_circuit = prepared_circuit.with_noise(cirq.depolarize(p=error_rate))
-                noisy_stim = stimcirq.cirq_circuit_to_stim_circuit(noisy_circuit)
-                simulator = stim.TableauSimulator()
-                simulator.do_circuit(noisy_stim)
-                flag_measurements = simulator.current_measurement_record()
-                stabilizer_measurements = measure_stabilizers(simulator, stabilizers)
-
-                if not np.any(stabilizer_measurements):
-                    # if no error but flag went off
-                    if True in flag_measurements:
-                        false_flags += 1
+                    if not np.any(stabilizer_measurements): 
+                        # if no error but flag went off
+                        if True in flag_measurements:
+                            false_flags += 1
+                        else:
+                            no_flag += 1
                     else:
-                        no_flag += 1
-                        rev = np.logical_not(stabilizer_measurements)
-                        #print(rev)
-                else:
-                    # if flags caught error
-                    if True in flag_measurements:
-                        correct_flags += 1
-                    # if flags missed error
-                    else:            
-                        faulty_stabilizers += stabilizer_measurements.sum()
-                        missed_flags += 1
-            
-        results[m] = faulty_stabilizers / (len(stabilizers) * (no_flag + missed_flags) * len(input_states))
-    #plt.yscale("log")   
-    plt.xscale("log")
-    plt.scatter(list(range(time_steps)), results, label="flag circuit")
-    plt.xlabel('time step')
-    plt.ylabel('robustness')
-    plt.legend()
-    plt.show()
-    #plt.savefig(output_file)   
-    return results
+                        error_occured += 1
+                        # if flags caught error
+                        if True in flag_measurements:
+                            correct_flags += 1
+                        # if flags missed error
+                        else:            
+                            missed_flags += 1
+                
+            results[m] = missed_flags / ((no_flag + missed_flags) * len(input_states))
+        if plotting:
+            scaled_time_steps = range(time_steps) * step_size
+            print(scaled_time_steps)
+            plt.scatter(scaled_time_steps, results, label="flag circuit")
+            plt.xlabel('moment')
+            plt.ylabel('logical error rate')
+            plt.legend()
+        return results
+    
+    def run_time_steps_icm(circuit: cirq.Circuit, number_of_runs, error_rate, input_states):
+        moments = list(circuit.moments)
+        max_times_steps = 10
+        time_steps = np.min([len(moments), max_times_steps])
+        step_size = len(moments) // time_steps
+        results = np.zeros((time_steps,))
+
+        for m in range(time_steps):
+
+            step = m * step_size
+            error_occured = 0
+
+            for s in range(len(input_states)):
+                state = input_states[s]
+                prepared_circuit = prepare_circuit_from_string(circuit, state)
+                split_circuit = cirq.Circuit(list(prepared_circuit.moments)[:step])
+                expected_stim = stimcirq.cirq_circuit_to_stim_circuit(split_circuit)
+                simulator_expected = stim.TableauSimulator()
+                simulator_expected.do_circuit(expected_stim)
+                stabilizers = simulator_expected.canonical_stabilizers()
+
+                for n in range(number_of_runs):
+
+                    noisy_circuit = split_circuit.with_noise(cirq.depolarize(p=error_rate))
+                    noisy_stim = stimcirq.cirq_circuit_to_stim_circuit(noisy_circuit)
+                    simulator = stim.TableauSimulator()
+                    simulator.do_circuit(noisy_stim)
+                    flag_measurements = simulator.current_measurement_record()
+                    stabilizer_measurements = measure_stabilizers(simulator, stabilizers)
+
+                    if np.any(stabilizer_measurements): 
+                        # if error occured
+                        error_occured += 1
+                
+            results[m] = error_occured / (len(input_states) * number_of_runs)
+        
+        if plotting:
+            scaled_time_steps = range(time_steps) * step_size
+            print(scaled_time_steps)
+            plt.scatter(scaled_time_steps, results, label="icm circuit")
+            plt.xlabel('moment')
+            plt.ylabel('logical error rate')
+            plt.legend()
+            #plt.show()
+            plt.savefig(output_file)   
+        return results
+    
+    results = run_time_steps_flag(flag_circuit, number_of_runs, error_rate, input_states)
+    results_icm = run_time_steps_icm(icm_circuit, number_of_runs, error_rate, input_states)
+    return results, results_icm
+
