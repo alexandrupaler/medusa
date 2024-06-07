@@ -1,8 +1,5 @@
 import itertools
-
 import cirq
-from concurrent.futures import ThreadPoolExecutor
-from functools import reduce
 
 
 class Error_Map:
