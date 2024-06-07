@@ -27,17 +27,15 @@ if __name__ == '__main__':
 
     print(icm_circuit)
 
-    f_cir_heuristic = c.add_flag(icm_circuit, strategy="heuristic")
+    flag_circuit = c.add_flag(icm_circuit, number_of_x_flag=1, number_of_z_flag=1)
 
     print("\n")
     print("Flags inserted!")
     print("\n")
 
-    flag_circuit = f_cir_heuristic
-
     print(flag_circuit)
     
     number_of_runs = 100
-    error_rates = np.linspace(0.001, 0.01, 5)
-    evaluate.stabilizers_benchmark_logical_error(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "results_stabilizers_logical_error_testcircuit2.png")
-    #evaluate.stabilizers_benchmark_robustness(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "results_stabilizers_robustness_testcircuit2.png")
+    error_rates = [0.0001, 0.0002, 0.0004, 0.0008, 0.001, 0.00125, 0.0025, 0.005, 0.01]
+    evaluate.stabilizers_robustness_and_logical_error(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "testcircuit 2")
+
