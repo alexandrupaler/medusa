@@ -2,7 +2,7 @@
 
 Preliminary results of increasing the fault-tolerance of quantum circuits. We consider addition circuits which are transformed with Jabalizer into the ICM form: left) the logical error rate of the circuit without taking into account any additional information; right) after adding at random positions two flags and postselecting the circuit outputs based on flags the logical error-rate decreases by orders of magnitude
 
-!(medusa_res.png)[medusa_res.png]
+![medusa_res.png](medusa_res.png)
 
 **Notes**:
 - Python version must be 3.8+ for multiprocessing.shared_memory to work
