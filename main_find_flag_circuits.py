@@ -28,7 +28,7 @@ if __name__ == '__main__':
             
             circuits.append(flag_circuit)
 
-            results, results_icm, results_rob, results_rob_icm = evaluate.stabilizers_robustness_and_logical_error(flag_circuit, icm_circuit, number_of_runs, [error_rate], False, "Adder ")
+            results, results_icm, results_rob, results_rob_icm, accept = evaluate.stabilizers_robustness_and_logical_error(flag_circuit, icm_circuit, number_of_runs, [error_rate], False, "Adder ")
             res[run] = np.average(results)
 
         # warning because triton
