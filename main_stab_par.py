@@ -71,6 +71,10 @@ if __name__ == '__main__':
     pool.join()
 
     # plotting
+
+    # alternative path for files (if using files from results_final/with_acceptance):
+    # "results_final/with_acceptance/individual_runs/
+    
     plt.title("Logical Error Rate, 2 Flags")
     for p in paramlist:
         results = pd.read_csv("results_" + str(p) + ".csv")
@@ -123,7 +127,7 @@ if __name__ == '__main__':
     for p in paramlist:
         results_icm = pd.read_csv("acceptance_" + str(p) + ".csv")
         icm_circuit_name = "adder " + str(p)
-        plt.semilogx(error_rates, results_icm, label=icm_circuit_name)
+        plt.loglog(error_rates, results_icm, label=icm_circuit_name)
     plt.xlabel('noise channel strength')
     plt.ylabel('acceptance rate')
     plt.legend()
