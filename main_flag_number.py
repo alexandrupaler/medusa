@@ -15,10 +15,10 @@ if __name__ == '__main__':
 
     # the following rough values are best on previous results:
 
-    adder_3_error = 0.00029
-    adder_4_error = 0.00054
-    adder_5_error = 0.00084
-    adder_6_error = 0.00125
+    adder_3_error = 0.0209
+    adder_4_error = 0.0398
+    adder_5_error = 0.0707
+    adder_6_error = 0.1082
 
     goal_errors = {
         3: adder_3_error,
@@ -85,6 +85,7 @@ if __name__ == '__main__':
                 break
 
         warnings.warn("final flags xf, zf: " + str(final_flags[0]) + ", " + str(final_flags[1]))
+        print("adder " + str(i) + " final flags: " + str(final_flags[0]) + ", " + str(final_flags[1]))
         return final_flags
 
     paramlist = [4,5,6,7]
