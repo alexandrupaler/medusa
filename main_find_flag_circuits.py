@@ -14,9 +14,9 @@ if __name__ == '__main__':
 
     def parallel_simulation(i):
         
-        number_of_flag_configurations = 5
+        number_of_flag_configurations = 10
         number_of_runs = 100
-        error_rate = 0.001
+        error_rate = 0.0001
 
         res = np.zeros((number_of_flag_configurations,))
         circuits = []

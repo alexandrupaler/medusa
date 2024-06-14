@@ -15,10 +15,10 @@ if __name__ == '__main__':
 
     # the following rough values are best on previous results:
 
-    adder_3_error = 0.0209
-    adder_4_error = 0.0398
-    adder_5_error = 0.0707
-    adder_6_error = 0.1082
+    adder_3_error = 0.00029 #0.00028861625100563154
+    adder_4_error = 0.00054 #0.0005423694576305424
+    adder_5_error = 0.00084 #0.0008370490474260235
+    adder_6_error = 0.00125 #0.001249112845990064
 
     goal_errors = {
         3: adder_3_error,
@@ -33,7 +33,11 @@ if __name__ == '__main__':
 
         goal_error = goal_errors[i - 1]
 
-        flag_amounts = [(0,1), (1,0), (1,1), (1,2), (2,1), (2,2), (0,3), (3,0), (1,3), (3,1), (2,3), (3,2), (3,3)]
+        flag_amounts = [(1,1), (1,2), (2,1), (2,2), (1,3), (3,1), (2,3), (3,2), (3,3)]
+
+        number_of_flag_configurations = 5
+        number_of_runs = 100
+        error_rate = 0.0001
 
         for flags in flag_amounts:
 
@@ -42,12 +46,7 @@ if __name__ == '__main__':
 
             warnings.warn("try out flags xf, zf: " + str(xf) + ", " + str(zf))
 
-            
             # find good flag configuration
-            number_of_flag_configurations = 5
-            number_of_runs = 10
-            error_rate = 0.0001
-
             res = np.zeros((number_of_flag_configurations,))
             circuits = []
 
@@ -70,25 +69,25 @@ if __name__ == '__main__':
             icm_circuit: cirq.Circuit = c.decompose_to_ICM(test_circuits.adder(i), i=i)
             flag_circuit = best_circuit
             
-            number_of_runs = 100
             error_rates = [error_rate]
 
             results, results_icm, results_rob, results_rob_icm, acceptance = evaluate.stabilizers_robustness_and_logical_error(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "Adder " + str(i))
 
-            # warning because triton
-            warnings.warn("done: " + str(i))
-
             # compare
             if results[0] <= goal_error:
-                print("error was small enough!")
+                
                 final_flags = (xf, zf)
-                break
 
+                # warning because triton
+                warnings.warn("error was small enough!" + str(i))
+
+                break
+        
         warnings.warn("final flags xf, zf: " + str(final_flags[0]) + ", " + str(final_flags[1]))
         print("adder " + str(i) + " final flags: " + str(final_flags[0]) + ", " + str(final_flags[1]))
         return final_flags
 
-    paramlist = [4,5,6,7]
+    paramlist = [4,5,6]
     pool = Pool()
     pool.map(parallel_simulation, paramlist)
     pool.close()
