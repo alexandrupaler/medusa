@@ -11,6 +11,8 @@ icm_converter:
 - Author: quan-hoang
 - Date: 2023-05-25
 
+! icm_converter.jl may be incompatible with Jabalizer
+
 run `main.py` for simple simulation with a test circuit
 run `main_adders.py` for non-parallel simulation with different sized addition circuits
 run `main_parallel.py` for parallelized simulation with different sized addition circuits
