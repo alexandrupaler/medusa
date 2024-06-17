@@ -13,6 +13,7 @@ icm_converter:
 
 ! icm_converter.jl may be incompatible with Jabalizer
 
+Running python files:
 - run `main.py` for simple simulation with a test circuit
 - run `main_adders.py` for non-parallel simulation with different sized addition circuits
 - run `main_parallel.py` for parallelized simulation with different sized addition circuits
