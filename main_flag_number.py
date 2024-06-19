@@ -129,6 +129,10 @@ if __name__ == '__main__':
             
         min_index = np.argmin(res)
         best_circuit = circuits[min_index]
+
+        json_string = cirq.to_json(best_circuit)
+        with open("flag_circuit_adder3_flags" + str(i) + ".json", "w") as outfile:
+            outfile.write(json_string)
             
         # run simulation
         c = compiler.FlagCompiler()
