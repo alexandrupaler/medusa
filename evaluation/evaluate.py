@@ -719,15 +719,12 @@ def stabilizers_benchmark_with_timesteps(flag_circuit: cirq.Circuit, icm_circuit
 
 
 # simulation which uses stabilizer measurements, calculates logical error, and has perfect flags
-# requires noise to be added into the circuit + the flag stabilizers to be found before calling this function
+# requires noise to be added into the circuit, input states generated & the flag stabilizers to be found before calling this function
 # UNTESTED!
-def stabilizers_perfect_flags(flag_circuit: cirq.Circuit, icm_circuit: cirq.Circuit, number_of_runs, flag_stabilizers):
+def stabilizers_perfect_flags(flag_circuit: cirq.Circuit, icm_circuit: cirq.Circuit, number_of_runs, flag_stabilizers, input_states):
     results = 0
     results_icm = 0
     acceptance = 0
-
-    number_of_input_states = 100
-    input_states = generate_input_strings(icm_circuit, number_of_input_states)
 
     error_occured = 0
     correct_flags = 0
@@ -741,7 +738,7 @@ def stabilizers_perfect_flags(flag_circuit: cirq.Circuit, icm_circuit: cirq.Circ
 
         # the expected results 
         # for flag circuit
-        stabilizers = flag_stabilizers
+        stabilizers = flag_stabilizers[s]
         # for icm circuit
         prepared_circuit_icm = prepare_circuit_from_string(icm_circuit, state)
         expected_stim_icm = stimcirq.cirq_circuit_to_stim_circuit(prepared_circuit_icm)
