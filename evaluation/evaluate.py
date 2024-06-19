@@ -722,6 +722,7 @@ def stabilizers_benchmark_with_timesteps(flag_circuit: cirq.Circuit, icm_circuit
 # requires noise to be added into the circuit, input states generated & the flag stabilizers to be found before calling this function
 # UNTESTED!
 def stabilizers_perfect_flags(flag_circuit: cirq.Circuit, icm_circuit: cirq.Circuit, number_of_runs, flag_stabilizers, input_states):
+    
     results = 0
     results_icm = 0
     acceptance = 0
@@ -785,9 +786,9 @@ def stabilizers_perfect_flags(flag_circuit: cirq.Circuit, icm_circuit: cirq.Circ
             if np.any(stabilizer_measurements_icm):
                 error_occured += 1
 
-        # update results
-        results = missed_flags / ((no_flag + missed_flags) * len(input_states))
-        results_icm = error_occured / (number_of_runs * len(input_states))
-        acceptance = (no_flag + missed_flags) / (number_of_runs * len(input_states))
+    # update results
+    results = missed_flags / ((no_flag + missed_flags) * len(input_states))
+    results_icm = error_occured / (number_of_runs * len(input_states))
+    acceptance = (no_flag + missed_flags) / (number_of_runs * len(input_states))
 
     return results, results_icm, acceptance
