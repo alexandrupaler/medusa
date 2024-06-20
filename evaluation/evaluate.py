@@ -659,7 +659,7 @@ def stabilizers_benchmark_with_timesteps(flag_circuit: cirq.Circuit, icm_circuit
             results[m] = missed_flags / ((no_flag + missed_flags) * len(input_states))
         if plotting:
             scaled_time_steps = range(time_steps) * step_size
-            print(scaled_time_steps)
+            #print(scaled_time_steps)
             plt.scatter(scaled_time_steps, results, label="flag circuit")
             plt.xlabel('moment')
             plt.ylabel('logical error rate')
@@ -724,7 +724,8 @@ def add_random_noise(circuit: cirq.Circuit, error_rate, perfect_flags=False):
     class PerfectFlagsDepolarizingNoise(cirq.NoiseModel):
         def noisy_operation(self, op: cirq.Operation):
             if 'f' not in str(op.qubits):
-                return [op, cirq.depolarize(p=error_rate).on_each(op.qubits)]
+                for q in op.qubits:
+                    return [op, cirq.depolarize(p=error_rate).on(q)]
             return op
     
     noisy_circuit = circuit
@@ -732,5 +733,5 @@ def add_random_noise(circuit: cirq.Circuit, error_rate, perfect_flags=False):
         noisy_circuit = circuit.with_noise(cirq.depolarize(p=error_rate))
     else:
         noisy_circuit = circuit.with_noise(noise=PerfectFlagsDepolarizingNoise())
-        
+
     return noisy_circuit
