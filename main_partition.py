@@ -1,7 +1,6 @@
 import cirq.circuits
 import cirq
 import matplotlib.pyplot as plt
-import warnings
 import pandas as pd
 import numpy as np
 from multiprocessing import Pool
@@ -14,6 +13,8 @@ if __name__ == '__main__':
 
     # triton cpus:
     # - 4
+
+    # Problem: preparing the circuit from string doesn't necessarily include all the qubuts in the circuit -> error
 
     error_rates = [0.0001, 0.0002, 0.0004, 0.0008, 0.001, 0.00125, 0.0025, 0.005, 0.01]
     number_of_runs = 100

@@ -1,14 +1,14 @@
 
 import cirq.circuits.circuit
-import numpy as np
+import warnings
 import cirq
 import stim
 import stimcirq
-from preparation import error_circuit
-from . import state_vector_comparison
 import random
 import matplotlib.pyplot as plt
-import warnings
+import numpy as np
+from preparation import error_circuit
+from . import state_vector_comparison
 
 # how do the error weights change & propagate
 def evaluate_flag_circuit(flag_circuit, icm_circuit, maximum_number_of_error, number_of_input_states, plotting, output_file="results.png"):

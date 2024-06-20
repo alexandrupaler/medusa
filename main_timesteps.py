@@ -1,15 +1,8 @@
 import cirq.circuits
+import cirq
+import matplotlib.pyplot as plt
 from preparation import compiler, test_circuits
 from evaluation import evaluate
-import cirq
-import numpy as np
-import stimcirq
-import matplotlib.pyplot as plt
-from matplotlib import cm
-import warnings
-import stim
-from multiprocessing import Pool
-import itertools
 
 
 if __name__ == '__main__':
