@@ -703,7 +703,7 @@ def stabilizers_benchmark_with_timesteps(flag_circuit: cirq.Circuit, icm_circuit
         
         if plotting:
             scaled_time_steps = range(time_steps) * step_size
-            plt.loglog(scaled_time_steps, results, label="icm circuit")
+            plt.semilogy(scaled_time_steps, results, label="icm circuit")
             plt.xlabel('moment')
             plt.ylabel('logical error rate')
             plt.legend()
