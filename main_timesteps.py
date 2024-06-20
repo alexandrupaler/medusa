@@ -16,54 +16,25 @@ if __name__ == '__main__':
 
     # ONLY FOR TESTING PURPOSES ATM
 
-    c = compiler.FlagCompiler()
-    circ = test_circuits.adder(3)
-    icm_circuit: cirq.Circuit = c.decompose_to_ICM(circ)
-
     number_of_runs = 100
     error_rates = [0.0001, 0.0002, 0.0004, 0.0008, 0.001, 0.00125, 0.0025, 0.005, 0.01]
+    c = compiler.FlagCompiler()
+    circ = test_circuits.test_circuit2()#(3)
 
-    results = np.zeros((len(error_rates),))
+    # decompose
+    icm_circuit: cirq.Circuit = c.decompose_to_ICM(circ)
 
-    for e in range(len(error_rates)):
-        error_rate = error_rates[e]
-        print("error :" + str(e))
+    # add flags
+    flag_circuit = c.add_flag(icm_circuit, number_of_x_flag=1, number_of_z_flag=1)
 
-        comp = compiler.FlagCompiler()
-
-        # add noise before flags
-        noisy_circuit = icm_circuit.with_noise(cirq.depolarize(p=error_rate))
-
-        # add flags
-        flag_circuit = comp.add_flag(noisy_circuit, strategy="heuristic")
-
-        # find inout states
-        number_of_input_states = 100
-        input_states = evaluate.generate_input_strings(icm_circuit, number_of_input_states)
-        
-        # find stabilizers
-        stabilizers = []
-        for s in range(len(input_states)):
-            print("state :" + str(s))
-
-            state = input_states[s]
-            prepared_circuit = evaluate.prepare_circuit_from_string(flag_circuit, state)
-            expected_stim = stimcirq.cirq_circuit_to_stim_circuit(prepared_circuit)
-            simulator_expected = stim.TableauSimulator()
-            simulator_expected.do_circuit(expected_stim)
-            stabilizers.append(simulator_expected.canonical_stabilizers())
-        
-        # run simulation
-        res, a, b = evaluate.stabilizers_perfect_flags(flag_circuit, icm_circuit, number_of_runs, stabilizers, input_states)
-        results[e] = res
+    # run simulation
+    results, a, b, c, d = evaluate.stabilizers_robustness_and_logical_error(flag_circuit, icm_circuit, number_of_runs, error_rates, False, "title", True)
 
     # plotting
-
     plt.title("Logical Error Rate with Perfect Flags")
     plt.loglog(error_rates, results)
     plt.xlabel('noise channel strength')
     plt.ylabel('logical error rate')
-    plt.legend()
     plt.show()
     #plt.savefig(filename)
 
