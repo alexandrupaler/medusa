@@ -19,7 +19,7 @@ if __name__ == '__main__':
     number_of_runs = 100
     error_rates = [0.0001, 0.0002, 0.0004, 0.0008, 0.001, 0.00125, 0.0025, 0.005, 0.01]
     c = compiler.FlagCompiler()
-    circ = test_circuits.test_circuit2()#(3)
+    circ = test_circuits.adder(5)
 
     # decompose
     icm_circuit: cirq.Circuit = c.decompose_to_ICM(circ)
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     results, a, b, c, d = evaluate.stabilizers_robustness_and_logical_error(flag_circuit, icm_circuit, number_of_runs, error_rates, False, "title", True)
 
     # plotting
-    plt.title("Logical Error Rate with Perfect Flags")
+    plt.title("Logical Error Rate with Perfect Flags, Adder 5")
     plt.loglog(error_rates, results)
     plt.xlabel('noise channel strength')
     plt.ylabel('logical error rate')

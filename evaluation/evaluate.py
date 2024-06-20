@@ -731,8 +731,6 @@ def add_random_noise(circuit: cirq.Circuit, error_rate, perfect_flags=False):
     if not perfect_flags:
         noisy_circuit = circuit.with_noise(cirq.depolarize(p=error_rate))
     else:
-        # TODO: a new way to add noise excluding the flag qubits
         noisy_circuit = circuit.with_noise(noise=PerfectFlagsDepolarizingNoise())
-
-
+        
     return noisy_circuit
