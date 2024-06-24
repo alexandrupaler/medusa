@@ -15,7 +15,7 @@ if __name__ == '__main__':
 
     def parallel_simulation(i):
         c = compiler.FlagCompiler()
-        circ = test_circuits.test_circuit2()#adder(i)
+        circ = test_circuits.adder(i)
 
         # decompose
         icm_circuit: cirq.Circuit = c.decompose_to_ICM(circ, i=i)
