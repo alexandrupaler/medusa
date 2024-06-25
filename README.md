@@ -6,6 +6,7 @@ Preliminary results of increasing the fault-tolerance of quantum circuits. We co
 
 **Notes**:
 - Python version must be 3.8+ for multiprocessing.shared_memory to work
+- `Qualtran` https://github.com/quantumlib/Qualtran version must be 0.3.0
 - `Jabalizer` https://github.com/QSI-BAQS/Jabalizer.jl
 - `Stim` https://github.com/quantumlib/Stim
 - icm_converter.jl may be incompatible with some versions of Jabalizer
