@@ -1,5 +1,8 @@
 import itertools
 import cirq
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 class Error_Map:
@@ -13,9 +16,14 @@ class Error_Map:
         self.circuit = circuit
         self.moment_with_cnot = list(filter(lambda m: self.__is_moment_with_cnot__(m), list(circuit.moments)))
         self.qubits = list(circuit.all_qubits())
+        self.num_moment_with_cnot = len(self.moment_with_cnot)
+        self.num_qubits = len(self.qubits)
         self.map_size = len(self.moment_with_cnot)
-        self.X_map = {}
-        self.Z_map = {}
+        self.X_propagation_map = {}
+        self.Z_propagation_map = {}
+        self.X_error_map = np.zeros(shape=(self.num_qubits,self.num_moment_with_cnot))
+        self.Z_error_map = np.zeros(shape=(self.num_qubits,self.num_moment_with_cnot))
+
 
     def create_map(self):
         # THere is a problem with index
@@ -52,30 +60,30 @@ class Error_Map:
                     propagated_x_error = []
                     propagated_z_error = []
                     for error in helper1:
-                        for e in self.X_map[tuple(error)]:
+                        for e in self.X_propagation_map[tuple(error)]:
                             propagated_x_error.append(e)
                     for error in helper2:
-                        for e in self.Z_map[tuple(error)]:
+                        for e in self.Z_propagation_map[tuple(error)]:
                             propagated_z_error.append(e)
                 # this two line below is bad and could be removed
                 propagated_x_error = [e for e in propagated_x_error if propagated_x_error.count(e) % 2 == 1]
                 propagated_z_error = [e for e in propagated_z_error if propagated_z_error.count(e) % 2 == 1]
 
-                self.X_map[tuple(original_error)] = propagated_x_error
-                self.Z_map[tuple(original_error)] = propagated_z_error
+                self.X_propagation_map[tuple(original_error)] = propagated_x_error
+                self.Z_propagation_map[tuple(original_error)] = propagated_z_error
             #print("")
             #print("map for 1 error:")
 
-        for key, val in self.X_map.copy().items():
+        for key, val in self.X_propagation_map.copy().items():
             if key not in distinct_x_error:
-                del self.X_map[key]
-        for key, val in self.Z_map.copy().items():
+                del self.X_propagation_map[key]
+        for key, val in self.Z_propagation_map.copy().items():
             if key not in distinct_z_error:
-                del self.Z_map[key]
+                del self.Z_propagation_map[key]
 
         #for key, val in self.X_map.items():
             #print("moments:", key[1], val)
-        return [self.X_map, self.Z_map]
+        return [self.X_propagation_map, self.Z_propagation_map]
 
     def create_map_2(self, max_error):
         x_map = self.create_map()[0]
@@ -98,3 +106,55 @@ class Error_Map:
             #print("moments:", h, "   ", val)
 
         return result
+
+    ## find the exact
+    def create_error_map(self, p: float):
+        qubits_with_index = dict(zip(self.qubits, range(self.num_qubits)))
+        moments_with_index = dict(zip(self.moment_with_cnot, range(self.num_moment_with_cnot)))
+
+        for m in self.moment_with_cnot:
+            c = moments_with_index[m]
+            print(c)
+            m: cirq.Moment
+            if c == 0:
+                for r, q in enumerate(self.qubits):
+                    q: cirq.NamedQubit
+                    self.X_error_map[r] = [p]
+
+            for q in self.qubits:
+                q: cirq.NamedQubit
+                r_q = qubits_with_index[q]
+                control = None
+                for op in m.operations:
+                    if op.qubits[1] == q:
+                        control = op.qubits[0]
+
+                if control is None:
+                    p_odd_q = self.X_error_map[r_q][c-1]
+                    error_accumulated_prob = p_odd_q*(1-p) + (1-p_odd_q)*p
+                    self.X_error_map[r_q][c] = error_accumulated_prob
+                else:
+                    r_c = qubits_with_index[control]
+                    p_odd_q = self.X_error_map[r_q][c-1]
+                    p_odd_c = self.X_error_map[r_c][c-1]
+                    error_accumulated_prob = p_odd_q*p_odd_q*p + (1-p_odd_q)*p_odd_c*(1-p) + p_odd_q*(1-p_odd_c)*(1-p)+ (1-p_odd_q)*(1-p_odd_c)*p
+                    self.X_error_map[r_q][c] = error_accumulated_prob
+
+    def plot_error_map(self):
+        plt.figure(figsize=(10, 8))
+        plt.imshow(self.X_error_map, cmap='viridis', aspect='auto')
+        plt.colorbar(label='Error Rate')
+        plt.title('Error Map Heatmap')
+        plt.xlabel('Moments with CNOT')
+        plt.ylabel('Qubits')
+        plt.xticks(ticks=np.arange(self.num_moment_with_cnot), labels=np.arange(1, self.num_moment_with_cnot + 1))
+        plt.yticks(ticks=np.arange(self.num_qubits), labels=self.qubits)
+        plt.show()
+
+
+
+
+
+
+
+
