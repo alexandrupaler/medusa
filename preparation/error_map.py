@@ -83,8 +83,8 @@ class Error_Map:
             if key not in distinct_z_error:
                 del self.Z_propagation_map[key]
 
-        #for key, val in self.X_map.items():
-            #print("moments:", key[1], val)
+        for key, val in self.X_propagation_map.items():
+            print(key, val)
         return [self.X_propagation_map, self.Z_propagation_map]
 
     def create_map_2(self, max_error):

@@ -1,5 +1,4 @@
 import cirq
-from flag_qubits import XFlagQubit, ZFlagQubit
 from .error_map import Error_Map
 
 class Flag:
@@ -53,7 +52,7 @@ class FlagCompiler:
     @staticmethod
     def __is_moment_with_cnot__(moment: cirq.Moment):
         for op in moment.operations:
-            if op is cirq.CNOT:
+            if len(op.qubits) == 2:
                 return True
         return False
 
