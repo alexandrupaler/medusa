@@ -26,51 +26,53 @@ class Error_Map:
 
 
     def create_map(self):
-        # THere is a problem with index
-        self.moment_with_cnot.reverse()
+        #what does this line do what Tf have I done ?
+        #self.moment_with_cnot.reverse()
         # take len(moment) step
+
         distinct_x_error = []
         distinct_z_error = []
         for i, moment in enumerate(self.moment_with_cnot):
             index = self.map_size - i - 1
             moment: cirq.Moment
-            control, target = moment.operations[0].qubits
-            # take w (w is width) step
-            for qubit in self.qubits:
-                qubit: cirq.NamedQubit
+            for op in moment.operations:
                 control: cirq.NamedQubit
                 target: cirq.NamedQubit
-                original_error = (qubit, index)
-                propagated_x_error = [(qubit, index + 1)]
-                propagated_z_error = [(qubit, index + 1)]
+                control, target = op.qubits
 
-                if control == qubit:
-                    distinct_x_error.append(tuple(original_error))
-                    propagated_x_error.append((target, index + 1))
-                elif target == qubit:
-                    distinct_z_error.append(tuple(original_error))
-                    propagated_z_error.append((control, index + 1))
+                for qubit in self.qubits:
+                    qubit: cirq.NamedQubit
+                    original_error = (qubit, index)
+                    propagated_x_error = [(qubit, index + 1)]
+                    propagated_z_error = [(qubit, index + 1)]
 
-                # we will query the dictionary to update the result
-                helper1 = propagated_x_error
-                helper2 = propagated_z_error
+                    if control == qubit:
+                        distinct_x_error.append(tuple(original_error))
+                        propagated_x_error.append((target, index + 1))
+                    elif target == qubit:
+                        distinct_z_error.append(tuple(original_error))
+                        propagated_z_error.append((control, index + 1))
 
-                # this can be changed to take O(w^2) -maybe
-                if not index + 1 == self.map_size:
-                    propagated_x_error = []
-                    propagated_z_error = []
-                    for error in helper1:
-                        for e in self.X_propagation_map[tuple(error)]:
-                            propagated_x_error.append(e)
-                    for error in helper2:
-                        for e in self.Z_propagation_map[tuple(error)]:
-                            propagated_z_error.append(e)
-                # this two line below is bad and could be removed
-                propagated_x_error = [e for e in propagated_x_error if propagated_x_error.count(e) % 2 == 1]
-                propagated_z_error = [e for e in propagated_z_error if propagated_z_error.count(e) % 2 == 1]
+                    # we will query the dictionary to update the result
+                    helper1 = propagated_x_error
+                    helper2 = propagated_z_error
 
-                self.X_propagation_map[tuple(original_error)] = propagated_x_error
-                self.Z_propagation_map[tuple(original_error)] = propagated_z_error
+                    # this can be changed to take O(w^2) -maybe
+                    if not index + 1 == self.map_size:
+                        propagated_x_error = []
+                        propagated_z_error = []
+                        for error in helper1:
+                            for e in self.X_propagation_map[tuple(error)]:
+                                propagated_x_error.append(e)
+                        for error in helper2:
+                            for e in self.Z_propagation_map[tuple(error)]:
+                                propagated_z_error.append(e)
+                    # this two line below is bad and could be removed
+                    propagated_x_error = [e for e in propagated_x_error if propagated_x_error.count(e) % 2 == 1]
+                    propagated_z_error = [e for e in propagated_z_error if propagated_z_error.count(e) % 2 == 1]
+
+                    self.X_propagation_map[tuple(original_error)] = propagated_x_error
+                    self.Z_propagation_map[tuple(original_error)] = propagated_z_error
             #print("")
             #print("map for 1 error:")
 
