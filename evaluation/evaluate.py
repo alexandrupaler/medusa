@@ -7,6 +7,7 @@ import stimcirq
 import random
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from preparation import error_circuit
 from . import state_vector_comparison
 
@@ -492,6 +493,10 @@ def stabilizers_robustness_and_logical_error(flag_circuit: cirq.Circuit, icm_cir
 
     for e in range(len(error_rates)):
 
+        flag_measurements_df = np.empty((input_states,number_of_runs))
+        stabilizer_measurements_df = np.empty((input_states,number_of_runs))
+        icm_measurements_df = np.empty((input_states,number_of_runs))
+
         warnings.warn("error rate number: " + str(e))
 
         error_rate = error_rates[e]
@@ -567,6 +572,19 @@ def stabilizers_robustness_and_logical_error(flag_circuit: cirq.Circuit, icm_cir
                     error_occured += 1
                     faulty_stabilizers_icm += stabilizer_measurements.sum()
 
+                # save measurement results
+                flag_measurements_df[s,n] = np.any(flag_measurements)
+                stabilizer_measurements_df[s,n] = np.any(stabilizer_measurements)
+                icm_measurements_df[s,n] = np.any(stabilizer_measurements_icm)
+
+        # save measurement results as csvs
+        flag_df = pd.DataFrame(flag_measurements_df)
+        res_df = pd.DataFrame(stabilizer_measurements_df)
+        res_icm_df = pd.DataFrame(icm_measurements_df)
+
+        flag_df.to_csv("flag_measurements_df_error_rate_" + str(e) + ".csv",index=False)
+        res_df.to_csv("stabilizer_measurements_df_error_rate_" + str(e) + ".csv",index=False)
+        res_icm_df.to_csv("icm_measurements_df_error_rate_" + str(e) + ".csv",index=False)
 
         # update results
         results[e] = missed_flags / ((no_flag + missed_flags) * len(input_states))
@@ -600,6 +618,57 @@ def stabilizers_robustness_and_logical_error(flag_circuit: cirq.Circuit, icm_cir
         plt.savefig(filename)
         plt.close()
     return results, results_icm, results_rob, results_rob_icm, acceptance
+
+# used to analyze the measurement results from the above function
+def analyze_results_from_csv(error_rates, number_of_runs, number_of_input_states):
+
+    results = np.zeros((len(error_rates),))
+    results_icm = np.zeros((len(error_rates),))
+    acceptance = np.zeros((len(error_rates),))
+
+    for e in range(len(error_rates)):
+
+        error_occured = 0
+        correct_flags = 0
+        missed_flags = 0
+        false_flags = 0
+        no_flag = 0
+
+        faulty_stabilizers = 0
+        faulty_stabilizers_icm = 0
+
+        flag_measurements = pd.read_csv("flag_measurements_df_error_rate_" + str(e) + ".csv")
+        stabilizer_measurements =  pd.read_csv("stabilizer_measurements_df_error_rate_" + str(e) + ".csv")
+        stabilizer_measurements_icm =  pd.read_csv("icm_measurements_df_error_rate_" + str(e) + ".csv")
+
+        # flag circuit
+        if not np.any(stabilizer_measurements):
+            # if no error but flag went off
+            if True in flag_measurements:
+                false_flags += 1
+            else:
+                no_flag += 1
+        else:
+            # if flags caught error
+            if True in flag_measurements:
+                correct_flags += 1
+            # if flags missed error
+            else:
+                faulty_stabilizers += stabilizer_measurements.sum()
+                missed_flags += 1
+
+        # icm_circuit
+        if np.any(stabilizer_measurements_icm):
+            error_occured += 1
+            faulty_stabilizers_icm += stabilizer_measurements.sum()
+
+        # update results
+        results[e] = missed_flags / ((no_flag + missed_flags) * number_of_input_states)
+        results_icm[e] = error_occured / (number_of_runs * number_of_input_states)
+        acceptance[e] = (no_flag + missed_flags) / (number_of_runs * number_of_input_states)
+
+    return results, results_icm, acceptance
+    
 
 # calculated error at different moments using stabilizer measurements
 def stabilizers_benchmark_with_timesteps(flag_circuit: cirq.Circuit, icm_circuit: cirq.Circuit, number_of_runs, error_rate, plotting, output_file="results.png",perfect_flags="default", post_selection=True):
