@@ -208,3 +208,16 @@ def adder(size: int):
     circuit = prepare_adder_for_jabalizer(circuit)
 
     return circuit
+
+def adder_only_cnots(size: int):
+    circuit = adder(size)
+
+    def wihtout_H(op: cirq.Operation) -> cirq.OP_TREE:
+        if not isinstance(op.gate, cirq.HPowGate):
+            yield op
+
+    circuit = circuit.map_operations(wihtout_H)
+
+    return circuit
+
+
