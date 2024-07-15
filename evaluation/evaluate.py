@@ -814,3 +814,50 @@ def add_random_noise(circuit: cirq.Circuit, error_rate, perfect_flags="default")
         noisy_circuit = circuit.with_noise(cirq.depolarize(p=error_rate))
 
     return noisy_circuit
+
+def calculate_logical_error_from_csv(number_of_error_rates, number_of_runs, number_of_input_states):
+
+    results = np.zeros((number_of_error_rates,))
+    results_icm = np.zeros((number_of_error_rates,))
+
+    for e in range(number_of_error_rates):
+        flag_measurements_df = pd.read_csv("flag_measurements_df_error_rate_" + str(e) + ".csv").to_numpy()
+        stabilizer_measurements_df = pd.read_csv("stabilizer_measurements_df_error_rate_" + str(e) + ".csv").to_numpy()
+        icm_measurements_df = pd.read_csv("icm_measurements_df_error_rate_" + str(e) + ".csv").to_numpy()
+
+        error_occured = 0
+        correct_flags = 0
+        missed_flags = 0
+        false_flags = 0
+        no_flag = 0
+
+        for s in range(number_of_input_states):
+            for n in range(number_of_runs):
+
+                flag_measurements = flag_measurements_df[s,n]
+                stabilizer_measurements = stabilizer_measurements_df[s,n]
+                stabilizer_measurements_icm = icm_measurements_df[s,n]
+
+                # flag circuits
+                if not np.any(stabilizer_measurements):
+                    # if no error but flag went off
+                    if np.any(flag_measurements):
+                        false_flags += 1
+                    else:
+                        no_flag += 1
+                else:
+                    # if flags caught error
+                    if np.any(flag_measurements):
+                        correct_flags += 1
+                    # if flags missed error
+                    else:
+                        missed_flags += 1
+
+                # icm circuit
+                if np.any(stabilizer_measurements_icm):
+                    error_occured += 1
+
+        results[e] = missed_flags / ((no_flag + missed_flags) * number_of_input_states)
+        results_icm[e] = error_occured / (number_of_runs * number_of_input_states)
+    
+    return results, results_icm
