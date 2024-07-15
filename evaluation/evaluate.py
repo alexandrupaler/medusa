@@ -493,9 +493,9 @@ def stabilizers_robustness_and_logical_error(flag_circuit: cirq.Circuit, icm_cir
 
     for e in range(len(error_rates)):
 
-        flag_measurements_df = np.empty((input_states,number_of_runs))
-        stabilizer_measurements_df = np.empty((input_states,number_of_runs))
-        icm_measurements_df = np.empty((input_states,number_of_runs))
+        flag_measurements_df = np.empty((len(input_states),number_of_runs))
+        stabilizer_measurements_df = np.empty((len(input_states),number_of_runs))
+        icm_measurements_df = np.empty((len(input_states),number_of_runs))
 
         warnings.warn("error rate number: " + str(e))
 
