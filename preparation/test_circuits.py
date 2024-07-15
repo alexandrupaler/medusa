@@ -168,16 +168,20 @@ def map_func(op: cirq.Operation) -> cirq.OP_TREE:
 def cla_map(op: cirq.Operation) -> cirq.OP_TREE:
     yield op.without_classical_controls()
 
-def replace_t_with_Z_map(op: cirq.Operation) -> cirq.OP_TREE:
-    if not isinstance(op.gate, cirq.ZPowGate) and not (op.gate.exponent == 0.25):
+def remove_t_gates(op: cirq.Operation) -> cirq.OP_TREE:
+    if not isinstance(op.gate, cirq.ZPowGate):
+        yield op
+    elif not (op.gate.exponent == 0.25):
         yield op
 
-def prepare_adder_for_jabalizer(circuit: cirq.Circuit):
+def prepare_adder_for_jabalizer(circuit: cirq.Circuit, with_t_gates=False):
 
     # no classical, cz -> h cx h, remove m & r
     circuit = circuit.map_operations(cla_map)
     circuit = circuit.map_operations(map_func)
-    circuit = circuit.map_operations(replace_t_with_Z_map)
+
+    if not with_t_gates:
+        circuit = circuit.map_operations(remove_t_gates)
 
     # transforming cleanqubits to named qubits
     #name_map =  {cirq.ops.CleanQubit(0): cirq.NamedQubit("c0")}
@@ -201,16 +205,16 @@ def prepare_adder_for_jabalizer(circuit: cirq.Circuit):
     return circuit
 
 
-def adder(size: int):
+def adder(size: int, with_t_gates=False):
 
     bloq = qualtran.bloqs.arithmetic.Add(qualtran.QUInt(size))
     circuit = get_clifford_plus_t_cirq_circuit_for_bloq(bloq)
-    circuit = prepare_adder_for_jabalizer(circuit)
+    circuit = prepare_adder_for_jabalizer(circuit,with_t_gates)
 
     return circuit
 
-def adder_only_cnots(size: int):
-    circuit = adder(size)
+def adder_only_cnots(size: int,with_t_gates=False):
+    circuit = adder(size,with_t_gates)
 
     def wihtout_H(op: cirq.Operation) -> cirq.OP_TREE:
         if not isinstance(op.gate, cirq.HPowGate):
