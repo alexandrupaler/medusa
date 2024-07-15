@@ -61,7 +61,7 @@ if __name__ == '__main__':
         res_icm_df.to_csv("results_icm_" + str(i) + ".csv",index=False)
         res_rob_df.to_csv("results_rob_" + str(i) + ".csv",index=False)
         res_rob_icm_df.to_csv("results_rob_icm_" + str(i) + ".csv",index=False)
-        acceptance.to_csv("acceptance_" + str(i) + ".csv")
+        acceptance.to_csv("acceptance_" + str(i) + ".csv",index=False)
 
     paramlist = [3,4,5,6,7] #[2,3,4,5,6,7]
     error_rates = [0.0001, 0.0002, 0.0004, 0.0008, 0.001, 0.00125, 0.0025, 0.005, 0.01]
