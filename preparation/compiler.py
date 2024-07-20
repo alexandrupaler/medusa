@@ -1,5 +1,6 @@
 import cirq
-from .error_map import Error_Map
+from preparation.error_map import Error_Map
+from preparation.flag_circuit import FlagCircuit
 
 class Flag:
     number_of_flag = 0
@@ -111,7 +112,7 @@ class FlagCompiler:
                         target_qbits.append(op.qubits[1])
 
         elif strategy == "heuristic":
-            # Brute force:D or i could do it better?
+            # Brute force:D
             for qubits in circuit.all_qubits():
                 x_gatherer = []
                 z_gatherer = []
@@ -140,7 +141,12 @@ class FlagCompiler:
                     z_end_moments.append(z_gatherer[-1])
                     target_qbits.append(qubits)
 
-        elif strategy == "map":
-            pass
+        elif strategy == "today_meeting":
+            result = FlagCircuit(circuit,channel_strength=0.1)
+            for l in  result.get_worst_location(number_of_locations=4):
+                print("cost :", l.objective_cost_1())
+                print(result.add_x_flag([l],in_place=False))
+
+            return result.body
 
         return flag_circuit
