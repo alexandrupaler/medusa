@@ -240,21 +240,33 @@ def graph_state(qubits: int, edge_probability: float, remove_hadamards: float):
     #full_matrix = matrix_top + np.transpose(matrix_top)
     #print(full_matrix)
 
+
     # create quantum circuit based on the graph state by substituting the edges with CZ gates
     graph_circuit = cirq.Circuit()
     cirq_qubits = cirq.LineQubit.range(qubits)
 
+    # probability to flip snots
+    flip_cx_p = 0.5
+
     def add_hadamard():
         return np.random.choice([False,True], 1, p=[remove_hadamards, 1 - remove_hadamards])
+    
+    def flip_cx():
+        return np.random.choice([False,True], 1, p=[1 - flip_cx_p, flip_cx_p])
     
     for q in range(qubits):
         for j in range(q+1,qubits):
             if matrix_top[q,j] == 1:
                 # add CZ gate as H CX H but don't add the hadamards based on the input probability
-
+                # + flip the CX based on probability defined above
                 if add_hadamard():
                     graph_circuit.append(cirq.H(cirq_qubits[q]))
-                graph_circuit.append(cirq.CX(cirq_qubits[q], cirq_qubits[j]))
+
+                if flip_cx():
+                    graph_circuit.append(cirq.CX(cirq_qubits[q], cirq_qubits[j]))
+                else:
+                    graph_circuit.append(cirq.CX(cirq_qubits[j], cirq_qubits[q]))
+                    
                 if add_hadamard():
                     graph_circuit.append(cirq.H(cirq_qubits[q]))
 
