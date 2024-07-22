@@ -1,9 +1,11 @@
 import cirq
+import cirq.circuits
 import qualtran
 import qualtran._infra
 import qualtran._infra.gate_with_registers
 import qualtran.bloqs
 import qualtran.bloqs.arithmetic
+import numpy as np
 
 # T dagger gate
 TDag = cirq.ZPowGate(exponent=-0.25)
@@ -224,4 +226,39 @@ def adder_only_cnots(size: int,with_t_gates=False):
 
     return circuit
 
+# for now let's assume max 1 edge between nodes
+def graph_state(qubits: int, edge_probability: float, remove_hadamards: float):
+
+    # generate graph state as a matrix based on the number of qubits and the density of edges
+    matrix_top = np.zeros((qubits,qubits))
+
+    for q in range(qubits):
+        edges_for_q = np.random.choice([0,1], qubits - 1 - q, p=[1 - edge_probability, edge_probability])
+        matrix_top[q,(q+1):qubits] = edges_for_q
+
+    # there is technically no need to obtain the full matrix ?
+    #full_matrix = matrix_top + np.transpose(matrix_top)
+    #print(full_matrix)
+
+    # create quantum circuit based on the graph state by substituting the edges with CZ gates
+    graph_circuit = cirq.Circuit()
+    cirq_qubits = cirq.LineQubit.range(qubits)
+
+    def add_hadamard():
+        return np.random.choice([False,True], 1, p=[remove_hadamards, 1 - remove_hadamards])
+    
+    for q in range(qubits):
+        for j in range(q+1,qubits):
+            if matrix_top[q,j] == 1:
+                # add CZ gate as H CX H but don't add the hadamards based on the input probability
+
+                if add_hadamard():
+                    graph_circuit.append(cirq.H(cirq_qubits[q]))
+                graph_circuit.append(cirq.CX(cirq_qubits[q], cirq_qubits[j]))
+                if add_hadamard():
+                    graph_circuit.append(cirq.H(cirq_qubits[q]))
+
+    return graph_circuit
+    
+    
 
