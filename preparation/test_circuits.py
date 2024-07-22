@@ -171,7 +171,7 @@ def cla_map(op: cirq.Operation) -> cirq.OP_TREE:
 def remove_t_gates(op: cirq.Operation) -> cirq.OP_TREE:
     if not isinstance(op.gate, cirq.ZPowGate):
         yield op
-    elif not (op.gate.exponent == 0.25):
+    elif not (op.gate.exponent == 0.25) and not op.gate.exponent == -0.25:
         yield op
 
 def prepare_adder_for_jabalizer(circuit: cirq.Circuit, with_t_gates=False):
