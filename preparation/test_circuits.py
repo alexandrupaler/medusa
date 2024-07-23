@@ -261,6 +261,13 @@ def CZ_to_H_CNOT_H(circuit: cirq.Circuit, remove_hadamards):
     
     return circuit.map_operations(map_cz)
 
+# remove double hadamards
+def merge_func(op1: cirq.Operation, op2: cirq.Operation):
+    if isinstance(op1.gate, cirq.HPowGate) and isinstance(op2.gate, cirq.HPowGate) and op1.qubits == op2.qubits:
+        return cirq.I(*op1.qubits)
+    else:
+        return None
+
 # generate graph state as a matrix based on the number of qubits and the density of edges
 def graph_state(qubits: int, edge_probability: float):
 
@@ -301,6 +308,12 @@ def circuit_generator_1(qubits: int, edge_probability: float, remove_hadamards: 
 
     # replace cz with h cx h
     graph_circuit = CZ_to_H_CNOT_H(graph_circuit, remove_hadamards)
+
+    # remove double hadamards
+    final_circuit = cirq.merge_operations(graph_circuit, merge_func)
+    final_circuit = cirq.drop_negligible_operations(final_circuit)
+    final_circuit = cirq.drop_empty_moments(final_circuit)
+
     return graph_circuit
 
 
@@ -332,37 +345,11 @@ def circuit_generator_2(qubits: int, edge_probability: float, remove_hadamards: 
 
     final_circuit = CZ_to_H_CNOT_H(final_circuit, remove_hadamards)
 
-    return final_circuit
+    # remove double hadamards
+    final_circuit = cirq.merge_operations(final_circuit, merge_func)
+    final_circuit = cirq.drop_negligible_operations(final_circuit)
+    final_circuit = cirq.drop_empty_moments(final_circuit)
 
-
-# v shape
-def circuit_generator_3(qubits: int, edge_probability: float, remove_hadamards: float):
-
-    graph_circuit = edges_to_CZ(qubits, edge_probability)
-
-    moments = list(graph_circuit.moments)
-    num_moments = len(list(graph_circuit.moments))
-    
-    moments_front = np.array(range(num_moments // 2))
-    moments_back = np.array(range(num_moments // 2, num_moments))
-    moments_back = np.flip(moments_back)
-
-    final_circuit = cirq.Circuit()
-
-    i = 0
-    j = 0
-    for m in range(num_moments):
-        if m % 2 != 0:
-            a = moments_front[i]
-            final_circuit.append(moments[a])
-            i += 1
-        else:
-            a = moments_back[j]
-            final_circuit.append(moments[a])
-            j += 1
-
-    final_circuit = CZ_to_H_CNOT_H(final_circuit, remove_hadamards)
-
-    return final_circuit
+    return final_circuit    
 
 
