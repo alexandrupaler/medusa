@@ -226,10 +226,44 @@ def adder_only_cnots(size: int,with_t_gates=False):
 
     return circuit
 
-# for now let's assume max 1 edge between nodes
-def graph_state(qubits: int, edge_probability: float, remove_hadamards: float):
 
-    # generate graph state as a matrix based on the number of qubits and the density of edges
+# helpers for generating circuits:
+#chance of removing/adding hadamard gate
+def add_hadamard(remove_hadamards):
+    return np.random.choice([False,True], 1, p=[remove_hadamards, 1 - remove_hadamards])
+
+#chance of flipping cnot
+def flip_cx(flip_cx_p = 0.5):
+    return np.random.choice([False,True], 1, p=[1 - flip_cx_p, flip_cx_p])
+
+# change CZ to H CX H and remove some H gates
+def CZ_to_H_CNOT_H(circuit: cirq.Circuit, remove_hadamards):
+
+    def map_cz(op: cirq.Operation) -> cirq.OP_TREE:
+        if isinstance(op.gate, cirq.CZPowGate):
+
+            c = 0
+            t = 1
+            if flip_cx():
+                c = 1
+                t = 0
+
+            if add_hadamard(remove_hadamards):
+                yield cirq.H(op.qubits[t])
+            
+            yield cirq.CX(op.qubits[c], op.qubits[t])
+
+            if add_hadamard(remove_hadamards):
+                yield cirq.H(op.qubits[t])
+
+        else:
+            yield op
+    
+    return circuit.map_operations(map_cz)
+
+# generate graph state as a matrix based on the number of qubits and the density of edges
+def graph_state(qubits: int, edge_probability: float):
+
     matrix_top = np.zeros((qubits,qubits))
 
     for q in range(qubits):
@@ -240,37 +274,95 @@ def graph_state(qubits: int, edge_probability: float, remove_hadamards: float):
     #full_matrix = matrix_top + np.transpose(matrix_top)
     #print(full_matrix)
 
+    print(matrix_top)
+    return matrix_top
 
-    # create quantum circuit based on the graph state by substituting the edges with CZ gates
+# create quantum circuit based on the graph state by substituting the edges with CZ gates
+def edges_to_CZ(qubits: int, edge_probability: float):
+
+    # get state
+    matrix_top = graph_state(qubits, edge_probability)
+
     graph_circuit = cirq.Circuit()
     cirq_qubits = cirq.LineQubit.range(qubits)
-
-    # probability to flip snots
-    flip_cx_p = 0.5
-
-    def add_hadamard():
-        return np.random.choice([False,True], 1, p=[remove_hadamards, 1 - remove_hadamards])
-    
-    def flip_cx():
-        return np.random.choice([False,True], 1, p=[1 - flip_cx_p, flip_cx_p])
     
     for q in range(qubits):
         for j in range(q+1,qubits):
             if matrix_top[q,j] == 1:
-                # add CZ gate as H CX H but don't add the hadamards based on the input probability
-                # + flip the CX based on probability defined above
-                if add_hadamard():
-                    graph_circuit.append(cirq.H(cirq_qubits[q]))
-
-                if flip_cx():
-                    graph_circuit.append(cirq.CX(cirq_qubits[q], cirq_qubits[j]))
-                else:
-                    graph_circuit.append(cirq.CX(cirq_qubits[j], cirq_qubits[q]))
-                    
-                if add_hadamard():
-                    graph_circuit.append(cirq.H(cirq_qubits[q]))
+                graph_circuit.append(cirq.CZ(cirq_qubits[q], cirq_qubits[j]), strategy=cirq.InsertStrategy.NEW_THEN_INLINE)
 
     return graph_circuit
+
+
+# cascading shape
+def circuit_generator_1(qubits: int, edge_probability: float, remove_hadamards: float):
+
+    graph_circuit = edges_to_CZ(qubits, edge_probability)
+
+    # replace cz with h cx h
+    graph_circuit = CZ_to_H_CNOT_H(graph_circuit, remove_hadamards)
+    return graph_circuit
+
+
+# zig zag shape
+def circuit_generator_2(qubits: int, edge_probability: float, remove_hadamards: float):
+
+    graph_circuit = edges_to_CZ(qubits, edge_probability)
+
+    moments = list(graph_circuit.moments)
+    num_moments = len(list(graph_circuit.moments))
     
+    moments_front = np.array(range(num_moments // 2))
+    moments_back = np.array(range(num_moments // 2, num_moments))
+    moments_back = np.flip(moments_back)
+
+    final_circuit = cirq.Circuit()
+
+    i = 0
+    j = 0
+    for m in range(num_moments):
+        if m % 2 != 0:
+            a = moments_front[i]
+            final_circuit.append(moments[a])
+            i += 1
+        else:
+            a = moments_back[j]
+            final_circuit.append(moments[a])
+            j += 1
+
+    final_circuit = CZ_to_H_CNOT_H(final_circuit, remove_hadamards)
+
+    return final_circuit
+
+
+# v shape
+def circuit_generator_3(qubits: int, edge_probability: float, remove_hadamards: float):
+
+    graph_circuit = edges_to_CZ(qubits, edge_probability)
+
+    moments = list(graph_circuit.moments)
+    num_moments = len(list(graph_circuit.moments))
     
+    moments_front = np.array(range(num_moments // 2))
+    moments_back = np.array(range(num_moments // 2, num_moments))
+    moments_back = np.flip(moments_back)
+
+    final_circuit = cirq.Circuit()
+
+    i = 0
+    j = 0
+    for m in range(num_moments):
+        if m % 2 != 0:
+            a = moments_front[i]
+            final_circuit.append(moments[a])
+            i += 1
+        else:
+            a = moments_back[j]
+            final_circuit.append(moments[a])
+            j += 1
+
+    final_circuit = CZ_to_H_CNOT_H(final_circuit, remove_hadamards)
+
+    return final_circuit
+
 
