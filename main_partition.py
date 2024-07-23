@@ -14,7 +14,7 @@ if __name__ == '__main__':
     # triton cpus:
     # - 4
 
-    # Problem: preparing the circuit from string doesn't necessarily include all the qubuts in the circuit -> error
+    # Problem: preparing the circuit from string doesn't necessarily include all the qubits in the circuit -> error
 
     error_rates = [0.0001, 0.0002, 0.0004, 0.0008, 0.001, 0.00125, 0.0025, 0.005, 0.01]
     number_of_runs = 100
@@ -43,7 +43,14 @@ if __name__ == '__main__':
             if s == i and end != number_of_moments:
                 end = number_of_moments
 
-            split_circuit = cirq.Circuit(moments[start:end])
+            # add all the qubits from the icm circuit into main circuit to ensure that the input states work as intended
+            split_circuit = []
+            for q in icm_circuit.all_qubits():
+                split_circuit.append(cirq.I(q))
+            
+            split_circuit.append(cirq.Circuit(moments[start:end]))
+
+            split_circuit = cirq.Circuit(split_circuit)
 
             # find good flag configuration
             res = np.zeros((number_of_flag_configurations,))
@@ -72,21 +79,22 @@ if __name__ == '__main__':
 
     paramlist = [1,2,3]
     pool = Pool()
-    pool.map(parallel_simulation, paramlist)
+    #pool.map(parallel_simulation, paramlist)
     pool.close()
     pool.join()
 
     # plotting
-    """
-    plt.title("Logical Error Rate, Adder 3")
-    for p in paramlist:
-        results = pd.read_csv("results_" + str(p) + ".csv")
-        flag_circuit_name = "Flags: " + str(p)
-        plt.loglog(error_rates, results, label=flag_circuit_name)
+    plt.title("Logical Error Rate Split, Adder " + str(adder_size))
+    for i in paramlist:
+        # let's only look at the very last results at the end of the whole circuit
+        for s in range(i,i+1): #(1,i+1):
+            results = pd.read_csv("results_" + str(i) + "_" + str(s) + ".csv")
+            flag_circuit_name = "section: " + str(s)
+            plt.loglog(error_rates, results, label=flag_circuit_name)
     plt.xlabel('noise channel strength')
     plt.ylabel('logical error rate')
     plt.legend()
-    filename = "logical_error_2_flags_split.png"
+    filename = "logical_error_flags_split_" + str(adder_size) + ".png"
     plt.savefig(filename)
     plt.close()
-    """
+    

@@ -24,11 +24,10 @@ if __name__ == '__main__':
         flag_circuit = c.add_flag(icm_circuit, number_of_x_flag=1, number_of_z_flag=1)
 
         # run simulation   
-        results, results_icm = evaluate.stabilizers_benchmark_with_timesteps(flag_circuit, icm_circuit, number_of_runs, error_rates[-1], True, "timesteps_perfect_flags_adder_" + str(i) + ".png", True)
+        results, without_post_selection, results_icm = evaluate.stabilizers_benchmark_with_timesteps(flag_circuit, icm_circuit, number_of_runs, error_rates[-1], True, "timesteps_perfect_flags_adder_" + str(i) + ".png", "perfect flags", False)
 
     paramlist = [3,4,5,6,7]
     pool = Pool()
     pool.map(parallel_simulation, paramlist)
     pool.close()
     pool.join()
-
