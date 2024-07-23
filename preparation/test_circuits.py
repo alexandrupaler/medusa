@@ -1,9 +1,11 @@
 import cirq
+import cirq.circuits
 import qualtran
 import qualtran._infra
 import qualtran._infra.gate_with_registers
 import qualtran.bloqs
 import qualtran.bloqs.arithmetic
+import numpy as np
 
 # T dagger gate
 TDag = cirq.ZPowGate(exponent=-0.25)
@@ -168,16 +170,20 @@ def map_func(op: cirq.Operation) -> cirq.OP_TREE:
 def cla_map(op: cirq.Operation) -> cirq.OP_TREE:
     yield op.without_classical_controls()
 
-def replace_t_with_Z_map(op: cirq.Operation) -> cirq.OP_TREE:
-    if not isinstance(op.gate, cirq.ZPowGate) and not (op.gate.exponent == 0.25):
+def remove_t_gates(op: cirq.Operation) -> cirq.OP_TREE:
+    if not isinstance(op.gate, cirq.ZPowGate):
+        yield op
+    elif not (op.gate.exponent == 0.25) and not op.gate.exponent == -0.25:
         yield op
 
-def prepare_adder_for_jabalizer(circuit: cirq.Circuit):
+def prepare_adder_for_jabalizer(circuit: cirq.Circuit, with_t_gates=False):
 
     # no classical, cz -> h cx h, remove m & r
     circuit = circuit.map_operations(cla_map)
     circuit = circuit.map_operations(map_func)
-    circuit = circuit.map_operations(replace_t_with_Z_map)
+
+    if not with_t_gates:
+        circuit = circuit.map_operations(remove_t_gates)
 
     # transforming cleanqubits to named qubits
     #name_map =  {cirq.ops.CleanQubit(0): cirq.NamedQubit("c0")}
@@ -201,10 +207,149 @@ def prepare_adder_for_jabalizer(circuit: cirq.Circuit):
     return circuit
 
 
-def adder(size: int):
+def adder(size: int, with_t_gates=False):
 
     bloq = qualtran.bloqs.arithmetic.Add(qualtran.QUInt(size))
     circuit = get_clifford_plus_t_cirq_circuit_for_bloq(bloq)
-    circuit = prepare_adder_for_jabalizer(circuit)
+    circuit = prepare_adder_for_jabalizer(circuit,with_t_gates)
 
     return circuit
+
+def adder_only_cnots(size: int,with_t_gates=False):
+    circuit = adder(size,with_t_gates)
+
+    def wihtout_H(op: cirq.Operation) -> cirq.OP_TREE:
+        if not isinstance(op.gate, cirq.HPowGate):
+            yield op
+
+    circuit = circuit.map_operations(wihtout_H)
+
+    return circuit
+
+
+# helpers for generating circuits:
+#chance of removing/adding hadamard gate
+def add_hadamard(remove_hadamards):
+    return np.random.choice([False,True], 1, p=[remove_hadamards, 1 - remove_hadamards])
+
+#chance of flipping cnot
+def flip_cx(flip_cx_p = 0.5):
+    return np.random.choice([False,True], 1, p=[1 - flip_cx_p, flip_cx_p])
+
+# change CZ to H CX H and remove some H gates
+def CZ_to_H_CNOT_H(circuit: cirq.Circuit, remove_hadamards):
+
+    def map_cz(op: cirq.Operation) -> cirq.OP_TREE:
+        if isinstance(op.gate, cirq.CZPowGate):
+
+            c = 0
+            t = 1
+            if flip_cx():
+                c = 1
+                t = 0
+
+            if add_hadamard(remove_hadamards):
+                yield cirq.H(op.qubits[t])
+            
+            yield cirq.CX(op.qubits[c], op.qubits[t])
+
+            if add_hadamard(remove_hadamards):
+                yield cirq.H(op.qubits[t])
+
+        else:
+            yield op
+    
+    return circuit.map_operations(map_cz)
+
+# remove double hadamards
+def merge_func(op1: cirq.Operation, op2: cirq.Operation):
+    if isinstance(op1.gate, cirq.HPowGate) and isinstance(op2.gate, cirq.HPowGate) and op1.qubits == op2.qubits:
+        return cirq.I(*op1.qubits)
+    else:
+        return None
+
+# generate graph state as a matrix based on the number of qubits and the density of edges
+def graph_state(qubits: int, edge_probability: float):
+
+    matrix_top = np.zeros((qubits,qubits))
+
+    for q in range(qubits):
+        edges_for_q = np.random.choice([0,1], qubits - 1 - q, p=[1 - edge_probability, edge_probability])
+        matrix_top[q,(q+1):qubits] = edges_for_q
+
+    # there is technically no need to obtain the full matrix ?
+    #full_matrix = matrix_top + np.transpose(matrix_top)
+    #print(full_matrix)
+
+    print(matrix_top)
+    return matrix_top
+
+# create quantum circuit based on the graph state by substituting the edges with CZ gates
+def edges_to_CZ(qubits: int, edge_probability: float):
+
+    # get state
+    matrix_top = graph_state(qubits, edge_probability)
+
+    graph_circuit = cirq.Circuit()
+    cirq_qubits = cirq.LineQubit.range(qubits)
+    
+    for q in range(qubits):
+        for j in range(q+1,qubits):
+            if matrix_top[q,j] == 1:
+                graph_circuit.append(cirq.CZ(cirq_qubits[q], cirq_qubits[j]), strategy=cirq.InsertStrategy.NEW_THEN_INLINE)
+
+    return graph_circuit
+
+
+# cascading shape
+def circuit_generator_1(qubits: int, edge_probability: float, remove_hadamards: float):
+
+    graph_circuit = edges_to_CZ(qubits, edge_probability)
+
+    # replace cz with h cx h
+    graph_circuit = CZ_to_H_CNOT_H(graph_circuit, remove_hadamards)
+
+    # remove double hadamards
+    final_circuit = cirq.merge_operations(graph_circuit, merge_func)
+    final_circuit = cirq.drop_negligible_operations(final_circuit)
+    final_circuit = cirq.drop_empty_moments(final_circuit)
+
+    return graph_circuit
+
+
+# zig zag shape
+def circuit_generator_2(qubits: int, edge_probability: float, remove_hadamards: float):
+
+    graph_circuit = edges_to_CZ(qubits, edge_probability)
+
+    moments = list(graph_circuit.moments)
+    num_moments = len(list(graph_circuit.moments))
+    
+    moments_front = np.array(range(num_moments // 2))
+    moments_back = np.array(range(num_moments // 2, num_moments))
+    moments_back = np.flip(moments_back)
+
+    final_circuit = cirq.Circuit()
+
+    i = 0
+    j = 0
+    for m in range(num_moments):
+        if m % 2 != 0:
+            a = moments_front[i]
+            final_circuit.append(moments[a])
+            i += 1
+        else:
+            a = moments_back[j]
+            final_circuit.append(moments[a])
+            j += 1
+
+    final_circuit = CZ_to_H_CNOT_H(final_circuit, remove_hadamards)
+
+    # remove double hadamards
+    final_circuit = cirq.merge_operations(final_circuit, merge_func)
+    final_circuit = cirq.drop_negligible_operations(final_circuit)
+    final_circuit = cirq.drop_empty_moments(final_circuit)
+
+    return final_circuit    
+
+
