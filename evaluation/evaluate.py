@@ -587,9 +587,9 @@ def stabilizers_robustness_and_logical_error(flag_circuit: cirq.Circuit, icm_cir
         res_icm_df.to_csv("icm_measurements_df_error_rate_" + str(e) + ".csv",index=False)
 
         # update results
-        results[e] = missed_flags / ((no_flag + missed_flags) * len(input_states))
+        results[e] = missed_flags / (no_flag + missed_flags)
         results_icm[e] = error_occured / (number_of_runs * len(input_states))
-        results_rob[e] = faulty_stabilizers / (len(stabilizers) * (no_flag + missed_flags) * len(input_states))
+        results_rob[e] = faulty_stabilizers / (len(stabilizers) * (no_flag + missed_flags))
         results_rob_icm[e] = faulty_stabilizers_icm / (len(stabilizers_icm) * (number_of_runs) * len(input_states))
         acceptance[e] = (no_flag + missed_flags) / (number_of_runs * len(input_states))
 
