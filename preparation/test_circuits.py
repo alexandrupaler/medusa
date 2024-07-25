@@ -317,7 +317,7 @@ def circuit_generator_1(qubits: int, edge_probability: float, remove_hadamards: 
     return graph_circuit
 
 
-# zig zag shape
+# rough zig zag shape
 def circuit_generator_2(qubits: int, edge_probability: float, remove_hadamards: float):
 
     graph_circuit = edges_to_CZ(qubits, edge_probability)
@@ -351,5 +351,52 @@ def circuit_generator_2(qubits: int, edge_probability: float, remove_hadamards: 
     final_circuit = cirq.drop_empty_moments(final_circuit)
 
     return final_circuit    
+
+# v shape
+def circuit_generator_3(qubits: int, edge_probability: float, remove_hadamards: float):
+
+    graph_circuit = edges_to_CZ(qubits, edge_probability)
+
+    all_moments = list(graph_circuit.moments)
+    all_qubits = list(graph_circuit.all_qubits())    
+
+    def sortqubits(q: cirq.LineQubit):
+        return q._comparison_key()
+    
+    all_qubits.sort(key=sortqubits)
+
+
+    # assuming each moment has exactly 1 CZ
+    def touches_q(q, moment: cirq.Moment):
+        op = moment._operations
+        op = op[0]
+        return op.qubits[0] == q
+    
+    circuit_front = cirq.Circuit()
+    circuit_back = cirq.Circuit()
+
+    for q in all_qubits:
+        moments_with_q = list(filter(lambda m: touches_q(q, m), all_moments))
+
+        num_moments = len(moments_with_q)
+
+        moments_front = moments_with_q[0:(num_moments // 2)]
+        circuit_front.append(moments_front, strategy=cirq.InsertStrategy.NEW)
+
+        moments_back = moments_with_q[(num_moments // 2):num_moments]
+        circuit_back.append(moments_back, strategy=cirq.InsertStrategy.NEW)
+
+    reversed_back = list(circuit_back.moments)[::-1]
+    circuit_front.append(reversed_back,strategy=cirq.InsertStrategy.NEW)
+
+    # from cz to h cx h
+    final_circuit = CZ_to_H_CNOT_H(circuit_front, remove_hadamards)
+
+    # remove double hadamards
+    final_circuit = cirq.merge_operations(final_circuit, merge_func)
+    final_circuit = cirq.drop_negligible_operations(final_circuit)
+    final_circuit = cirq.drop_empty_moments(final_circuit)
+
+    return final_circuit 
 
 
