@@ -22,7 +22,7 @@ if __name__ == '__main__':
     def parallel_simulation(i):
         c = compiler.FlagCompiler()
 
-        icm_circuit: cirq.Circuit = c.decompose_to_ICM(test_circuits.adder(i), i=i)
+        icm_circuit: cirq.Circuit = c.decompose_to_ICM(test_circuits.adder_only_cnots(i), i=i)
 
         # choose random qubits [xf, zf]
         qubits = list(icm_circuit.all_qubits())
@@ -63,7 +63,7 @@ if __name__ == '__main__':
         number_of_runs = 1000
 
         start = time.time()
-        results, results_icm, results_rob, results_rob_icm, acceptance = evaluate.stabilizers_robustness_and_logical_error(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "Adder " + str(i))
+        results, results_icm, results_rob, results_rob_icm, acceptance = evaluate.stabilizers_robustness_and_logical_error(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "Adder " + str(i), perfect_flags="perfect flags")
         end = time.time()
         print("time it took: " + str(end - start))
 
