@@ -190,13 +190,13 @@ def prepare_circuit_from_string(circuit: cirq.circuits.circuit.Circuit, input_st
     return prepared_circuit
 
        
-def random_noise_benchmark(flag_circuit, icm_circuit, number_of_runs, error_rates, plotting, output_file="results.png",perfect_flags="default"):
+def random_noise_benchmark(flag_circuit, icm_circuit, number_of_runs, error_rates, plotting, output_file="results.png",noise_type="default"):
 
     # helper
     def benchmark_run(flag_circuit: cirq.circuits.circuit.Circuit, error_rate, initial_state):
 
         # use cirq to generate errors and prepare state
-        circuit_with_errors = add_random_noise(flag_circuit, error_rate, perfect_flags) #flag_circuit.with_noise(cirq.depolarize(p=error_rate))
+        circuit_with_errors = add_random_noise(flag_circuit, error_rate, noise_type) #flag_circuit.with_noise(cirq.depolarize(p=error_rate))
         circuit_with_errors = prepare_circuit_from_string(circuit_with_errors, initial_state)
         stim_circuit_errors = stimcirq.cirq_circuit_to_stim_circuit(circuit_with_errors)
         circuit_expected = prepare_circuit_from_string(flag_circuit, initial_state)
@@ -355,7 +355,7 @@ def random_noise_benchmark(flag_circuit, icm_circuit, number_of_runs, error_rate
 
     return results, flagless_results
 
-def random_noise_on_error_circuit(flag_circuit, icm_circuit, number_of_runs, error_rates, plotting, output_file="results.png",perfect_flags="default"):
+def random_noise_on_error_circuit(flag_circuit, icm_circuit, number_of_runs, error_rates, plotting, output_file="results.png",noise_type="default"):
 
     # generate input states as bitstrings
     number_of_states = 100
@@ -397,12 +397,12 @@ def random_noise_on_error_circuit(flag_circuit, icm_circuit, number_of_runs, err
             error_rate = error_rates[e]
 
             # flagless circuit
-            flagless_circuit = add_random_noise(icm_circuit, error_rate, perfect_flags) #icm_circuit.with_noise(cirq.depolarize(p=error_rate))
+            flagless_circuit = add_random_noise(icm_circuit, error_rate, noise_type) #icm_circuit.with_noise(cirq.depolarize(p=error_rate))
             flagless_circuit = prepare_circuit_from_string(flagless_circuit, initial_state)
             flagless_stim_circuit = stimcirq.cirq_circuit_to_stim_circuit(flagless_circuit)
 
             # use cirq to generate errors and prepare state
-            circuit_with_errors = add_random_noise(flag_circuit, error_rate, perfect_flags) #flag_circuit.with_noise(cirq.depolarize(p=error_rate))
+            circuit_with_errors = add_random_noise(flag_circuit, error_rate, noise_type) #flag_circuit.with_noise(cirq.depolarize(p=error_rate))
             circuit_with_errors = prepare_circuit_from_string(circuit_with_errors, initial_state)
             stim_circuit_errors = stimcirq.cirq_circuit_to_stim_circuit(circuit_with_errors)
 
@@ -481,7 +481,7 @@ def measure_stabilizers(simulator: stim.TableauSimulator, stabilizers: list[stim
     return res
 
 # simulation which uses stabilizer measurements, calculates both robustness and logical error
-def stabilizers_robustness_and_logical_error(flag_circuit: cirq.Circuit, icm_circuit: cirq.Circuit, number_of_runs, error_rates, plotting, plot_title, perfect_flags="default"):
+def stabilizers_robustness_and_logical_error(flag_circuit: cirq.Circuit, icm_circuit: cirq.Circuit, number_of_runs, error_rates, plotting, plot_title, noise_type="default"):
     results = np.zeros((len(error_rates),))
     results_icm = np.zeros((len(error_rates),))
     results_rob = np.zeros((len(error_rates),))
@@ -533,9 +533,9 @@ def stabilizers_robustness_and_logical_error(flag_circuit: cirq.Circuit, icm_cir
 
                 # add noise to circuits
                 # for flag circuit
-                noisy_circuit = add_random_noise(flag_circuit, error_rate, perfect_flags) #flag_circuit.with_noise(cirq.depolarize(p=error_rate))
+                noisy_circuit = add_random_noise(flag_circuit, error_rate, noise_type) #flag_circuit.with_noise(cirq.depolarize(p=error_rate))
                 # for icm circuit
-                noisy_circuit_icm = add_random_noise(icm_circuit, error_rate, perfect_flags) #icm_circuit.with_noise(cirq.depolarize(p=error_rate))
+                noisy_circuit_icm = add_random_noise(icm_circuit, error_rate, noise_type) #icm_circuit.with_noise(cirq.depolarize(p=error_rate))
 
                 # run simulations
                 # for flag circuit
@@ -671,7 +671,7 @@ def analyze_results_from_csv(error_rates, number_of_runs, number_of_input_states
     
 
 # calculated error at different moments using stabilizer measurements
-def stabilizers_benchmark_with_timesteps(flag_circuit: cirq.Circuit, icm_circuit: cirq.Circuit, number_of_runs, error_rate, plotting, output_file="results.png",perfect_flags="default", post_selection=True):
+def stabilizers_benchmark_with_timesteps(flag_circuit: cirq.Circuit, icm_circuit: cirq.Circuit, number_of_runs, error_rate, plotting, output_file="results.png",noise_type="default", post_selection=True):
     number_of_input_states = 100
     input_states = generate_input_strings(icm_circuit, number_of_input_states)
 
@@ -704,7 +704,7 @@ def stabilizers_benchmark_with_timesteps(flag_circuit: cirq.Circuit, icm_circuit
 
                 for n in range(number_of_runs):
 
-                    noisy_circuit = add_random_noise(split_circuit, error_rate, perfect_flags) #split_circuit.with_noise(cirq.depolarize(p=error_rate))
+                    noisy_circuit = add_random_noise(split_circuit, error_rate, noise_type) #split_circuit.with_noise(cirq.depolarize(p=error_rate))
                     noisy_stim = stimcirq.cirq_circuit_to_stim_circuit(noisy_circuit)
                     simulator = stim.TableauSimulator()
                     simulator.do_circuit(noisy_stim)
@@ -763,7 +763,7 @@ def stabilizers_benchmark_with_timesteps(flag_circuit: cirq.Circuit, icm_circuit
 
                 for n in range(number_of_runs):
 
-                    noisy_circuit = add_random_noise(split_circuit, error_rate, perfect_flags) #split_circuit.with_noise(cirq.depolarize(p=error_rate))
+                    noisy_circuit = add_random_noise(split_circuit, error_rate, noise_type) #split_circuit.with_noise(cirq.depolarize(p=error_rate))
                     noisy_stim = stimcirq.cirq_circuit_to_stim_circuit(noisy_circuit)
                     simulator = stim.TableauSimulator()
                     simulator.do_circuit(noisy_stim)
@@ -791,7 +791,7 @@ def stabilizers_benchmark_with_timesteps(flag_circuit: cirq.Circuit, icm_circuit
     return results, without_post_selection, results_icm
 
 # helper used to add noise to circuits
-def add_random_noise(circuit: cirq.Circuit, error_rate, perfect_flags="default"):
+def add_random_noise(circuit: cirq.Circuit, error_rate, noise_type="default"):
 
     # custom noise model excluding flags:
     class PerfectFlagsDepolarizingNoise(cirq.NoiseModel):
@@ -806,10 +806,12 @@ def add_random_noise(circuit: cirq.Circuit, error_rate, perfect_flags="default")
             return [op, cirq.depolarize(p=error_rate).on_each(op.qubits)]
     
     noisy_circuit = circuit
-    if perfect_flags == "perfect flags":
+    if noise_type == "perfect flags":
         noisy_circuit = circuit.with_noise(noise=PerfectFlagsDepolarizingNoise())
-    elif perfect_flags == "new noise model":
+    elif noise_type == "new noise model":
         noisy_circuit = circuit.with_noise(noise=CustomDepolarizingNoise())
+    elif noise_type == "noiseless":
+        noisy_circuit = noisy_circuit
     else:
         noisy_circuit = circuit.with_noise(cirq.depolarize(p=error_rate))
 

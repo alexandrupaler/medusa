@@ -57,7 +57,7 @@ if __name__ == '__main__':
 
         print(new_flag_circuit)
                 
-        results, results_icm, results_rob, results_rob_icm, acceptance = evaluate.stabilizers_robustness_and_logical_error(new_flag_circuit, icm_circuit, number_of_runs, error_rates, False, "Adder", perfect_flags="perfect flags")
+        results, results_icm, results_rob, results_rob_icm, acceptance = evaluate.stabilizers_robustness_and_logical_error(new_flag_circuit, icm_circuit, number_of_runs, error_rates, False, "Adder", noise_type="perfect flags")
         
         res_df = pd.DataFrame(results)
         res_df.to_csv("results_" + str(i) + ".csv",index=False)

@@ -39,7 +39,7 @@ if __name__ == '__main__':
             
             circuits.append(flag_circuit)
 
-            results, results_icm, results_rob, results_rob_icm, accept = evaluate.stabilizers_robustness_and_logical_error(flag_circuit, icm_circuit, number_of_runs, [error_rates[0]], False, "Adder ", perfect_flags="perfect flags")
+            results, results_icm, results_rob, results_rob_icm, accept = evaluate.stabilizers_robustness_and_logical_error(flag_circuit, icm_circuit, number_of_runs, [error_rates[0]], False, "Adder ", noise_type="perfect flags")
             res[run] = np.average(results)
             
         min_index = np.argmin(res)
@@ -54,7 +54,7 @@ if __name__ == '__main__':
         icm_circuit: cirq.Circuit = c.decompose_to_ICM(test_circuits.adder(adder_size), i=i)
         flag_circuit = best_circuit
         
-        results, results_icm, results_rob, results_rob_icm, acceptance = evaluate.stabilizers_robustness_and_logical_error(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "Adder " + str(i), perfect_flags="perfect flags")
+        results, results_icm, results_rob, results_rob_icm, acceptance = evaluate.stabilizers_robustness_and_logical_error(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "Adder " + str(i), noise_type="perfect flags")
         
         res_df = pd.DataFrame(results)
         res_df.to_csv("results_" + str(i) + ".csv",index=False)

@@ -23,7 +23,7 @@ if __name__ == '__main__':
     # the number of input states is assumed to be 100
     input_states = 100
 
-    comp_results, comp_icm, rob, rob_icm, accept = evaluate.stabilizers_robustness_and_logical_error(flag_circuit, icm_circuit, number_of_runs, error_rates, False, "title", perfect_flags = "perfect flags")
+    comp_results, comp_icm, rob, rob_icm, accept = evaluate.stabilizers_robustness_and_logical_error(flag_circuit, icm_circuit, number_of_runs, error_rates, False, "title", noise_type = "perfect flags")
 
     # obtain results from csvs
     results, results_icm = evaluate.calculate_logical_error_from_csv(len(error_rates), number_of_runs, input_states)

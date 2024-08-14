@@ -63,7 +63,7 @@ if __name__ == '__main__':
         number_of_runs = 1000
 
         start = time.time()
-        results, results_icm, results_rob, results_rob_icm, acceptance = evaluate.stabilizers_robustness_and_logical_error(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "Adder " + str(i), perfect_flags="perfect flags")
+        results, results_icm, results_rob, results_rob_icm, acceptance = evaluate.stabilizers_robustness_and_logical_error(flag_circuit, icm_circuit, number_of_runs, error_rates, True, "Adder " + str(i), noise_type="perfect flags")
         end = time.time()
         print("time it took: " + str(end - start))
 
