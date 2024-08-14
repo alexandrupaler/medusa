@@ -39,7 +39,7 @@ if __name__ == '__main__':
     
     plt.loglog(error_rates, noiseless, label="noiseless")
     plt.loglog(error_rates, noisy, label="noisy")
-    plt.loglog(error_rates, perfect_flags, label="perefct flags")
+    plt.loglog(error_rates, perfect_flags, label="perfect flags")
 
     plt.xlabel('noise channel strength')
     plt.ylabel('logical error rate')
