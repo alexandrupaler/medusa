@@ -1,6 +1,7 @@
 import cirq.circuits
 import cirq 
 import matplotlib.pyplot as plt
+import pandas as pd
 
 if __name__ == '__main__' and __package__ is None:
     from os import sys, path
@@ -34,6 +35,13 @@ if __name__ == '__main__':
     # perfect flag simulation
     perfect_flags, a, b, c, d = evaluate.stabilizers_robustness_and_logical_error(base, icm_circuit, number_of_runs, error_rates, False, "" , "perfect flags")
 
+    # save as csv
+    df = pd.DataFrame(noiseless)
+    df.to_csv('noiseless.csv',index=False)
+    df = pd.DataFrame(noisy)
+    df.to_csv('noisy.csv',index=False)
+    df = pd.DataFrame(perfect_flags)
+    df.to_csv('perfect_flags.csv',index=False)
 
     plt.title("Logical Error Rate for Different Noise Models")
     
