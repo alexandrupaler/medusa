@@ -701,10 +701,12 @@ def stabilizers_benchmark_with_timesteps(flag_circuit: cirq.Circuit, icm_circuit
                 simulator_expected.do_circuit(expected_stim)
                 stabilizers = simulator_expected.canonical_stabilizers()
 
+                # add noise
+                noisy_circuit = add_random_noise(split_circuit, error_rate, noise_type) #split_circuit.with_noise(cirq.depolarize(p=error_rate))
+                noisy_stim = stimcirq.cirq_circuit_to_stim_circuit(noisy_circuit)
+
                 for n in range(number_of_runs):
 
-                    noisy_circuit = add_random_noise(split_circuit, error_rate, noise_type) #split_circuit.with_noise(cirq.depolarize(p=error_rate))
-                    noisy_stim = stimcirq.cirq_circuit_to_stim_circuit(noisy_circuit)
                     simulator = stim.TableauSimulator()
                     simulator.do_circuit(noisy_stim)
                     flag_measurements = simulator.current_measurement_record()
@@ -760,10 +762,12 @@ def stabilizers_benchmark_with_timesteps(flag_circuit: cirq.Circuit, icm_circuit
                 simulator_expected.do_circuit(expected_stim)
                 stabilizers = simulator_expected.canonical_stabilizers()
 
+                # add noise
+                noisy_circuit = add_random_noise(split_circuit, error_rate, noise_type) #split_circuit.with_noise(cirq.depolarize(p=error_rate))
+                noisy_stim = stimcirq.cirq_circuit_to_stim_circuit(noisy_circuit)
+
                 for n in range(number_of_runs):
 
-                    noisy_circuit = add_random_noise(split_circuit, error_rate, noise_type) #split_circuit.with_noise(cirq.depolarize(p=error_rate))
-                    noisy_stim = stimcirq.cirq_circuit_to_stim_circuit(noisy_circuit)
                     simulator = stim.TableauSimulator()
                     simulator.do_circuit(noisy_stim)
                     flag_measurements = simulator.current_measurement_record()
