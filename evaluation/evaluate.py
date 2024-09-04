@@ -530,12 +530,13 @@ def stabilizers_robustness_and_logical_error(flag_circuit: cirq.Circuit, icm_cir
 
             # add noise to circuits
             # for flag circuit
-            noisy_circuit = add_random_noise(prepared_circuit, error_rate, noise_type) #flag_circuit.with_noise(cirq.depolarize(p=error_rate))
-            noisy_stim = stimcirq.cirq_circuit_to_stim_circuit(noisy_circuit)
-
+            noisy_circuit = add_random_noise(flag_circuit, error_rate, noise_type) #flag_circuit.with_noise(cirq.depolarize(p=error_rate))
+            prepared_circuit = prepare_circuit_from_string(noisy_circuit, state)
+            noisy_stim = stimcirq.cirq_circuit_to_stim_circuit(prepared_circuit)
             # for icm circuit
-            noisy_circuit_icm = add_random_noise(prepared_circuit_icm, error_rate, noise_type) #icm_circuit.with_noise(cirq.depolarize(p=error_rate))
-            noisy_stim_icm = stimcirq.cirq_circuit_to_stim_circuit(noisy_circuit_icm)
+            noisy_circuit_icm = add_random_noise(icm_circuit, error_rate, noise_type) #icm_circuit.with_noise(cirq.depolarize(p=error_rate))
+            prepared_circuit_icm = prepare_circuit_from_string(noisy_circuit_icm, state)
+            noisy_stim_icm = stimcirq.cirq_circuit_to_stim_circuit(prepared_circuit_icm)
 
             for n in range(number_of_runs):
 
