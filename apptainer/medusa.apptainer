@@ -2,7 +2,7 @@ Bootstrap: localimage
 From: images/julia.sif
 
 %files
-    Apptainer
+    medusa.apptainer
     Project.toml /opt/Project.toml
     Manifest.toml /opt/Manifest.toml
     src/cli.jl /opt/src/cli.jl
