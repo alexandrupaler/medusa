@@ -814,7 +814,8 @@ def add_random_noise(circuit: cirq.Circuit, error_rate, noise_type="default"):
             if 'f' not in str(op.qubits):
                 return [op, cirq.depolarize(p=error_rate).on_each(op.qubits)]
             else: 
-                return [op, cirq.depolarize(p=error_rate * flag_mod).on_each(op.qubits)]
+                new_e = error_rate * flag_mod
+                return [op, cirq.depolarize(p=new_e).on_each(op.qubits)]
     
     noisy_circuit = circuit
     if noise_type == "perfect flags":
@@ -823,7 +824,7 @@ def add_random_noise(circuit: cirq.Circuit, error_rate, noise_type="default"):
         noisy_circuit = circuit.with_noise(noise=CustomDepolarizingNoise())
     elif noise_type == "noiseless":
         noisy_circuit = noisy_circuit
-    elif "budget" in noise_type: # "budgetB"
+    elif "budget" in noise_type: # "budgetB" where B is the modifier
         flag_mod = float(noise_type[6:])
         noisy_circuit = circuit.with_noise(noise=BudgetFlagNoise())
     else:
