@@ -807,6 +807,14 @@ def add_random_noise(circuit: cirq.Circuit, error_rate, noise_type="default"):
     class CustomDepolarizingNoise(cirq.NoiseModel):
         def noisy_operation(self, op: cirq.Operation):
             return [op, cirq.depolarize(p=error_rate).on_each(op.qubits)]
+        
+    # custom noise model adding different noise channel strength to flags:
+    class BudgetFlagNoise(cirq.NoiseModel):
+        def noisy_operation(self, op: cirq.Operation):
+            if 'f' not in str(op.qubits):
+                return [op, cirq.depolarize(p=error_rate).on_each(op.qubits)]
+            else: 
+                return [op, cirq.depolarize(p=error_rate * flag_mod).on_each(op.qubits)]
     
     noisy_circuit = circuit
     if noise_type == "perfect flags":
@@ -815,6 +823,9 @@ def add_random_noise(circuit: cirq.Circuit, error_rate, noise_type="default"):
         noisy_circuit = circuit.with_noise(noise=CustomDepolarizingNoise())
     elif noise_type == "noiseless":
         noisy_circuit = noisy_circuit
+    elif "budget" in noise_type: # "budgetB"
+        flag_mod = float(noise_type[6:])
+        noisy_circuit = circuit.with_noise(noise=BudgetFlagNoise())
     else:
         noisy_circuit = circuit.with_noise(cirq.depolarize(p=error_rate))
 
