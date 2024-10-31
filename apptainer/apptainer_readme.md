@@ -1,0 +1,3 @@
+```
+sudo docker pull julia
+```
