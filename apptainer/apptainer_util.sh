@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 set -eu
 IMAGES_DIR="images"
+
+# the name of the docker image to start from
 BASE_IMAGE="julia:latest"
+
+# the name of the project
 APP_NAME="medusa"
 
 base() {
     mkdir -p "$IMAGES_DIR"
-    apptainer build "$IMAGES_DIR/julia.sif" "docker://$BASE_IMAGE"
+    apptainer build "$IMAGES_DIR/$BASE_IMAGE.sif" "docker://$BASE_IMAGE"
 }
 
 build() {

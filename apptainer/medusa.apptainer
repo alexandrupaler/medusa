@@ -1,16 +1,17 @@
 Bootstrap: localimage
-From: images/julia.sif
+From: images/julia:latest.sif
 
 %files
-    medusa.apptainer
-    Project.toml /opt/Project.toml
-    Manifest.toml /opt/Manifest.toml
-    src/cli.jl /opt/src/cli.jl
-    src/App.jl /opt/src/App.jl
+    ../requirements.txt requirements.txt
+    ../julia_requirements.jl julia_requirements.jl
 
 %post
-    export JULIA_DEPOT_PATH="/usr/local/julia/local/share/julia"
-    julia --project="/opt/." -e 'using Pkg; Pkg.instantiate()'
+    apt update
+    apt-get -y install python3 git
+    apt install python3-pip -y
+    pip3 install --break-system-packages -r requirements.txt
+    pip3 install --break-system-packages qualtran==0.3.0
+    julia julia_requirements.jl
 
 %runscript
     julia --project="/opt/." "/opt/src/cli.jl" "$@"
