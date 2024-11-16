@@ -197,7 +197,11 @@ def prepare_adder_for_jabalizer(circuit: cirq.Circuit, with_t_gates=False):
 
     def line_map(q: cirq.Qid):
         name = str(q)
-        num = ord(name[0]) + (10 * (int(name[1]) + 1))
+        num = 0
+        numstr = str(ord(name[0])) # + (10 * (int(name[1]) + 1))
+        for i in range(1, len(name)):
+            numstr += str(name[i])
+        num = int(numstr)
         return cirq.LineQubit(num)
 
     circuit = circuit.transform_qubits(qubit_map =name_map)
