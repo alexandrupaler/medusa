@@ -17,6 +17,7 @@ if __name__ == '__main__':
 
     number_of_runs = 10000
     error_rate = 0.001
+    goal = 0.05
 
     # save icm circuits and flag circuits as jsons
     def save_circuit_info(name, icm_circuit, i):
@@ -72,12 +73,20 @@ if __name__ == '__main__':
         _, res_icm_small = run_simulation(icm_circuit_small, flag_circuit_small, error_mod, error_rate)
 
         res_icm = res_icm_small + 1
-        # expected range is [0.4, 0.9]
-        error_mod_end = 0.4
-        error_mod = 0.9 
-        while res_icm_small <= res_icm:
+        # expected range is [0.4, 1.0]
+        er_a = 0.4
+        er_b = 1.0
+        done = False
+        while not done:
+            error_mod = (er_a + er_b) / 2
             res, res_icm = run_simulation(icm_circuit, flag_circuit, error_mod, error_rate)
-            error_mod = error_mod - ((error_mod - error_mod_end)/2)
+            diff = res_icm_small - res
+            if abs(diff) < goal:
+                done = True
+            elif diff < 0:
+                er_a = error_mod
+            else:
+                er_b = error_mod
         
         # save as csvs
         res_df = pd.DataFrame(res)
