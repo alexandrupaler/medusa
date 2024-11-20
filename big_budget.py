@@ -13,8 +13,12 @@ import numpy as np
 if __name__ == '__main__':
 
     # triton cpus:
-    # - 945 :)
+    # - lots :)
 
+    number_of_runs = 10000
+    error_rate = 0.001
+
+    # save icm circuits and flag circuits as jsons
     def save_circuit_info(name, icm_circuit, i):
         c = compiler.FlagCompiler()
         #icm_circuit: cirq.Circuit = c.decompose_to_ICM(icm_circuit, i=i)
@@ -28,10 +32,9 @@ if __name__ == '__main__':
         with open("circuits/fc_" + name + "_" + str(i) + ".json", "w") as outfile:
             outfile.write(fc_json)
 
-    # first save icm circuits and flag circuits
     edge_probability = 0.5
     remove_hadamards = 1.0
-    for i in range(5, 7): #40+1):
+    for i in range(4, 7): #40+1): #the 4 is because we need i-1
         print(i)
         adder = test_circuits.adder_only_cnots(i)
         b1 = test_circuits.circuit_generator_1(i, edge_probability, remove_hadamards)
@@ -50,43 +53,49 @@ if __name__ == '__main__':
 
     def parallel_simulation(inp):
 
-        a, error_rate = inp
-        b, error_mod = a
-        circuit_type, circuit_size = b
+        circuit_type, circuit_size = inp
 
-        # fetch circuits
+        # fetch circuit files
+        # get icm i-1 logical error rate
+        icm_file_small = "circuits/icm_" + circuit_type + "_" + str(circuit_size) + ".json"
+        icm_circuit_small = cirq.read_json(icm_file)
+        fc_file_small = "circuits/fc_" + circuit_type + "_" + str(circuit_size) + ".json"
+        flag_circuit_small = cirq.read_json(fc_file)
+        # get icm and flag i logical error rate
         icm_file = "circuits/icm_" + circuit_type + "_" + str(circuit_size) + ".json"
         icm_circuit = cirq.read_json(icm_file)
-
         fc_file = "circuits/fc_" + circuit_type + "_" + str(circuit_size) + ".json"
         flag_circuit = cirq.read_json(fc_file)
 
-        res, res_icm = run_simulation(icm_circuit, flag_circuit, error_mod, error_rate)
+
+        # TODO: the i-1 could be done elsewhere
+        _, res_icm_small = run_simulation(icm_circuit_small, flag_circuit_small, error_mod, error_rate)
+
+        res_icm = res_icm_small + 1
+        # expected range is [0.4, 0.9]
+        error_mod_end = 0.4
+        error_mod = 0.9 
+        while res_icm_small <= res_icm:
+            res, res_icm = run_simulation(icm_circuit, flag_circuit, error_mod, error_rate)
+            error_mod = error_mod - ((error_mod - error_mod_end)/2)
         
         # save as csvs
         res_df = pd.DataFrame(res)
         res_icm_df = pd.DataFrame(res_icm)
+        res_icm_small_df = pd.DataFrame(res_icm_small)
         res_df.to_csv("fc_" + circuit_type + "_" + circuit_size + "_" + error_mod + "_" + error_rate + ".csv",index=False)
         res_icm_df.to_csv("icm_" + circuit_type + "_" + circuit_size + "_" + error_mod + "_" + error_rate + ".csv",index=False)
+        res_icm_small_df.to_csv("icm_small_" + circuit_type + "_" + circuit_size + "_" + error_mod + "_" + error_rate + ".csv",index=False)
 
 
     #circuit_sizes = range(5, 40+1)
     #circuit_types = ["adder", "b1", "b2", "b3"]
-    #error_mods = [0.01, 0.05, 0.1, 0.5, 1]
-    #error_rates = [0.0001, 0.0002, 0.0004, 0.0008, 0.001, 0.00125, 0.0025, 0.005, 0.01]
 
-    circuit_sizes = [5]
+    circuit_sizes = [5, 6]
     circuit_types = ["b1"]
-    error_mods = [1]
-    error_rates = [0.0001, 0.01]
 
-    # circuit_type, circuit_size, error_mod, error_rate = inp
     paramlist = list(itertools.product(circuit_types, circuit_sizes))
-    paramlist = list(itertools.product(paramlist, error_mods))
-    paramlist = list(itertools.product(paramlist, error_rates))
-    print(paramlist)
 
-    number_of_runs = 10000
     pool = Pool(processes=2)
     pool.map(parallel_simulation, paramlist)
     pool.close()
