@@ -1,6 +1,6 @@
 import cirq
-from preparation.error_map import Error_Map
-from preparation.flag_circuit import FlagCircuit
+from .error_map import Error_Map
+
 
 class Flag:
     number_of_flag = 0
@@ -17,13 +17,12 @@ class Flag:
                   ]
         return x_flag
 
-
+    # fix bug her
     def create_z_flag(self, target):
         z_flag = [[cirq.H(self.flag_qubitz), cirq.CNOT(self.flag_qubitz, target)],
                   [cirq.CNOT(self.flag_qubitz, target), cirq.H(self.flag_qubitz), cirq.measure(self.flag_qubitz),
                    cirq.ResetChannel().on(self.flag_qubitz)]]
         return z_flag
-
 
 
 class FlagCompiler:
@@ -37,7 +36,6 @@ class FlagCompiler:
                                 )):
             return True
 
-    #TODO: this don't work on my machine
     def decompose_to_ICM(self, circuit, i=0, j=0):
         json_string = cirq.to_json(cirq.Circuit(cirq.decompose(circuit, keep=self.keep_clifford_plus_T)))
         with open("input_cirq_circuit" + str(i) + str(j) + ".json", "w") as outfile:
@@ -50,16 +48,11 @@ class FlagCompiler:
         cirq_circuit = cirq.read_json("output_cirq_icm_circuit" + str(i) + str(j) + ".json")
         return cirq_circuit
 
-    @staticmethod
-    def __is_moment_with_cnot__(moment: cirq.Moment):
-        for op in moment.operations:
+    def __is_moment_with_cnot__(self, momnet: cirq.Moment):
+        for op in momnet.operations:
             if len(op.qubits) == 2:
                 return True
         return False
-
-
-
-
 
     def add_flag(self, circuit: cirq.Circuit, number_of_x_flag=0, number_of_z_flag=0,
                  strategy="random") -> cirq.Circuit:
@@ -112,7 +105,7 @@ class FlagCompiler:
                         target_qbits.append(op.qubits[1])
 
         elif strategy == "heuristic":
-            # Brute force:D
+            # Brute force:D or i could do it better?
             for qubits in circuit.all_qubits():
                 x_gatherer = []
                 z_gatherer = []
@@ -141,12 +134,81 @@ class FlagCompiler:
                     z_end_moments.append(z_gatherer[-1])
                     target_qbits.append(qubits)
 
-        elif strategy == "today_meeting":
-            result = FlagCircuit(circuit,channel_strength=0.1)
-            for l in  result.get_worst_location(number_of_locations=4):
-                print("cost :", l.objective_cost_1())
-                print(result.add_x_flag([l],in_place=False))
+        elif strategy == "map":
+            helper = moments_with_cnot_and_index[0][1]
+            #print(helper)
 
-            return result.body
+            #print(list(map(lambda m: m[1], moments_with_cnot_and_index)))
+            x_map, z_map = Error_Map(circuit).create_map()
+            control_qbits = [key[0] for key, value in x_map.items() if len(value) > 1]
+            target_qbits = [key[0] for key, value in z_map.items() if len(value) > 1]
+
+            # change this into the most recent cnot..
+            x_end_moments = [(key[1] + helper) for key, value in x_map.items() if len(value) > 1]
+            z_end_moments = [(key[1] + helper) for key, value in z_map.items() if len(value) > 1]
+            #print(x_end_moments)
+            for q, m in zip(control_qbits, x_end_moments):
+                m: cirq.Moment
+                cnot_on_this = list(filter(lambda m: q == m[0].operations[0].qubits[0], moments_with_cnot_and_index))
+                cnot_on_this = list(map(lambda m: m[1], cnot_on_this))
+                # print(q)
+                # print(cnot_on_this)
+                current_index = cnot_on_this.index(m)
+                if current_index == 0:
+                    x_start_moments.append(0)
+                else:
+                    x_start_moments.append(cnot_on_this[current_index - 1] + 1)
+            for q, m in zip(target_qbits, z_end_moments):
+                m: cirq.Moment
+                cnot_on_this = list(filter(lambda m: q == m[0].operations[0].qubits[1], moments_with_cnot_and_index))
+                cnot_on_this = list(map(lambda m: m[1], cnot_on_this))
+                #print(cnot_on_this)
+                current_index = cnot_on_this.index(m)
+                if current_index == 0:
+                    z_start_moments.append(0)
+                else:
+                    z_start_moments.append(cnot_on_this[current_index - 1] + 1)
+
+        x_flags = []
+        z_flags = []
+        for control in control_qbits:
+            f = Flag()
+            x_flags.append(f.create_x_flag(control))
+        for target in target_qbits:
+            f = Flag()
+            z_flags.append(f.create_z_flag(target))
+        helper0x = 0
+        helper0z = 0
+        helper1x = 0
+        helper1z = 0
+        #
+        number_of_x_flag = len(x_start_moments)
+        number_of_z_flag = len(z_start_moments)
+        for index, current_moment in enumerate(circuit.moments):
+            for n in range(number_of_x_flag):
+                if helper0x < number_of_x_flag and x_start_moments[n] == index:
+                    for g in x_flags[n][0]:
+                        flag_circuit.append(g, strategy=cirq.InsertStrategy.NEW_THEN_INLINE)
+                    helper0x += 1
+
+            for n in range(number_of_z_flag):
+                if helper0z < number_of_z_flag and z_start_moments[n] == index:
+                    for g in z_flags[n][0]:
+                        flag_circuit.append(g, strategy=cirq.InsertStrategy.NEW_THEN_INLINE)
+                    helper0z += 1
+
+            flag_circuit.append(current_moment)
+
+            for n in range(number_of_x_flag):
+                if helper1x < number_of_x_flag and x_end_moments[n] == index:
+                    for g in x_flags[n][1]:
+                        flag_circuit.append(g, strategy=cirq.InsertStrategy.NEW_THEN_INLINE)
+                    helper1x += 1
+
+            for n in range(number_of_z_flag):
+                if helper1z < number_of_z_flag and z_end_moments[n] == index:
+                    for g in z_flags[n][1]:
+                        flag_circuit.append(g, strategy=cirq.InsertStrategy.NEW_THEN_INLINE)
+                    helper1z += 1
 
         return flag_circuit

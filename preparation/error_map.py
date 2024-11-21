@@ -1,11 +1,5 @@
 import itertools
 import cirq
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from cirq import NamedQubit
-
-from preparation.error_location import  Single_Error, ErrorLocation
 
 
 class Error_Map:
@@ -17,64 +11,72 @@ class Error_Map:
 
     def __init__(self, circuit: cirq.Circuit):
         self.circuit = circuit
+        self.moment_with_cnot = list(filter(lambda m: self.__is_moment_with_cnot__(m), list(circuit.moments)))
         self.qubits = list(circuit.all_qubits())
-        self.num_qubits = len(self.qubits)
-        self.map_size = len(circuit.moments)
-        #NOT ideal use
-        self.X_propagation_map = {qubit: {} for qubit in self.qubits}
-        self.Z_propagation_map = {qubit: {} for qubit in self.qubits}
+        self.map_size = len(self.moment_with_cnot)
+        self.X_map = {}
+        self.Z_map = {}
 
-        self.Error_Locations = []
-
-
-    def create_map(self, channel_strength:float ):
-        reversed_moments = list(reversed(self.circuit.moments))
-        for i,moment in enumerate(reversed_moments):
+    def create_map(self):
+        # THere is a problem with index
+        self.moment_with_cnot.reverse()
+        # take len(moment) step
+        distinct_x_error = []
+        distinct_z_error = []
+        for i, moment in enumerate(self.moment_with_cnot):
+            index = self.map_size - i - 1
+            moment: cirq.Moment
+            control, target = moment.operations[0].qubits
+            # take w (w is width) step
             for qubit in self.qubits:
-                index= len(reversed_moments)-1-i
-                if moment.operates_on([qubit]):
-                    self.X_propagation_map[qubit][id(moment)]= Single_Error(qubit, moment, index, channel_strength)
-                else:
-                    self.X_propagation_map[qubit][id(moment)]= Single_Error(qubit, moment, index, error_rate=0)
-                if i > 0:
-                    next_moment = reversed_moments[i - 1]
-                    self.X_propagation_map[qubit][id(moment)].propagate(self.X_propagation_map[qubit][id(next_moment)])
-                else:
-                    self.X_propagation_map[qubit][id(moment)].propagated_to.append((qubit,id(moment)))
+                qubit: cirq.NamedQubit
+                control: cirq.NamedQubit
+                target: cirq.NamedQubit
+                original_error = (qubit, index)
+                propagated_x_error = [(qubit, index + 1)]
+                propagated_z_error = [(qubit, index + 1)]
 
+                if control == qubit:
+                    distinct_x_error.append(tuple(original_error))
+                    propagated_x_error.append((target, index + 1))
+                elif target == qubit:
+                    distinct_z_error.append(tuple(original_error))
+                    propagated_z_error.append((control, index + 1))
 
-            for op in moment.operations:
-                next_moment:cirq.Moment
-                if i > 0:
-                    next_moment = reversed_moments[i - 1]
-                else:
-                    continue
-                if len(op.qubits) == 2:
-                    control, target = op.qubits
-                    self.X_propagation_map[control][id(moment)].propagate(self.X_propagation_map[target][id(next_moment)])
+                # we will query the dictionary to update the result
+                helper1 = propagated_x_error
+                helper2 = propagated_z_error
 
-        for qubit in self.qubits:
-            errors = []
-            for moment in self.circuit.moments:
-                op = moment.operation_at(qubit)
-                if op is not None:
-                    if len(op.qubits) == 1 or (len(op.qubits) == 2 and qubit == op.qubits[1]):
-                        if len(errors) > 0:
-                            self.Error_Locations.append(ErrorLocation(errors))
-                        errors = []
-                    else:
-                        errors.append(self.X_propagation_map[qubit][id(moment)])
-                else:
-                    errors.append(self.X_propagation_map[qubit][id(moment)])
+                # this can be changed to take O(w^2) -maybe
+                if not index + 1 == self.map_size:
+                    propagated_x_error = []
+                    propagated_z_error = []
+                    for error in helper1:
+                        for e in self.X_map[tuple(error)]:
+                            propagated_x_error.append(e)
+                    for error in helper2:
+                        for e in self.Z_map[tuple(error)]:
+                            propagated_z_error.append(e)
+                # this two line below is bad and could be removed
+                propagated_x_error = [e for e in propagated_x_error if propagated_x_error.count(e) % 2 == 1]
+                propagated_z_error = [e for e in propagated_z_error if propagated_z_error.count(e) % 2 == 1]
 
-            if len(errors) > 0:
-                self.Error_Locations.append(ErrorLocation(errors))
+                self.X_map[tuple(original_error)] = propagated_x_error
+                self.Z_map[tuple(original_error)] = propagated_z_error
+            #print("")
+            #print("map for 1 error:")
 
-        return [self.X_propagation_map, self.Z_propagation_map]
+        for key, val in self.X_map.copy().items():
+            if key not in distinct_x_error:
+                del self.X_map[key]
+        for key, val in self.Z_map.copy().items():
+            if key not in distinct_z_error:
+                del self.Z_map[key]
 
+        #for key, val in self.X_map.items():
+            #print("moments:", key[1], val)
+        return [self.X_map, self.Z_map]
 
-
-    ##create map for combination of two error
     def create_map_2(self, max_error):
         x_map = self.create_map()[0]
         result = {}
@@ -96,15 +98,3 @@ class Error_Map:
             #print("moments:", h, "   ", val)
 
         return result
-
-    ## find the exact
-
-class Error_Map_2:
-    pass
-
-
-
-
-
-
-

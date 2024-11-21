@@ -47,9 +47,9 @@ class ZError(cirq.Gate):
 
 # A class that represent error location and allows us to cancel out identical error
 class ErrorLocation:
-    def __init__(self, qubit: cirq.NamedQubit, moment: cirq.Moment):
+    def __init__(self, qubit: cirq.NamedQubit, index: int):
         self.qubit = qubit
-        self.moment = moment
+        self.index = index
 
 
 # this is quite problem matric
