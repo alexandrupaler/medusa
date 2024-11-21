@@ -15,14 +15,15 @@ if __name__ == '__main__':
     # triton cpus:
     # - lots :)
 
-    number_of_runs = 10000
+    number_of_runs = 10 #10000
     error_rate = 0.001
     goal = 0.05
-
+    
+    """
     # save icm circuits and flag circuits as jsons
     def save_circuit_info(name, icm_circuit, i):
         c = compiler.FlagCompiler()
-        #icm_circuit: cirq.Circuit = c.decompose_to_ICM(icm_circuit, i=i)
+        icm_circuit: cirq.Circuit = c.decompose_to_ICM(icm_circuit, i=i)
         flag_circuit = c.add_flag(icm_circuit, strategy="heuristic")
 
         icm_json = cirq.to_json(icm_circuit)
@@ -45,7 +46,7 @@ if __name__ == '__main__':
         save_circuit_info("b1", b1, i)
         save_circuit_info("b2", b2, i)
         save_circuit_info("b3", b3, i)
-
+    """
 
     def run_simulation(icm_circuit, flag_circuit, error_mod, error_rate):
         c = compiler.FlagCompiler()
@@ -58,10 +59,11 @@ if __name__ == '__main__':
 
         # fetch circuit files
         # get icm i-1 logical error rate
-        icm_file_small = "circuits/icm_" + circuit_type + "_" + str(circuit_size) + ".json"
-        icm_circuit_small = cirq.read_json(icm_file)
-        fc_file_small = "circuits/fc_" + circuit_type + "_" + str(circuit_size) + ".json"
-        flag_circuit_small = cirq.read_json(fc_file)
+        icm_file_small = "circuits/icm_" + circuit_type + "_" + str(circuit_size-1) + ".json"
+        icm_circuit_small = cirq.read_json(icm_file_small)
+        fc_file_small = "circuits/fc_" + circuit_type + "_" + str(circuit_size-1) + ".json"
+        flag_circuit_small = cirq.read_json(fc_file_small)
+        
         # get icm and flag i logical error rate
         icm_file = "circuits/icm_" + circuit_type + "_" + str(circuit_size) + ".json"
         icm_circuit = cirq.read_json(icm_file)
@@ -70,11 +72,11 @@ if __name__ == '__main__':
 
 
         # TODO: the i-1 could be done elsewhere
-        _, res_icm_small = run_simulation(icm_circuit_small, flag_circuit_small, error_mod, error_rate)
+        _, res_icm_small = run_simulation(icm_circuit_small, flag_circuit_small, 1, error_rate)
 
         res_icm = res_icm_small + 1
-        # expected range is [0.4, 1.0]
-        er_a = 0.4
+        # expected range is [0.3, 1.0]
+        er_a = 0.3
         er_b = 1.0
         done = False
         while not done:
@@ -92,9 +94,9 @@ if __name__ == '__main__':
         res_df = pd.DataFrame(res)
         res_icm_df = pd.DataFrame(res_icm)
         res_icm_small_df = pd.DataFrame(res_icm_small)
-        res_df.to_csv("fc_" + circuit_type + "_" + circuit_size + "_" + error_mod + "_" + error_rate + ".csv",index=False)
-        res_icm_df.to_csv("icm_" + circuit_type + "_" + circuit_size + "_" + error_mod + "_" + error_rate + ".csv",index=False)
-        res_icm_small_df.to_csv("icm_small_" + circuit_type + "_" + circuit_size + "_" + error_mod + "_" + error_rate + ".csv",index=False)
+        res_df.to_csv("fc_" + circuit_type + "_" + str(circuit_size) + "_" + str(error_mod) + "_" + str(error_rate) + ".csv",index=False)
+        res_icm_df.to_csv("icm_" + circuit_type + "_" + str(circuit_size) + "_" + str(error_mod) + "_" + str(error_rate) + ".csv",index=False)
+        res_icm_small_df.to_csv("icm_small_" + circuit_type + "_" + str(circuit_size) + "_" + str(error_mod) + "_" + str(error_rate) + ".csv",index=False)
 
 
     #circuit_sizes = range(5, 40+1)
