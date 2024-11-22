@@ -15,9 +15,9 @@ if __name__ == '__main__':
     # triton cpus:
     # - lots :)
 
-    number_of_runs = 100 #10000
+    number_of_runs = 10000
     error_rate = 0.001
-    goal = 0.05
+    goal = 0.005
     
     """
     # save icm circuits and flag circuits as jsons
@@ -36,7 +36,7 @@ if __name__ == '__main__':
 
     edge_probability = 0.5
     remove_hadamards = 1.0
-    for i in range(4, 8): #40+1): #the 4 is because we need i-1
+    for i in range(4, 40+1): #the 4 is because we need i-1
         print(i)
         adder = test_circuits.adder_only_cnots(i)
         b1 = test_circuits.circuit_generator_1(i, edge_probability, remove_hadamards)
@@ -83,7 +83,8 @@ if __name__ == '__main__':
             error_mod = (er_a + er_b) / 2
             res, res_icm = run_simulation(icm_circuit, flag_circuit, error_mod, error_rate)
             diff = res_icm_small - res
-            if abs(diff) / res_icm_small < goal:
+            warnings.warn(str(diff))
+            if abs(diff) < goal: #abs(diff) / res_icm_small < goal:
                 done = True
             elif diff < 0:
                 er_b = error_mod
@@ -99,15 +100,13 @@ if __name__ == '__main__':
         res_icm_small_df.to_csv("icm_small_" + circuit_type + "_" + str(circuit_size) + "_" + str(error_mod) + "_" + str(error_rate) + ".csv",index=False)
 
 
-    #circuit_sizes = range(5, 40+1)
+    circuit_sizes = range(5, 40+1)
     #circuit_types = ["adder", "b1", "b2", "b3"]
-
-    circuit_sizes = [7]
     circuit_types = ["adder"]
 
     paramlist = list(itertools.product(circuit_types, circuit_sizes))
 
-    pool = Pool(processes=2)
+    pool = Pool()
     pool.map(parallel_simulation, paramlist)
     pool.close()
     pool.join()
