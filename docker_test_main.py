@@ -22,7 +22,7 @@ if __name__ == '__main__':
     edge_probability = 0.5
     remove_hadamards = True
 
-    icm_circuit = test_circuits.circuit_generator_1(qubits, edge_probability, remove_hadamards)
+    icm_circuit = test_circuits.line_to_named(test_circuits.circuit_generator_1(qubits, edge_probability, remove_hadamards))
 
     print("\n")
     print("Decompose done!")

@@ -404,3 +404,11 @@ def circuit_generator_3(qubits: int, edge_probability: float, remove_hadamards: 
     return final_circuit 
 
 
+#transforms linequbits into namequbits
+def line_to_named(circuit):
+
+    def simple_map(q: cirq.Qid):
+        return cirq.NamedQubit(str(q))
+
+    return circuit.transform_qubits(qubit_map=simple_map)
+
