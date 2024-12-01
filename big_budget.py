@@ -19,37 +19,36 @@ if __name__ == '__main__':
     error_rate = 0.001
     goal = 0.005
     
-    """
-    # save icm circuits and flag circuits as jsons
-    def save_circuit_info(name, icm_circuit, i):
-        c = compiler.FlagCompiler()
-        icm_circuit: cirq.Circuit = c.decompose_to_ICM(icm_circuit, i=i)
-        flag_circuit = c.add_flag(icm_circuit, strategy="heuristic")
+    def generate_circuits():
+        # save icm circuits and flag circuits as jsons
+        def save_circuit_info(name, icm_circuit, i):
+            c = compiler.FlagCompiler()
+            icm_circuit: cirq.Circuit = c.decompose_to_ICM(icm_circuit, i=i)
+            flag_circuit = c.add_flag(icm_circuit, strategy="heuristic")
 
-        icm_json = cirq.to_json(icm_circuit)
-        with open("circuits/icm_" + name + "_" + str(i) + ".json", "w") as outfile:
-            outfile.write(icm_json)
+            icm_json = cirq.to_json(icm_circuit)
+            with open("circuits/icm_" + name + "_" + str(i) + ".json", "w") as outfile:
+                outfile.write(icm_json)
 
-        fc_json = cirq.to_json(flag_circuit)
-        with open("circuits/fc_" + name + "_" + str(i) + ".json", "w") as outfile:
-            outfile.write(fc_json)
+            fc_json = cirq.to_json(flag_circuit)
+            with open("circuits/fc_" + name + "_" + str(i) + ".json", "w") as outfile:
+                outfile.write(fc_json)
 
-    edge_probability = 0.5
-    remove_hadamards = 1.0
-    for i in range(4, 40+1): #the 4 is because we need i-1
-        print(i)
-        adder = test_circuits.adder_only_cnots(i)
-        b1 = test_circuits.circuit_generator_1(i, edge_probability, remove_hadamards)
-        b2 = test_circuits.circuit_generator_2(i, edge_probability, remove_hadamards)
-        b3 = test_circuits.circuit_generator_3(i, edge_probability, remove_hadamards)
-        save_circuit_info("adder", adder, i)
-        save_circuit_info("b1", b1, i)
-        save_circuit_info("b2", b2, i)
-        save_circuit_info("b3", b3, i)
-    """
+        edge_probability = 0.5
+        remove_hadamards = 1.0
+        for i in range(4, 40+1): #the 4 is because we need i-1
+            print(i)
+            adder = test_circuits.adder_only_cnots(i)
+            b1 = test_circuits.circuit_generator_1(i, edge_probability, remove_hadamards)
+            b2 = test_circuits.circuit_generator_2(i, edge_probability, remove_hadamards)
+            b3 = test_circuits.circuit_generator_3(i, edge_probability, remove_hadamards)
+            save_circuit_info("adder", adder, i)
+            save_circuit_info("b1", b1, i)
+            save_circuit_info("b2", b2, i)
+            save_circuit_info("b3", b3, i)
+    
 
     def run_simulation(icm_circuit, flag_circuit, error_mod, error_rate):
-        c = compiler.FlagCompiler()
         results, results_icm, _, _, _ = evaluate.stabilizers_robustness_and_logical_error(flag_circuit, icm_circuit, number_of_runs, [error_rate], False, "", "budget" + str(error_mod))
         return results, results_icm
 
@@ -74,7 +73,6 @@ if __name__ == '__main__':
         # TODO: the i-1 could be done elsewhere
         _, res_icm_small = run_simulation(icm_circuit_small, flag_circuit_small, 1, error_rate)
 
-        res_icm = res_icm_small + 1
         # expected range is [0.3, 1.0]
         er_a = 0.3
         er_b = 1.0
@@ -95,18 +93,22 @@ if __name__ == '__main__':
         res_df = pd.DataFrame(res)
         res_icm_df = pd.DataFrame(res_icm)
         res_icm_small_df = pd.DataFrame(res_icm_small)
-        res_df.to_csv("fc_" + circuit_type + "_" + str(circuit_size) + "_" + str(error_mod) + "_" + str(error_rate) + ".csv",index=False)
-        res_icm_df.to_csv("icm_" + circuit_type + "_" + str(circuit_size) + "_" + str(error_mod) + "_" + str(error_rate) + ".csv",index=False)
-        res_icm_small_df.to_csv("icm_small_" + circuit_type + "_" + str(circuit_size) + "_" + str(error_mod) + "_" + str(error_rate) + ".csv",index=False)
+        res_df.to_csv("bigbudget/fc_" + circuit_type + "_" + str(circuit_size) + "_" + str(error_mod) + "_" + str(error_rate) + ".csv",index=False)
+        res_icm_df.to_csv("bigbudget/icm_" + circuit_type + "_" + str(circuit_size) + "_" + str(error_mod) + "_" + str(error_rate) + ".csv",index=False)
+        res_icm_small_df.to_csv("bigbudget/icm_small_" + circuit_type + "_" + str(circuit_size) + "_" + str(error_mod) + "_" + str(error_rate) + ".csv",index=False)
 
+
+    # uncomment to generate circuit jsons
+    #generate_circuits()
 
     circuit_sizes = range(5, 40+1)
     #circuit_types = ["adder", "b1", "b2", "b3"]
-    circuit_types = ["adder"]
+    circuit_types = ["b1", "b2", "b3"]
 
     paramlist = list(itertools.product(circuit_types, circuit_sizes))
 
-    pool = Pool()
+    procs = len(paramlist) + 1
+    pool = Pool(processes=procs)
     pool.map(parallel_simulation, paramlist)
     pool.close()
     pool.join()
