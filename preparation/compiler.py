@@ -212,3 +212,52 @@ class FlagCompiler:
                     helper1z += 1
 
         return flag_circuit
+    
+    def important_flags(self, flag_circuit: cirq.Circuit, n_of_flags):
+
+        # assuming everything is in its own moment
+
+        n_of_moments = len(flag_circuit.moments)
+
+        flag_qubits = list(filter(lambda q: 'f' in q.name, flag_circuit.all_qubits()))
+
+        moments_with_index = list(zip(list(flag_circuit.moments), range(n_of_moments)))
+        moments_with_cnot_and_index = list(filter(lambda a: self.__is_moment_with_cnot__(a[0]), moments_with_index))
+
+        def rank_flags(fq: cirq.Qid):
+            #check how many cnots the flag is protecting
+            moments_with_fq = list(filter(lambda m: fq in m[0].qubits, moments_with_cnot_and_index))
+            first_moment_with_fq = moments_with_fq[0]
+            first_i = first_moment_with_fq[1]
+            last_moment_with_fq = moments_with_fq[-1]
+            last_i = last_moment_with_fq[1]
+
+            # find the qubit that is protected
+            protected_qubit = first_moment_with_fq[0].qubits[0] # control, target
+            if 'z' in fq.name:
+                protected_qubit = first_moment_with_fq[0].qubits[1]
+            
+            # find hoq many cnots touch the protected qubit
+            protected_cnots = list(filter(lambda m: protected_qubit in m[0].qubits and m[1] > first_i and m[1] < last_i, moments_with_cnot_and_index))
+
+            return len(protected_cnots)
+
+        # sort the flags based on ranking
+        flag_qubits.sort(key=rank_flags)
+
+        # pick the amount we want or all flags
+        improtant_flags = flag_qubits[:min(n_of_flags, len(flag_qubits))]
+
+        #only take those important flags
+        def map_func(op: cirq.Operation) -> cirq.OP_TREE:
+            # if flag qubit
+            if 'f' in str(op.qubits):
+                # if important
+                if any(q in improtant_flags for q in op.qubits):
+                    yield op
+            else:
+                yield op
+
+        new_circuit = flag_circuit.map_operations(map_func)
+
+        return new_circuit
