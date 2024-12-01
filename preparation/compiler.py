@@ -233,17 +233,18 @@ class FlagCompiler:
             last_i = last_moment_with_fq[1]
 
             # find the qubit that is protected
-            protected_qubit = first_moment_with_fq[0].qubits[0] # control, target
+            protected_qubit = first_moment_with_fq[0].operations[0].qubits[0] # control, target
             if 'z' in fq.name:
-                protected_qubit = first_moment_with_fq[0].qubits[1]
+                protected_qubit = first_moment_with_fq[0].operations[0].qubits[1]
             
             # find hoq many cnots touch the protected qubit
             protected_cnots = list(filter(lambda m: protected_qubit in m[0].qubits and m[1] > first_i and m[1] < last_i, moments_with_cnot_and_index))
 
+            print(fq, len(protected_cnots))
             return len(protected_cnots)
 
         # sort the flags based on ranking
-        flag_qubits.sort(key=rank_flags)
+        flag_qubits.sort(key=rank_flags, reverse=True)
 
         # pick the amount we want or all flags
         improtant_flags = flag_qubits[:min(n_of_flags, len(flag_qubits))]
