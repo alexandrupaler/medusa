@@ -58,7 +58,11 @@ if __name__ == '__main__':
         er_b = 1.0
 
         done = False
-        while not done:
+        max_runs = 100
+        while (not done) and (max_runs > 0):
+
+            max_runs -= 1
+
             error_mod = (er_a + er_b) / 2
             large_fc_failure_rate, large_icm_failure_rate = run_simulation(large_icm, large_fc, error_mod, error_rate)
 
