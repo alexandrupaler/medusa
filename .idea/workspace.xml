@@ -5,16 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a1f431e9-70a7-497a-9d9b-02910d4d4a88" name="Changes" comment="Refactoring:&#10;To use the new code just change the strat in compiler. Here is the detail of what have been done:&#10;+) create A wrapper class for quantum circuit with flags: Flag_Circuit This class contain methods to manipulate the circuit&#10;+) Added new class Error_Location which represent sub circuit where errors can be detected with a flag: This will not only make sure flag won't affect computation but allow us to extend to different type of flag. &#10;+) Helper class Single_Error represent depolarizing error.&#10;+) Refactor error map so that it works with new class.">
-      <change afterPath="$PROJECT_DIR$/preparation/error_location.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/sanity_check.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/test_circuit/flag_circuit_adder6.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/test_error_location.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/test_single_error.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/preparation/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/preparation/Flag.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/preparation/compiler.py" beforeDir="false" afterPath="$PROJECT_DIR$/preparation/compiler.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/preparation/error_map.py" beforeDir="false" afterPath="$PROJECT_DIR$/preparation/error_map.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/preparation/flag_circuit.py" beforeDir="false" afterPath="$PROJECT_DIR$/preparation/flag_circuit.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/preparation/flag_qubits.py" beforeDir="false" afterPath="$PROJECT_DIR$/preparation/flag_qubits.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/generator_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/big_budget.py" beforeDir="false" afterPath="$PROJECT_DIR$/big_budget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/big_budget_with_samples.py" beforeDir="false" afterPath="$PROJECT_DIR$/big_budget_with_samples.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,6 +45,9 @@
     &quot;accountId&quot;: &quot;93d927cb-b089-416c-a000-ebe989e79feb&quot;
   }
 }</component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
 }</component>
@@ -66,7 +65,9 @@
     &quot;Python.main_random_icm.executor&quot;: &quot;Run&quot;,
     &quot;Python.main_stab_par.executor&quot;: &quot;Run&quot;,
     &quot;Python.sanity_check.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;result__for__random__icm&quot;,
     &quot;last_opened_file_path&quot;: &quot;/home/quan/PycharmProjects/medusa2&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
@@ -74,6 +75,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -84,10 +86,31 @@
       <recent name="$PROJECT_DIR$/preparation" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.sanity_check">
+  <component name="RunManager" selected="Python.big_budget">
+    <configuration name="big_budget" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="medusa" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/big_budget.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="main_benchmark_random_ICM" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="medusa2" />
-      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -110,7 +133,6 @@
     </configuration>
     <configuration name="main_heuristic_flags" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="medusa2" />
-      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -133,7 +155,6 @@
     </configuration>
     <configuration name="main_random_icm" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="medusa2" />
-      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -156,7 +177,6 @@
     </configuration>
     <configuration name="main_stab_par" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="medusa2" />
-      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -177,39 +197,16 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="sanity_check" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="medusa2" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test/sanity_check.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <list>
       <item itemvalue="Python.main_benchmark_random_ICM" />
       <item itemvalue="Python.main_heuristic_flags" />
       <item itemvalue="Python.main_random_icm" />
       <item itemvalue="Python.main_stab_par" />
-      <item itemvalue="Python.sanity_check" />
+      <item itemvalue="Python.big_budget" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.sanity_check" />
+        <item itemvalue="Python.big_budget" />
         <item itemvalue="Python.main_random_icm" />
         <item itemvalue="Python.main_stab_par" />
         <item itemvalue="Python.main_benchmark_random_ICM" />
@@ -247,6 +244,9 @@
       <workItem from="1721341659431" duration="7236000" />
       <workItem from="1721476466423" duration="12852000" />
       <workItem from="1721502770205" duration="1028000" />
+      <workItem from="1733738192300" duration="277000" />
+      <workItem from="1733738473107" duration="646000" />
+      <workItem from="1733739485515" duration="3176000" />
     </task>
     <task id="LOCAL-00001" summary="add skeleton for new classes">
       <option name="closed" value="true" />
@@ -316,12 +316,13 @@
     <option name="LAST_COMMIT_MESSAGE" value="Refactoring:&#10;To use the new code just change the strat in compiler. Here is the detail of what have been done:&#10;+) create A wrapper class for quantum circuit with flags: Flag_Circuit This class contain methods to manipulate the circuit&#10;+) Added new class Error_Location which represent sub circuit where errors can be detected with a flag: This will not only make sure flag won't affect computation but allow us to extend to different type of flag. &#10;+) Helper class Single_Error represent depolarizing error.&#10;+) Refactor error map so that it works with new class." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/medusa2$main_heuristic_flags.coverage" NAME="main_heuristic_flags Coverage Results" MODIFIED="1720117839135" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/medusa$big_budget.coverage" NAME="big_budget Coverage Results" MODIFIED="1733738978528" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/medusa2$main_benchmark_random_ICM.coverage" NAME="main_benchmark_random_ICM Coverage Results" MODIFIED="1720118226715" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/medusa2$main_error_map.coverage" NAME="main_error_map Coverage Results" MODIFIED="1720112021395" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/medusa2$main.coverage" NAME="main Coverage Results" MODIFIED="1720006591441" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/medusa2$main_random_icm.coverage" NAME="main_random_icm Coverage Results" MODIFIED="1720119875854" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/medusa2$sanity_check.coverage" NAME="sanity_check Coverage Results" MODIFIED="1721502258985" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/medusa2$main_heuristic_flags.coverage" NAME="main_heuristic_flags Coverage Results" MODIFIED="1720117839135" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/medusa2$main_random_icm.coverage" NAME="main_random_icm Coverage Results" MODIFIED="1720119875854" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/medusa2$main_stab_par.coverage" NAME="main_stab_par Coverage Results" MODIFIED="1720119043175" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/medusa2$main.coverage" NAME="main Coverage Results" MODIFIED="1720006591441" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/medusa2$main_error_map.coverage" NAME="main_error_map Coverage Results" MODIFIED="1720112021395" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

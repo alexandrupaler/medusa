@@ -9,6 +9,8 @@ from preparation import compiler, test_circuits
 from evaluation import evaluate
 import numpy as np
 
+from generator_utils import generate_circuits
+
 
 if __name__ == '__main__':
 
@@ -23,40 +25,7 @@ if __name__ == '__main__':
 
 
     # use this to generate 10 x b1, b2 and b3 circuits
-    def generate_circuits():
-    
-        # save icm circuits and flag circuits as jsons
-        def save_circuit_info(name, icm_circuit, i, j):
-            c = compiler.FlagCompiler()
-            
-            # no decompose because jabalizer messes up the order of the gates
-            # icm_circuit: cirq.Circuit = c.decompose_to_ICM(icm_circuit, i=i)
 
-            # need this because linequbits don't have a name
-            named_icm_circuit = test_circuits.line_to_named(icm_circuit)
-            flag_circuit = c.add_flag(named_icm_circuit, strategy="heuristic")
-
-            icm_json = cirq.to_json(named_icm_circuit)
-            #circuits/icm_name_i_j.json
-            with open("circuits/icm_" + name + "_" + str(i) + "_" + str(j) + ".json", "w") as outfile:
-                outfile.write(icm_json)
-
-            #circuits/fc_name_i_j.json
-            fc_json = cirq.to_json(flag_circuit)
-            with open("circuits/fc_" + name + "_" + str(i) + "_" + str(j) + ".json", "w") as outfile:
-                outfile.write(fc_json)
-
-        edge_probability = 0.5
-        remove_hadamards = 1.0
-        for i in range(4, 40+1): #the 4 is because we need i-1
-            warnings.warn(str(i))
-            for j in range(number_of_samples):
-                b1 = test_circuits.circuit_generator_1(i, edge_probability, remove_hadamards)
-                b2 = test_circuits.circuit_generator_2(i, edge_probability, remove_hadamards)
-                b3 = test_circuits.circuit_generator_3(i, edge_probability, remove_hadamards)
-                save_circuit_info("b1", b1, i, j)
-                save_circuit_info("b2", b2, i, j)
-                save_circuit_info("b3", b3, i, j)
     
 
     def run_simulation(icm_circuit, flag_circuit, error_mod, error_rate):
@@ -120,7 +89,7 @@ if __name__ == '__main__':
         res_icm_small_df.to_csv(path + "icm_small_" + circuit_type + "_" + str(circuit_size) + "_" + str(error_mod) + "_" + str(error_rate) + ".csv",index=False)
 
     # uncomment to generate circuit jsons
-    generate_circuits()
+    generate_circuits(min_qubits=4, max_qubits=40, number_of_bench_samples=10)
 
     circuit_sizes = range(5, 40+1)
     circuit_types = ["b1", "b2", "b3"]
