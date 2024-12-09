@@ -68,8 +68,10 @@ if __name__ == '__main__':
             if abs(diff) < epsilon_target:  # abs(diff) / res_icm_small < goal:
                 done = True
             elif diff < 0:
+                print("-")
                 er_b = error_mod
             else:
+                print("+")
                 er_a = error_mod
 
         # save as csvs
