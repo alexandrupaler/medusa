@@ -34,6 +34,8 @@ if __name__ == '__main__':
     """
     bkp_folder_name = datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
     config = {"circuits": "circuits/", "logs": f"{bkp_folder_name}/logs/"}
+    # Create the cicuit folder
+    Path(config["circuits"]).mkdir(parents=True, exist_ok=True)
     # Create the logs folder
     Path(config["logs"]).mkdir(parents=True, exist_ok=True)
     # Copy the main script into the backup folder
@@ -151,7 +153,7 @@ if __name__ == '__main__':
 
 
     # uncomment to generate circuit jsons
-    generate_circuits(min_qubits=4, max_qubits=40, number_of_bench_samples=n_of_samples)
+    generate_circuits(min_qubits=4, max_qubits=5, number_of_bench_samples=n_of_samples, path=config["circuits"])
 
     circuit_sizes = range(40 + 1)
     circuit_types = ["adder", "b1", "b2", "b3"]
