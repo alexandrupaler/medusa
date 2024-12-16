@@ -30,6 +30,11 @@ if __name__ == '__main__':
         #if 'b' in str(circuit_type):
         if 'a' in str(circuit_type):
 
+            # If you know the circuit type, size and error_rate
+            # then you can load the json and read the values from the dictionary
+            # with open(f"{config['logs']}/report_{circuit_type}_{circuit_size}_{error_rate}.json", "r") as report:
+            #     last_values = json.load(report)
+
             # "fc_" + circuit_type + "_" + str(circuit_size) + "_" + str(error_mod) + "_" + str(error_rate) + ".csv"
             res = pd.read_csv(path + "fc_" + circuit_type + "_" + circuit_size + "_" + error_mod + "_" + str(error_rate) + ".csv")
             icm_small = pd.read_csv(path + "icm_small_" + circuit_type + "_" + circuit_size + "_" + error_mod + "_" + str(error_rate) + ".csv")

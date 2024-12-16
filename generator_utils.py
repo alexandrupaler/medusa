@@ -43,6 +43,7 @@ def generate_circuits(min_qubits, max_qubits, number_of_bench_samples):
         # adder circuit
         adder = test_circuits.adder_only_cnots(i)
         icm_circ, flag_circ = compile_circuits(adder, size=i, apply_jabalizer=True)
+        # for the adder there is a single sample circuit, because this one is not a random one
         save_circuits(f"adder_{i}_{0}", icm_circ, flag_circ)
 
         for j in range(number_of_bench_samples):
