@@ -27,12 +27,13 @@ if __name__ == '__main__':
     number_of_runs = 10
     error_rate = 0.001
     epsilon_target = 0.005
+    n_of_samples = 10
 
     """
         Create backups and logs
     """
     bkp_folder_name = datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
-    config = {"circuits": "/circuits/", "logs": f"{bkp_folder_name}/logs/"}
+    config = {"circuits": "circuits/", "logs": f"{bkp_folder_name}/logs/"}
     # Create the logs folder
     Path(config["logs"]).mkdir(parents=True, exist_ok=True)
     # Copy the main script into the backup folder
@@ -54,7 +55,7 @@ if __name__ == '__main__':
         return results_flag, results_icm
 
 
-    def parallel_simulation(inp, number_of_samples):
+    def parallel_simulation(inp, number_of_samples=n_of_samples):
 
         circuit_type, circuit_size = inp
 
@@ -75,12 +76,12 @@ if __name__ == '__main__':
 
             # fetch circuit files
             # get icm i-1 logical error rate
-            small_icm = cirq.read_json(f"{config['circuits']}/icm_{circuit_type}_{circuit_size - 1}_{sample_i}.json")
-            small_fc = cirq.read_json(f"{config['circuits']}/fc_{circuit_type}_{circuit_size - 1}_{sample_i}.json")
+            small_icm = cirq.read_json(f"{config['circuits']}icm_{circuit_type}_{circuit_size - 1}_{sample_i}.json")
+            small_fc = cirq.read_json(f"{config['circuits']}fc_{circuit_type}_{circuit_size - 1}_{sample_i}.json")
 
             # get icm and flag i logical error rate
-            large_icm = cirq.read_json(f"{config['circuits']}/icm_{circuit_type}_{circuit_size}_{sample_i}.json")
-            large_fc = cirq.read_json(f"{config['circuits']}/fc_{circuit_type}_{circuit_size}_{sample_i}.json")
+            large_icm = cirq.read_json(f"{config['circuits']}icm_{circuit_type}_{circuit_size}_{sample_i}.json")
+            large_fc = cirq.read_json(f"{config['circuits']}fc_{circuit_type}_{circuit_size}_{sample_i}.json")
 
             # TODO: the i-1 could be done elsewhere
             _, small_icm_failure_rate = run_simulation(small_icm, small_fc, 1, error_rate)
@@ -104,10 +105,10 @@ if __name__ == '__main__':
                 if abs(diff) < epsilon_target:  # abs(diff) / res_icm_small < goal:
                     done = True
 
-                    # Save the last values for later analysis
-                    last_values["large_fc_failure_rate"][sample_i] = large_fc_failure_rate
-                    last_values["large_icm_failure_rate"][sample_i] = large_icm_failure_rate
-                    last_values["small_icm_failure_rate"][sample_i] = small_icm_failure_rate
+                    # Save the last values for later analysism [0] is because results are in arrays
+                    last_values["large_fc_failure_rate"][sample_i] = large_fc_failure_rate[0]
+                    last_values["large_icm_failure_rate"][sample_i] = large_icm_failure_rate[0]
+                    last_values["small_icm_failure_rate"][sample_i] = small_icm_failure_rate[0]
                     last_values["error_mod"][sample_i] = error_mod
 
                 elif diff < 0:
@@ -124,27 +125,36 @@ if __name__ == '__main__':
         last_values["averages"]["small_icm_failure_rate"] = np.average(last_values["small_icm_failure_rate"])
         last_values["averages"]["error_mod"] = np.average(last_values["error_mod"])
 
+        # error: "Object of type ndarray is not JSON serializable"
+        # solution is to pass default function to json.dump
+        def numpy_to_list(obj):
+            if isinstance(obj, np.ndarray):
+                return obj.tolist()
+            raise TypeError('Not serializable')
+
         with open(f"{config['logs']}/report_{circuit_type}_{circuit_size}_{error_rate}.json", "w") as report:
-            json.dump(last_values, report)
+            json.dump(last_values, report, default=numpy_to_list)
 
         # save as CSVs - single value per file - legacy
         err_mod_avg = last_values["averages"]["error_mod"]
-        res_df = pd.DataFrame(last_values["averages"]["large_fc_failure_rate"])
-        res_df.to_csv(f"{config['logs']}/fc_{circuit_type}_{circuit_size}_{err_mod_avg}_{error_rate}.csv", index=False)
-        res_icm_df = pd.DataFrame(last_values["averages"]["large_icm_failure_rate"])
-        res_icm_df.to_csv(f"{config['logs']}/icm_{circuit_type}_{circuit_size}_{err_mod_avg}_{error_rate}.csv",
+        
+        res_df = pd.DataFrame([last_values["averages"]["large_fc_failure_rate"]])
+        res_df.to_csv(f"{config['logs']}fc_{circuit_type}_{circuit_size}_{err_mod_avg}_{error_rate}.csv", index=False)
+        
+        res_icm_df = pd.DataFrame([last_values["averages"]["large_icm_failure_rate"]])
+        res_icm_df.to_csv(f"{config['logs']}icm_{circuit_type}_{circuit_size}_{err_mod_avg}_{error_rate}.csv",
                           index=False)
-        res_icm_small_df = pd.DataFrame(last_values["averages"]["small_icm_failure_rate"])
+
+        res_icm_small_df = pd.DataFrame([last_values["averages"]["small_icm_failure_rate"]])
         res_icm_small_df.to_csv(
-            f"{config['logs']}/icm_small_{circuit_type}_{circuit_size}_{err_mod_avg}_{error_rate}.csv", index=False)
+            f"{config['logs']}icm_small_{circuit_type}_{circuit_size}_{err_mod_avg}_{error_rate}.csv", index=False)
 
 
     # uncomment to generate circuit jsons
-    generate_circuits(min_qubits=4, max_qubits=40, number_of_bench_samples=1)
+    generate_circuits(min_qubits=4, max_qubits=40, number_of_bench_samples=n_of_samples)
 
-    circuit_sizes = range(5, 40 + 1)
-    # circuit_types = ["adder", "b1", "b2", "b3"]
-    circuit_types = ["b1", "b2", "b3"]
+    circuit_sizes = range(40 + 1)
+    circuit_types = ["adder", "b1", "b2", "b3"]
 
     paramlist = list(itertools.product(circuit_types, circuit_sizes))
 
