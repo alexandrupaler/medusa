@@ -138,18 +138,18 @@ if __name__ == '__main__':
             json.dump(last_values, report, default=numpy_to_list)
 
         # save as CSVs - single value per file - legacy
-        err_mod_avg = last_values["averages"]["error_mod"]
-        
-        res_df = pd.DataFrame([last_values["averages"]["large_fc_failure_rate"]])
-        res_df.to_csv(f"{config['logs']}fc_{circuit_type}_{circuit_size}_{err_mod_avg}_{error_rate}.csv", index=False)
-        
-        res_icm_df = pd.DataFrame([last_values["averages"]["large_icm_failure_rate"]])
-        res_icm_df.to_csv(f"{config['logs']}icm_{circuit_type}_{circuit_size}_{err_mod_avg}_{error_rate}.csv",
-                          index=False)
-
-        res_icm_small_df = pd.DataFrame([last_values["averages"]["small_icm_failure_rate"]])
-        res_icm_small_df.to_csv(
-            f"{config['logs']}icm_small_{circuit_type}_{circuit_size}_{err_mod_avg}_{error_rate}.csv", index=False)
+        # err_mod_avg = last_values["averages"]["error_mod"]
+        #
+        # res_df = pd.DataFrame([last_values["averages"]["large_fc_failure_rate"]])
+        # res_df.to_csv(f"{config['logs']}fc_{circuit_type}_{circuit_size}_{err_mod_avg}_{error_rate}.csv", index=False)
+        #
+        # res_icm_df = pd.DataFrame([last_values["averages"]["large_icm_failure_rate"]])
+        # res_icm_df.to_csv(f"{config['logs']}icm_{circuit_type}_{circuit_size}_{err_mod_avg}_{error_rate}.csv",
+        #                   index=False)
+        #
+        # res_icm_small_df = pd.DataFrame([last_values["averages"]["small_icm_failure_rate"]])
+        # res_icm_small_df.to_csv(
+        #     f"{config['logs']}icm_small_{circuit_type}_{circuit_size}_{err_mod_avg}_{error_rate}.csv", index=False)
 
 
     # uncomment to generate circuit jsons
