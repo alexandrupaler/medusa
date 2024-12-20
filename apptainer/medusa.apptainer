@@ -3,7 +3,7 @@ From: images/julia:latest.sif
 
 %files
     ../requirements.txt requirements.txt
-    ../julia_requirements.jl julia_requirements.jl
+    ../preparation/julia_requirements.jl julia_requirements.jl
 
 %post
     apt update

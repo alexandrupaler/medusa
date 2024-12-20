@@ -27,13 +27,13 @@ if __name__ == '__main__':
     number_of_runs = 10
     error_rate = 0.001
     epsilon_target = 0.005
-    n_of_samples = 10
+    n_of_samples = 1
 
     """
         Create backups and logs
     """
     bkp_folder_name = datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
-    config = {"circuits": "circuits/", "logs": f"{bkp_folder_name}/logs/"}
+    config = {"circuits": "misc/circuits/", "logs": f"{bkp_folder_name}/logs/"}
     # Create the cicuit folder
     Path(config["circuits"]).mkdir(parents=True, exist_ok=True)
     # Create the logs folder
@@ -139,9 +139,9 @@ if __name__ == '__main__':
 
 
     # uncomment to generate circuit jsons
-    generate_circuits(min_qubits=4, max_qubits=5, number_of_bench_samples=n_of_samples, path=config["circuits"])
+    # generate_circuits(min_qubits=4, max_qubits=5, number_of_bench_samples=n_of_samples, path=config["circuits"])
 
-    circuit_sizes = range(40 + 1)
+    circuit_sizes = range(10, 40 + 1)
     circuit_types = ["adder", "b1", "b2", "b3"]
 
     paramlist = list(itertools.product(circuit_types, circuit_sizes))
@@ -149,7 +149,7 @@ if __name__ == '__main__':
     procs = len(paramlist) + 1
 
     # max number of processes
-    maxprocs = 4
+    maxprocs = 120
     pool = Pool(processes=procs)
     pool.map(parallel_simulation, paramlist)
     pool.close()
