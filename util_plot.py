@@ -28,7 +28,7 @@ if __name__ == '__main__':
     # path = "importancebudget/"
     error_rate = 0.001
 
-    files = list(filter(lambda f: f.startswith("fc_"), os.listdir(path)))
+    files = list(filter(lambda f: f.startswith("report_"), os.listdir(path)))
     files.sort(key=lambda w: int(w.split("_")[2]))
 
     for filename in files:
@@ -39,11 +39,11 @@ if __name__ == '__main__':
 
         # Check the circuit type
         # if 'b' in str(circuit_type):
-        if 'a' in str(circuit_type):
+        if 'b1' in str(circuit_type):
             # If you know the circuit type, size and error_rate
             # then you can load the json and read the values from the dictionary
             last_values = {}
-            with open(f"{path}/report_{circuit_type}_{circuit_size}_{error_rate}.json", "r") as report:
+            with open(f"{path}/{filename}", "r") as report:
                 last_values = json.load(report)
 
             """
@@ -71,7 +71,7 @@ if __name__ == '__main__':
             # uncomment below` for flag and icm error plotted together
             plt.scatter(int(circuit_size), res, color='red')
             plt.scatter(int(circuit_size), icm_small, color='blue')
-            plt.ylabel("logic`al error rate")
+            plt.ylabel("logical error rate")
 
             # uncomment below for difference between flag and icm error
             # plt.scatter(int(circuit_size), (res - icm_small), color='red')
@@ -97,4 +97,5 @@ if __name__ == '__main__':
     # plt.savefig("bigbudgetb123.png")
 
     # "./plots/bigbdgtadderimprtmodfq.png"
+    # plt.legend()
     plt.savefig(plot_fname)
