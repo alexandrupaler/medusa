@@ -9,7 +9,18 @@ from evaluation import evaluate
 import numpy as np
 import os
 
-
+"""
+    Assumming:
+    * an almost infinite (2 times number of qubits etc) supply of perfect flags
+    * a circuit without flags of size A
+    * a circuit with flags of size B, where B > A
+    
+    Problem Statement:
+    What is the smallest A you can reach if you have perfect flags in B?
+    
+    The intuition is that smaller A will have lower error-rate, such that 
+    adding perfect flags _should_ lower the error rate to the point of A
+"""
 if __name__ == '__main__':
 
     # triton cpus:
@@ -92,11 +103,11 @@ if __name__ == '__main__':
     plt.scatter(x, final_res)
     plt.xlabel("circuit size")
     plt.ylabel("achieved icm size")
-    plt.savefig("history.png")
+    plt.savefig("opt_tradeoff_flags_failure.png")
 
     # save result as csv
     df = pd.DataFrame(final_res)
-    df.to_csv('history_adder.csv',index=False)
+    df.to_csv('opt_tradeoff_flags_failure_adder.csv', index=False)
 
     shared_res.unlink()
     shared_res.close()

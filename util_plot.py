@@ -65,4 +65,5 @@ if __name__ == '__main__':
     plt.tight_layout()
     #plt.xlabel("circuit size")
     #plt.savefig("bigbudgetb123.png")
-    plt.savefig("bigbdgtadderimprtmodfq.png")
+
+    plt.savefig("./plots/bigbdgtadderimprtmodfq.png")

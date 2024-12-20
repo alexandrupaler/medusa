@@ -17,7 +17,7 @@ from preparation import compiler, test_circuits
 from evaluation import evaluate
 import numpy as np
 
-from generator_utils import generate_circuits
+from util_generator import generate_circuits
 
 if __name__ == '__main__':
 
