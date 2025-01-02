@@ -43,7 +43,7 @@ class FlagCompiler:
 
         # here is a hacky way to convert using jabalizer
         import os
-        os.system("julia compiler/icm_converter.jl " + str(i) + " " + str(j))
+        os.system("julia preparation/icm_converter.jl " + str(i) + " " + str(j))
 
         cirq_circuit = cirq.read_json("output_cirq_icm_circuit" + str(i) + str(j) + ".json")
         return cirq_circuit

@@ -24,16 +24,16 @@ if __name__ == '__main__':
     # triton cpus:
     # - lots :)
 
-    number_of_runs = 10
+    number_of_runs = 10000
     error_rate = 0.001
     epsilon_target = 0.005
-    n_of_samples = 1
+    n_of_circuit_samples = 0
 
     """
         Create backups and logs
     """
     bkp_folder_name = datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
-    config = {"circuits": "misc/circuits/", "logs": f"{bkp_folder_name}/logs/"}
+    config = {"circuits": f"{bkp_folder_name}/circuits/", "logs": f"{bkp_folder_name}/logs/"}
     # Create the cicuit folder
     Path(config["circuits"]).mkdir(parents=True, exist_ok=True)
     # Create the logs folder
@@ -57,15 +57,15 @@ if __name__ == '__main__':
         return results_flag, results_icm
 
 
-    def parallel_simulation(inp, number_of_samples=n_of_samples):
+    def parallel_simulation(inp, number_of_runs=number_of_runs):
 
         circuit_type, circuit_size = inp
 
         last_values = {
-            "large_fc_failure_rate": np.zeros(number_of_samples),
-            "large_icm_failure_rate": np.zeros(number_of_samples),
-            "small_icm_failure_rate": np.zeros(number_of_samples),
-            "error_mod": np.zeros(number_of_samples),
+            "large_fc_failure_rate": np.zeros(number_of_runs),
+            "large_icm_failure_rate": np.zeros(number_of_runs),
+            "small_icm_failure_rate": np.zeros(number_of_runs),
+            "error_mod": np.zeros(number_of_runs),
             "averages": {
                 "large_fc_failure_rate": -1,
                 "large_icm_failure_rate": -1,
@@ -74,16 +74,16 @@ if __name__ == '__main__':
             }
         }
 
-        for sample_i in range(number_of_samples):
+        for run_id in range(number_of_runs):
 
             # fetch circuit files
             # get icm i-1 logical error rate
-            small_icm = cirq.read_json(f"{config['circuits']}icm_{circuit_type}_{circuit_size - 1}_{sample_i}.json")
-            small_fc = cirq.read_json(f"{config['circuits']}fc_{circuit_type}_{circuit_size - 1}_{sample_i}.json")
+            small_icm = cirq.read_json(f"{config['circuits']}icm_{circuit_type}_{circuit_size - 1}_{run_id}.json")
+            small_fc = cirq.read_json(f"{config['circuits']}fc_{circuit_type}_{circuit_size - 1}_{run_id}.json")
 
             # get icm and flag i logical error rate
-            large_icm = cirq.read_json(f"{config['circuits']}icm_{circuit_type}_{circuit_size}_{sample_i}.json")
-            large_fc = cirq.read_json(f"{config['circuits']}fc_{circuit_type}_{circuit_size}_{sample_i}.json")
+            large_icm = cirq.read_json(f"{config['circuits']}icm_{circuit_type}_{circuit_size}_{run_id}.json")
+            large_fc = cirq.read_json(f"{config['circuits']}fc_{circuit_type}_{circuit_size}_{run_id}.json")
 
             # TODO: the i-1 could be done elsewhere
             _, small_icm_failure_rate = run_simulation(small_icm, small_fc, 1, error_rate)
@@ -108,10 +108,10 @@ if __name__ == '__main__':
                     done = True
 
                     # Save the last values for later analysism [0] is because results are in arrays
-                    last_values["large_fc_failure_rate"][sample_i] = large_fc_failure_rate[0]
-                    last_values["large_icm_failure_rate"][sample_i] = large_icm_failure_rate[0]
-                    last_values["small_icm_failure_rate"][sample_i] = small_icm_failure_rate[0]
-                    last_values["error_mod"][sample_i] = error_mod
+                    last_values["large_fc_failure_rate"][run_id] = large_fc_failure_rate[0]
+                    last_values["large_icm_failure_rate"][run_id] = large_icm_failure_rate[0]
+                    last_values["small_icm_failure_rate"][run_id] = small_icm_failure_rate[0]
+                    last_values["error_mod"][run_id] = error_mod
 
                 elif diff < 0:
                     print("-")
@@ -139,10 +139,10 @@ if __name__ == '__main__':
 
 
     # uncomment to generate circuit jsons
-    # generate_circuits(min_qubits=4, max_qubits=5, number_of_bench_samples=n_of_samples, path=config["circuits"])
+    generate_circuits(min_qubits=4, max_qubits=40, number_of_bench_samples=n_of_circuit_samples, path=config["circuits"])
 
-    circuit_sizes = range(10, 40 + 1)
-    circuit_types = ["adder", "b1", "b2", "b3"]
+    circuit_sizes = range(5, 40 + 1)
+    circuit_types = ["adder"] #"b1", "b2", "b3"]
 
     paramlist = list(itertools.product(circuit_types, circuit_sizes))
 

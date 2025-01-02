@@ -6,7 +6,7 @@ import cirq.circuits
 from preparation import compiler, test_circuits
 
 
-def compile_circuits(orig_circuit, size, apply_jabalizer = False):
+def compile_circuits(orig_circuit, size, apply_jabalizer = False, chosen_flags = -1):
     c = compiler.FlagCompiler()
 
     if apply_jabalizer:
@@ -16,6 +16,10 @@ def compile_circuits(orig_circuit, size, apply_jabalizer = False):
         named_icm_circuit = test_circuits.line_to_named(orig_circuit)
 
     flag_circuit = c.add_flag(named_icm_circuit, strategy="heuristic")
+
+    # if we only want the n most important flags to be chosen
+    if chosen_flags > 0:
+        flag_circuit = c.important_flags(flag_circuit, chosen_flags)
 
     return named_icm_circuit, flag_circuit
 
@@ -31,7 +35,7 @@ def save_circuits(name, icm_circuit, flag_circuit, path):
         outfile.write(fc_json)
 
 
-def generate_circuits(min_qubits, max_qubits, number_of_bench_samples, path):
+def generate_circuits(min_qubits, max_qubits, number_of_bench_samples, path, chosen_flags = -1):
     # save icm circuits and flag circuits as jsons
 
     edge_probability = 0.5
@@ -42,7 +46,7 @@ def generate_circuits(min_qubits, max_qubits, number_of_bench_samples, path):
 
         # adder circuit
         adder = test_circuits.adder_only_cnots(i)
-        icm_circ, flag_circ = compile_circuits(adder, size=i, apply_jabalizer=True)
+        icm_circ, flag_circ = compile_circuits(adder, size=i, apply_jabalizer=True, chosen_flags=chosen_flags)
         # for the adder there is a single sample circuit, because this one is not a random one
         save_circuits(f"adder_{i}_{0}", icm_circ, flag_circ, path)
 
@@ -53,12 +57,12 @@ def generate_circuits(min_qubits, max_qubits, number_of_bench_samples, path):
             b2 = test_circuits.circuit_generator_2(i, edge_probability, remove_hadamards)
             b3 = test_circuits.circuit_generator_3(i, edge_probability, remove_hadamards)
 
-            icm_circ, flag_circ = compile_circuits(b1, size=i, apply_jabalizer=False)
+            icm_circ, flag_circ = compile_circuits(b1, size=i, apply_jabalizer=False, chosen_flags=chosen_flags)
             save_circuits(f"b1_{i}_{j}", icm_circ, flag_circ, path)
 
-            icm_circ, flag_circ = compile_circuits(b2, size=i, apply_jabalizer=False)
+            icm_circ, flag_circ = compile_circuits(b2, size=i, apply_jabalizer=False, chosen_flags=chosen_flags)
             save_circuits(f"b2_{i}_{j}", icm_circ, flag_circ, path)
 
-            icm_circ, flag_circ = compile_circuits(b3, size=i, apply_jabalizer=False)
+            icm_circ, flag_circ = compile_circuits(b3, size=i, apply_jabalizer=False, chosen_flags=chosen_flags)
             save_circuits(f"b3_{i}_{j}", icm_circ, flag_circ, path)
 
