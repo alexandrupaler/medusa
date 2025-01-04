@@ -57,15 +57,18 @@ if __name__ == '__main__':
         return results_flag, results_icm
 
 
-    def parallel_simulation(inp, number_of_runs=number_of_runs):
+    def parallel_simulation(inp, n_of_circuit_samples=n_of_circuit_samples):
 
         circuit_type, circuit_size = inp
 
+        # this is to avoid problems when only dealing with adders (i.e. 0 benchmark circuit samples)
+        circuit_samples = max(n_of_circuit_samples, 1)
+
         last_values = {
-            "large_fc_failure_rate": np.zeros(number_of_runs),
-            "large_icm_failure_rate": np.zeros(number_of_runs),
-            "small_icm_failure_rate": np.zeros(number_of_runs),
-            "error_mod": np.zeros(number_of_runs),
+            "large_fc_failure_rate": np.zeros(circuit_samples),
+            "large_icm_failure_rate": np.zeros(circuit_samples),
+            "small_icm_failure_rate": np.zeros(circuit_samples),
+            "error_mod": np.zeros(circuit_samples),
             "averages": {
                 "large_fc_failure_rate": -1,
                 "large_icm_failure_rate": -1,
@@ -74,16 +77,16 @@ if __name__ == '__main__':
             }
         }
 
-        for run_id in range(number_of_runs):
+        for sample_id in range(circuit_samples):
 
             # fetch circuit files
             # get icm i-1 logical error rate
-            small_icm = cirq.read_json(f"{config['circuits']}icm_{circuit_type}_{circuit_size - 1}_{run_id}.json")
-            small_fc = cirq.read_json(f"{config['circuits']}fc_{circuit_type}_{circuit_size - 1}_{run_id}.json")
+            small_icm = cirq.read_json(f"{config['circuits']}icm_{circuit_type}_{circuit_size - 1}_{sample_id}.json")
+            small_fc = cirq.read_json(f"{config['circuits']}fc_{circuit_type}_{circuit_size - 1}_{sample_id}.json")
 
             # get icm and flag i logical error rate
-            large_icm = cirq.read_json(f"{config['circuits']}icm_{circuit_type}_{circuit_size}_{run_id}.json")
-            large_fc = cirq.read_json(f"{config['circuits']}fc_{circuit_type}_{circuit_size}_{run_id}.json")
+            large_icm = cirq.read_json(f"{config['circuits']}icm_{circuit_type}_{circuit_size}_{sample_id}.json")
+            large_fc = cirq.read_json(f"{config['circuits']}fc_{circuit_type}_{circuit_size}_{sample_id}.json")
 
             # TODO: the i-1 could be done elsewhere
             _, small_icm_failure_rate = run_simulation(small_icm, small_fc, 1, error_rate)
@@ -108,10 +111,10 @@ if __name__ == '__main__':
                     done = True
 
                     # Save the last values for later analysism [0] is because results are in arrays
-                    last_values["large_fc_failure_rate"][run_id] = large_fc_failure_rate[0]
-                    last_values["large_icm_failure_rate"][run_id] = large_icm_failure_rate[0]
-                    last_values["small_icm_failure_rate"][run_id] = small_icm_failure_rate[0]
-                    last_values["error_mod"][run_id] = error_mod
+                    last_values["large_fc_failure_rate"][sample_id] = large_fc_failure_rate[0]
+                    last_values["large_icm_failure_rate"][sample_id] = large_icm_failure_rate[0]
+                    last_values["small_icm_failure_rate"][sample_id] = small_icm_failure_rate[0]
+                    last_values["error_mod"][sample_id] = error_mod
 
                 elif diff < 0:
                     print("-")
