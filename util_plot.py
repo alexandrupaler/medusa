@@ -39,7 +39,7 @@ if __name__ == '__main__':
 
         # Check the circuit type
         # if 'b' in str(circuit_type):
-        if 'b1' in str(circuit_type):
+        if 'adder' in str(circuit_type):
             # If you know the circuit type, size and error_rate
             # then you can load the json and read the values from the dictionary
             last_values = {}
@@ -68,7 +68,7 @@ if __name__ == '__main__':
             icm_small = last_values["averages"]["small_icm_failure_rate"]
             error_mod = last_values["averages"]["error_mod"]
 
-            # uncomment below` for flag and icm error plotted together
+            # uncomment below for flag and icm error plotted together
             plt.scatter(int(circuit_size), res, color='red')
             plt.scatter(int(circuit_size), icm_small, color='blue')
             plt.ylabel("logical error rate")
@@ -81,10 +81,12 @@ if __name__ == '__main__':
             # plt.scatter(int(circuit_size), float(error_mod), color='blue')
             # plt.ylabel("flag error mod")
 
-            # # uncomment below for flag qubit amount
+            # uncomment below for flag qubit amount
             # import cirq
-            # circuits_path = "misc/circuits2/"  # remember to pick correct path!
+            # circuits_path = "01_04_2025_20_15_06/circuits/"  # remember to pick correct path!
+            # TODO: fix circuits sample number at the end of file name
             # flag_circuit_path = circuits_path + "fc_" + circuit_type + "_" + str(circuit_size) + ".json"
+            # flag_circuit_path = circuits_path + "fc_" + circuit_type + "_" + str(circuit_size) + "_0.json"
             # flag_circuit: cirq.Circuit = cirq.read_json(flag_circuit_path)
             # fqs = list(filter(lambda q: 'f' in q.name, flag_circuit.all_qubits()))
             # n_of_fq = len(fqs)
