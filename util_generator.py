@@ -20,6 +20,9 @@ def compile_circuits(orig_circuit, size, apply_jabalizer = False, chosen_flags =
     # if we only want the n most important flags to be chosen
     if chosen_flags > 0:
         flag_circuit = c.important_flags(flag_circuit, chosen_flags)
+    elif chosen_flags == -2:
+        num_of_important_flags = round(len(orig_circuit.all_qubits())**(1/2))
+        flag_circuit = c.important_flags(flag_circuit, num_of_important_flags)
 
     return named_icm_circuit, flag_circuit
 
