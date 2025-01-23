@@ -1,0 +1,14 @@
+adders 5-40 all with 10 of the "best" flags
+number_of_runs = 10000
+error_rate = 0.001
+epsilon_target = 0.005
+
+- all achieve error rate of icm_small with epsilon_target
+- 0.475 - 0.650 mod is sufficient (see 10_flags_mod.png)
+- smaller (i.e. more expensive) error mod needed for smaller circuits
+- unlike previously, now sqrt(dq) flags achieve i-2 or i-3 approx. Maybe before I had a bug?
+
+Conclusion:
+Flags are nice for logical error > 0.1 cases, but is there any point in examining those cases?
+
+What next?
