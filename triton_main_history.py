@@ -115,7 +115,7 @@ if __name__ == '__main__':
 
 
     # uncomment to generate circuit jsons
-    generate_circuits(min_qubits=4, max_qubits=40, number_of_bench_samples=n_of_circuit_samples, path=config["circuits"])
+    generate_circuits(min_qubits=4, max_qubits=40, number_of_bench_samples=n_of_circuit_samples, path=config["circuits"], chosen_flags = 10)
 
     circuit_sizes = range(5, 40 + 1)
     circuit_types = ["adder"] #"b1", "b2", "b3"]
