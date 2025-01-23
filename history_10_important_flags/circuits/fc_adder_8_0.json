@@ -64,7 +64,7 @@
             },
             {
               "cirq_type": "NamedQubit",
-              "name": "101xf"
+              "name": "98xf"
             }
           ]
         }
@@ -295,29 +295,6 @@
             {
               "cirq_type": "NamedQubit",
               "name": "9999999991"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999991"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "97xf"
             }
           ]
         }
@@ -359,7 +336,7 @@
           "qubits": [
             {
               "cirq_type": "NamedQubit",
-              "name": "106zf"
+              "name": "103zf"
             }
           ]
         }
@@ -378,7 +355,7 @@
           "qubits": [
             {
               "cirq_type": "NamedQubit",
-              "name": "106zf"
+              "name": "103zf"
             },
             {
               "cirq_type": "NamedQubit",
@@ -452,67 +429,6 @@
             {
               "cirq_type": "NamedQubit",
               "name": "9999999986"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999991"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "97xf"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "MeasurementGate",
-            "num_qubits": 1,
-            "key": "97xf",
-            "invert_mask": []
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "97xf"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "ResetChannel",
-            "dimension": 2
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "97xf"
             }
           ]
         }
@@ -581,7 +497,7 @@
             },
             {
               "cirq_type": "NamedQubit",
-              "name": "98xf"
+              "name": "94xf"
             }
           ]
         }
@@ -696,29 +612,6 @@
             },
             {
               "cirq_type": "NamedQubit",
-              "name": "95xf"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999992"
-            },
-            {
-              "cirq_type": "NamedQubit",
               "name": "9999999975"
             }
           ]
@@ -807,11 +700,540 @@
           "qubits": [
             {
               "cirq_type": "NamedQubit",
+              "name": "9999999991"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999992"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999975"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999985"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
               "name": "9999999992"
             },
             {
               "cirq_type": "NamedQubit",
-              "name": "95xf"
+              "name": "97xf"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999992"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999974"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999992"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999984"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999974"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999993"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999984"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999993"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999993"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999974"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999993"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999984"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999993"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999974"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999993"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999984"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999992"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999993"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999974"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999984"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999993"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "102xf"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999993"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999973"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999993"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999983"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999973"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999994"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999983"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999994"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999994"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "99xf"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999994"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999973"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999994"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999983"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999994"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999973"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999994"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999983"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999994"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "99xf"
             }
           ]
         }
@@ -825,13 +1247,13 @@
           "gate": {
             "cirq_type": "MeasurementGate",
             "num_qubits": 1,
-            "key": "95xf",
+            "key": "99xf",
             "invert_mask": []
           },
           "qubits": [
             {
               "cirq_type": "NamedQubit",
-              "name": "95xf"
+              "name": "99xf"
             }
           ]
         }
@@ -849,513 +1271,7 @@
           "qubits": [
             {
               "cirq_type": "NamedQubit",
-              "name": "95xf"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999991"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999992"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999975"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999985"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999992"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "96xf"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999992"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999974"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999992"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999984"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999974"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999993"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999984"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999993"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999993"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999974"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999993"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999984"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999993"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999974"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999993"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999984"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999992"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999993"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999974"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999984"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999993"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "91xf"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999993"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999973"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999993"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999983"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999973"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999994"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999983"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999994"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999994"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999973"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999994"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999983"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999994"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999973"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "cirq_type": "Moment",
-      "operations": [
-        {
-          "cirq_type": "GateOperation",
-          "gate": {
-            "cirq_type": "CXPowGate",
-            "exponent": 1.0,
-            "global_shift": 0.0
-          },
-          "qubits": [
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999994"
-            },
-            {
-              "cirq_type": "NamedQubit",
-              "name": "9999999983"
+              "name": "99xf"
             }
           ]
         }
@@ -1539,7 +1455,7 @@
             },
             {
               "cirq_type": "NamedQubit",
-              "name": "93xf"
+              "name": "90xf"
             }
           ]
         }
@@ -1563,6 +1479,48 @@
             {
               "cirq_type": "NamedQubit",
               "name": "9999999972"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "HPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "116zf"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "116zf"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999982"
             }
           ]
         }
@@ -1654,7 +1612,7 @@
             },
             {
               "cirq_type": "NamedQubit",
-              "name": "93xf"
+              "name": "90xf"
             }
           ]
         }
@@ -1668,13 +1626,13 @@
           "gate": {
             "cirq_type": "MeasurementGate",
             "num_qubits": 1,
-            "key": "93xf",
+            "key": "90xf",
             "invert_mask": []
           },
           "qubits": [
             {
               "cirq_type": "NamedQubit",
-              "name": "93xf"
+              "name": "90xf"
             }
           ]
         }
@@ -1692,7 +1650,7 @@
           "qubits": [
             {
               "cirq_type": "NamedQubit",
-              "name": "93xf"
+              "name": "90xf"
             }
           ]
         }
@@ -1761,7 +1719,7 @@
             },
             {
               "cirq_type": "NamedQubit",
-              "name": "94xf"
+              "name": "91xf"
             }
           ]
         }
@@ -2106,7 +2064,7 @@
             },
             {
               "cirq_type": "NamedQubit",
-              "name": "94xf"
+              "name": "91xf"
             }
           ]
         }
@@ -2120,13 +2078,13 @@
           "gate": {
             "cirq_type": "MeasurementGate",
             "num_qubits": 1,
-            "key": "94xf",
+            "key": "91xf",
             "invert_mask": []
           },
           "qubits": [
             {
               "cirq_type": "NamedQubit",
-              "name": "94xf"
+              "name": "91xf"
             }
           ]
         }
@@ -2144,7 +2102,7 @@
           "qubits": [
             {
               "cirq_type": "NamedQubit",
-              "name": "94xf"
+              "name": "91xf"
             }
           ]
         }
@@ -2316,6 +2274,86 @@
           "qubits": [
             {
               "cirq_type": "NamedQubit",
+              "name": "116zf"
+            },
+            {
+              "cirq_type": "NamedQubit",
+              "name": "9999999982"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "HPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "116zf"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "MeasurementGate",
+            "num_qubits": 1,
+            "key": "116zf",
+            "invert_mask": []
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "116zf"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "ResetChannel",
+            "dimension": 2
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
+              "name": "116zf"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cirq_type": "Moment",
+      "operations": [
+        {
+          "cirq_type": "GateOperation",
+          "gate": {
+            "cirq_type": "CXPowGate",
+            "exponent": 1.0,
+            "global_shift": 0.0
+          },
+          "qubits": [
+            {
+              "cirq_type": "NamedQubit",
               "name": "9999999993"
             },
             {
@@ -2366,7 +2404,7 @@
             },
             {
               "cirq_type": "NamedQubit",
-              "name": "91xf"
+              "name": "102xf"
             }
           ]
         }
@@ -2380,13 +2418,13 @@
           "gate": {
             "cirq_type": "MeasurementGate",
             "num_qubits": 1,
-            "key": "91xf",
+            "key": "102xf",
             "invert_mask": []
           },
           "qubits": [
             {
               "cirq_type": "NamedQubit",
-              "name": "91xf"
+              "name": "102xf"
             }
           ]
         }
@@ -2404,7 +2442,7 @@
           "qubits": [
             {
               "cirq_type": "NamedQubit",
-              "name": "91xf"
+              "name": "102xf"
             }
           ]
         }
@@ -2496,7 +2534,7 @@
             },
             {
               "cirq_type": "NamedQubit",
-              "name": "96xf"
+              "name": "97xf"
             }
           ]
         }
@@ -2510,13 +2548,13 @@
           "gate": {
             "cirq_type": "MeasurementGate",
             "num_qubits": 1,
-            "key": "96xf",
+            "key": "97xf",
             "invert_mask": []
           },
           "qubits": [
             {
               "cirq_type": "NamedQubit",
-              "name": "96xf"
+              "name": "97xf"
             }
           ]
         }
@@ -2534,7 +2572,7 @@
           "qubits": [
             {
               "cirq_type": "NamedQubit",
-              "name": "96xf"
+              "name": "97xf"
             }
           ]
         }
@@ -2626,7 +2664,7 @@
             },
             {
               "cirq_type": "NamedQubit",
-              "name": "98xf"
+              "name": "94xf"
             }
           ]
         }
@@ -2640,13 +2678,13 @@
           "gate": {
             "cirq_type": "MeasurementGate",
             "num_qubits": 1,
-            "key": "98xf",
+            "key": "94xf",
             "invert_mask": []
           },
           "qubits": [
             {
               "cirq_type": "NamedQubit",
-              "name": "98xf"
+              "name": "94xf"
             }
           ]
         }
@@ -2664,7 +2702,7 @@
           "qubits": [
             {
               "cirq_type": "NamedQubit",
-              "name": "98xf"
+              "name": "94xf"
             }
           ]
         }
@@ -2756,7 +2794,7 @@
             },
             {
               "cirq_type": "NamedQubit",
-              "name": "101xf"
+              "name": "98xf"
             }
           ]
         }
@@ -2770,13 +2808,13 @@
           "gate": {
             "cirq_type": "MeasurementGate",
             "num_qubits": 1,
-            "key": "101xf",
+            "key": "98xf",
             "invert_mask": []
           },
           "qubits": [
             {
               "cirq_type": "NamedQubit",
-              "name": "101xf"
+              "name": "98xf"
             }
           ]
         }
@@ -2794,7 +2832,7 @@
           "qubits": [
             {
               "cirq_type": "NamedQubit",
-              "name": "101xf"
+              "name": "98xf"
             }
           ]
         }
@@ -2836,7 +2874,7 @@
           "qubits": [
             {
               "cirq_type": "NamedQubit",
-              "name": "106zf"
+              "name": "103zf"
             },
             {
               "cirq_type": "NamedQubit",
@@ -2859,7 +2897,7 @@
           "qubits": [
             {
               "cirq_type": "NamedQubit",
-              "name": "106zf"
+              "name": "103zf"
             }
           ]
         }
@@ -2873,13 +2911,13 @@
           "gate": {
             "cirq_type": "MeasurementGate",
             "num_qubits": 1,
-            "key": "106zf",
+            "key": "103zf",
             "invert_mask": []
           },
           "qubits": [
             {
               "cirq_type": "NamedQubit",
-              "name": "106zf"
+              "name": "103zf"
             }
           ]
         }
@@ -2897,7 +2935,7 @@
           "qubits": [
             {
               "cirq_type": "NamedQubit",
-              "name": "106zf"
+              "name": "103zf"
             }
           ]
         }
