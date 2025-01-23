@@ -82,7 +82,6 @@ if __name__ == '__main__':
             # plt.ylabel("flag error mod")
 
             # uncomment below for flag qubit amount
-            # import cirq
             # circuits_path = "01_04_2025_20_15_06/circuits/"  # remember to pick correct path!
             # TODO: fix circuits sample number at the end of file name
             # flag_circuit_path = circuits_path + "fc_" + circuit_type + "_" + str(circuit_size) + ".json"
