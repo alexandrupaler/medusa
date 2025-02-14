@@ -27,9 +27,10 @@ if __name__ == '__main__':
     # ONLY WORKS WITH ADDERS
 
     number_of_runs = 10000
-    error_rates = [5*0.0001, 7*0.0001, 10*0.0001] 
+    base_error = 0.0001
+    error_rates = [5, 7, 10] 
     epsilon_target = 0.005
-    n_of_circuit_samples = 0 # banchmark samples
+    n_of_circuit_samples = 0 # benchmark samples
     min_q = 5
     max_q = 10
     circuit_types = ["adder"]
@@ -88,9 +89,10 @@ if __name__ == '__main__':
         large_icm = cirq.read_json(f"{config['circuits']}icm_{circuit_type}_{circuit_size}_{sample_id}.json")
         large_fc = cirq.read_json(f"{config['circuits']}fc_{circuit_type}_{circuit_size}_{sample_id}.json")
 
+        # TODO: this could be done in parallel maybe
         for e in range(len(error_rates)):
 
-            error_rate = error_rates[e]
+            error_rate = error_rates[e] * base_error
 
             # TODO: the i-1 could be done elsewhere
             _, small_icm_failure_rate = run_simulation(small_icm, small_fc, 1, error_rate)
