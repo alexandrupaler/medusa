@@ -38,8 +38,8 @@ if __name__ == '__main__':
         circuit_size = parts[2]
 
         # Check the circuit type
-        # if 'b' in str(circuit_type):
-        if 'adder' in str(circuit_type):
+        if 'b' in str(circuit_type):
+        # if 'adder' in str(circuit_type):
             # If you know the circuit type, size and error_rate
             # then you can load the json and read the values from the dictionary
             last_values = {}
@@ -68,9 +68,17 @@ if __name__ == '__main__':
             icm_small = last_values["averages"]["small_icm_failure_rate"]
             error_mod = last_values["averages"]["error_mod"]
 
+            # for plotting the different benchmark gens with different colours
+            if "1" in str(circuit_type):
+                col = 'green'
+            elif "2" in str(circuit_type):
+                col = 'orange'
+            else:
+                col = 'blue'
+
             # uncomment below for flag and icm error plotted together
             plt.scatter(int(circuit_size), res, color='red')
-            plt.scatter(int(circuit_size), icm_small, color='blue')
+            plt.scatter(int(circuit_size), icm_small, color=col)
             plt.ylabel("logical error rate")
 
             # uncomment below for difference between flag and icm error

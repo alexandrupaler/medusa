@@ -28,6 +28,10 @@ if __name__ == '__main__':
     error_rate = 0.001
     epsilon_target = 0.005
     n_of_circuit_samples = 0
+    min_q = 5
+    max_q = 10
+    circuit_types = ["adder"]
+    chosen_flags = -1
 
     """
         Create backups and logs
@@ -142,10 +146,9 @@ if __name__ == '__main__':
 
 
     # uncomment to generate circuit jsons
-    generate_circuits(min_qubits=4, max_qubits=40, number_of_bench_samples=n_of_circuit_samples, path=config["circuits"])
+    generate_circuits(min_qubits=min_q-1, max_qubits=max_q+1, number_of_bench_samples=n_of_circuit_samples, path=config["circuits"], chosen_flags=chosen_flags)
 
-    circuit_sizes = range(5, 40 + 1)
-    circuit_types = ["adder"] #"b1", "b2", "b3"]
+    circuit_sizes = range(min_q, max_q + 1)
 
     paramlist = list(itertools.product(circuit_types, circuit_sizes))
 
@@ -153,7 +156,7 @@ if __name__ == '__main__':
 
     # max number of processes
     maxprocs = 120
-    pool = Pool(processes=procs)
+    pool = Pool(processes=min(procs, maxprocs))
     pool.map(parallel_simulation, paramlist)
     pool.close()
     pool.join()
