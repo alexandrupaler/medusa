@@ -53,9 +53,9 @@ if __name__ == '__main__':
                 error_mod = last_values["error_mod"]
 
                 # uncomment below for flag and icm error plotted together
-                #plt.scatter(int(circuit_size), res[e], color='red')
-                #plt.scatter(int(circuit_size), icm_small[e], color='blue')
-                #plt.ylabel("logical error rate")
+                plt.scatter(int(circuit_size), res[e], color='red')
+                plt.scatter(int(circuit_size), icm_small[e], color='blue')
+                plt.ylabel("logical error rate")
 
                 # uncomment below for difference between flag and icm error
                 # plt.scatter(int(circuit_size), (res[e] - icm_small[e]), color='red')
@@ -68,14 +68,14 @@ if __name__ == '__main__':
                 # uncomment below for flag qubit amount
                 circuits_path = "budget_all_smaller_e/circuits/"  # remember to pick correct path!
                 # TODO: fix circuits sample number at the end of file name
-                flag_circuit_path = circuits_path + "fc_" + circuit_type + "_" + str(circuit_size) + ".json"
-                flag_circuit_path = circuits_path + "fc_" + circuit_type + "_" + str(circuit_size) + "_0.json"
-                flag_circuit: cirq.Circuit = cirq.read_json(flag_circuit_path)
-                fqs = list(filter(lambda q: 'f' in q.name, flag_circuit.all_qubits()))
-                n_of_fq = len(fqs)
-                plt.scatter(n_of_fq, float(error_mod[e]))
-                plt.ylabel("flag error mod")
-                plt.xlabel("number of flag qubits")
+                # flag_circuit_path = circuits_path + "fc_" + circuit_type + "_" + str(circuit_size) + ".json"
+                # flag_circuit_path = circuits_path + "fc_" + circuit_type + "_" + str(circuit_size) + "_0.json"
+                # flag_circuit: cirq.Circuit = cirq.read_json(flag_circuit_path)
+                # fqs = list(filter(lambda q: 'f' in q.name, flag_circuit.all_qubits()))
+                # n_of_fq = len(fqs)
+                # plt.scatter(n_of_fq, float(error_mod[e]))
+                # plt.ylabel("flag error mod")
+                # plt.xlabel("number of flag qubits")
 
     plt.tight_layout()
     # plt.xlabel("circuit size")

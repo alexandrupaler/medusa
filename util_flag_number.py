@@ -19,7 +19,9 @@ if __name__ == '__main__':
     files.sort(key=lambda w: int(w.split("_")[2]))
 
     for file in files:
+        circ_size = file.split("_")[2]
         flag_circuit: cirq.Circuit = cirq.read_json(path + "/" + file)
+        dqs = flag_circuit.all_qubits()
         fqs = list(filter(lambda q: 'f' in q.name, flag_circuit.all_qubits()))
         n_of_fq = len(fqs)
-        print(n_of_fq)
+        print(circ_size, n_of_fq, len(dqs))

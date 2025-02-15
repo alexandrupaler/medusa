@@ -28,8 +28,8 @@ if __name__ == '__main__':
 
     number_of_runs = 10000
     base_error = 0.0001
-    error_rates = [5, 7, 10] 
-    epsilon_target = 0.005
+    error_rates = [1, 5, 7, 10] 
+    epsilon_target = 0.0005
     n_of_circuit_samples = 0 # benchmark samples
     min_q = 5
     max_q = 10
@@ -117,9 +117,9 @@ if __name__ == '__main__':
                     done = True
 
                     # Save the last values for later analysis
-                    last_values["large_fc_failure_rate"][e] = large_fc_failure_rate
-                    last_values["large_icm_failure_rate"][e] = large_icm_failure_rate
-                    last_values["small_icm_failure_rate"][e] = small_icm_failure_rate
+                    last_values["large_fc_failure_rate"][e] = large_fc_failure_rate[0]
+                    last_values["large_icm_failure_rate"][e] = large_icm_failure_rate[0]
+                    last_values["small_icm_failure_rate"][e] = small_icm_failure_rate[0]
                     last_values["error_mod"][e] = error_mod
 
                 elif diff < 0:
