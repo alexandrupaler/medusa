@@ -3,6 +3,7 @@ import sys
 import matplotlib.pyplot as plt
 import cirq
 import json
+import numpy as np
 
 # Some notes:
 #
@@ -52,29 +53,29 @@ if __name__ == '__main__':
                 error_mod = last_values["error_mod"]
 
                 # uncomment below for flag and icm error plotted together
-                plt.scatter(int(circuit_size), res[e], color='red')
-                plt.scatter(int(circuit_size), icm_small[e], color='blue')
-                plt.ylabel("logical error rate")
+                #plt.scatter(int(circuit_size), res[e], color='red')
+                #plt.scatter(int(circuit_size), icm_small[e], color='blue')
+                #plt.ylabel("logical error rate")
 
                 # uncomment below for difference between flag and icm error
-                # plt.scatter(int(circuit_size), (res - icm_small), color='red')
+                # plt.scatter(int(circuit_size), (res[e] - icm_small[e]), color='red')
                 # plt.ylabel("logical error rate difference")
 
                 # uncomment below for flag error mod
-                # plt.scatter(int(circuit_size), float(error_mod), color='blue')
+                # plt.scatter(int(circuit_size), float(error_mod[e]), color='blue')
                 # plt.ylabel("flag error mod")
 
                 # uncomment below for flag qubit amount
-                # circuits_path = "01_04_2025_20_15_06/circuits/"  # remember to pick correct path!
+                circuits_path = "budget_all_smaller_e/circuits/"  # remember to pick correct path!
                 # TODO: fix circuits sample number at the end of file name
-                # flag_circuit_path = circuits_path + "fc_" + circuit_type + "_" + str(circuit_size) + ".json"
-                # flag_circuit_path = circuits_path + "fc_" + circuit_type + "_" + str(circuit_size) + "_0.json"
-                # flag_circuit: cirq.Circuit = cirq.read_json(flag_circuit_path)
-                # fqs = list(filter(lambda q: 'f' in q.name, flag_circuit.all_qubits()))
-                # n_of_fq = len(fqs)
-                # plt.scatter(n_of_fq, float(error_mod))
-                # plt.ylabel("flag error mod")
-                # plt.xlabel("number of flag qubits, " + r'$\approx\sqrt{dq}$')
+                flag_circuit_path = circuits_path + "fc_" + circuit_type + "_" + str(circuit_size) + ".json"
+                flag_circuit_path = circuits_path + "fc_" + circuit_type + "_" + str(circuit_size) + "_0.json"
+                flag_circuit: cirq.Circuit = cirq.read_json(flag_circuit_path)
+                fqs = list(filter(lambda q: 'f' in q.name, flag_circuit.all_qubits()))
+                n_of_fq = len(fqs)
+                plt.scatter(n_of_fq, float(error_mod[e]))
+                plt.ylabel("flag error mod")
+                plt.xlabel("number of flag qubits")
 
     plt.tight_layout()
     # plt.xlabel("circuit size")
