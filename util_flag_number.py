@@ -3,6 +3,7 @@ import sys
 import matplotlib.pyplot as plt
 import cirq
 import json
+import numpy as np
 
 if __name__ == '__main__':
 
@@ -23,5 +24,15 @@ if __name__ == '__main__':
         flag_circuit: cirq.Circuit = cirq.read_json(path + "/" + file)
         dqs = flag_circuit.all_qubits()
         fqs = list(filter(lambda q: 'f' in q.name, flag_circuit.all_qubits()))
+        n_of_q = len(flag_circuit.all_qubits())
         n_of_fq = len(fqs)
+        n_of_dq = n_of_q - n_of_fq
+        
         print(circ_size, n_of_fq, len(dqs))
+        plt.scatter(circ_size, n_of_dq, c='red')
+        plt.scatter(circ_size, n_of_fq, c='blue')
+        plt.scatter(circ_size, n_of_q, c='green')
+        
+    #plt.tight_layout()
+    plt.xticks(np.arange(5, 40, 5)) # assumption! for formatting
+    plt.savefig("qubit_counts_10.png")
