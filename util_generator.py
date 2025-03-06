@@ -2,6 +2,7 @@ import warnings
 
 import cirq
 import cirq.circuits
+import math
 
 from preparation import compiler, test_circuits
 
@@ -18,10 +19,14 @@ def compile_circuits(orig_circuit, size, apply_jabalizer = False, chosen_flags =
     flag_circuit = c.add_flag(named_icm_circuit, strategy="heuristic")
 
     # if we only want the n most important flags to be chosen
+    # -1 setting is for all flags
     if chosen_flags > 0:
         flag_circuit = c.important_flags(flag_circuit, chosen_flags)
-    elif chosen_flags == -2:
+    elif chosen_flags == -2: # sqrt(n of qubits)
         num_of_important_flags = round(len(orig_circuit.all_qubits())**(1/2))
+        flag_circuit = c.important_flags(flag_circuit, num_of_important_flags)
+    elif chosen_flags == -3: # 3 * log_2(size)
+        num_of_important_flags = round(3 * math.log2(size))
         flag_circuit = c.important_flags(flag_circuit, num_of_important_flags)
 
     return named_icm_circuit, flag_circuit
