@@ -241,7 +241,6 @@ class FlagCompiler:
             # find hoq many cnots touch the protected qubit
             protected_cnots = list(filter(lambda m: protected_qubit in m[0].qubits and m[1] > first_i and m[1] < last_i, moments_with_cnot_and_index))
 
-            print(fq, len(protected_cnots))
             return len(protected_cnots)
 
         # sort the flags based on ranking
@@ -307,11 +306,12 @@ class FlagCompiler:
         important_flags = []
         for k, g in itertools.groupby(flag_qubits, key=group_func):
             # sort the flags based on ranking
-            sorted_flags = g.sort(key=rank_flags, reverse=True)
+            sorted_flags = list(g)
+            sorted_flags.sort(key=rank_flags, reverse=True)
             important_flags.append(sorted_flags[0])
 
         # sort again and pick the amount we want
-        important_flags = important_flags.sort(key=rank_flags, reverse=True)
+        important_flags.sort(key=rank_flags, reverse=True)
         important_flags = important_flags[:min(n_of_flags, len(important_flags))]
 
         #only take those important flags
