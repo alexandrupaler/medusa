@@ -265,11 +265,12 @@ class FlagCompiler:
     
 
     def unique_important_flags(self, flag_circuit: cirq.Circuit, n_of_flags):
-
+        
         # assuming everything is in its own moment
         n_of_moments = len(flag_circuit.moments)
 
         flag_qubits = list(filter(lambda q: 'f' in q.name, flag_circuit.all_qubits()))
+        data_qubits = list(filter(lambda q: 'f' not in q.name, flag_circuit.all_qubits()))
 
         moments_with_index = list(zip(list(flag_circuit.moments), range(n_of_moments)))
         moments_with_cnot_and_index = list(filter(lambda a: self.__is_moment_with_cnot__(a[0]), moments_with_index))
@@ -304,11 +305,17 @@ class FlagCompiler:
         
         # group flags
         important_flags = []
-        for k, g in itertools.groupby(flag_qubits, key=group_func):
+        for dq in data_qubits:
+            # this could probably be done in a nicer way
+            sorted_flags = []
+            for k, g in itertools.groupby(flag_qubits, key=group_func):
+                if k == dq:
+                    sorted_flags.extend(list(g))
             # sort the flags based on ranking
-            sorted_flags = list(g)
             sorted_flags.sort(key=rank_flags, reverse=True)
-            important_flags.append(sorted_flags[0])
+            if sorted_flags: # if not empty
+                important_flags.append(sorted_flags[0])
+            
 
         # sort again and pick the amount we want
         important_flags.sort(key=rank_flags, reverse=True)
@@ -325,6 +332,6 @@ class FlagCompiler:
                 yield op
 
         new_circuit = flag_circuit.map_operations(map_func)
-
+        
         return new_circuit
 
