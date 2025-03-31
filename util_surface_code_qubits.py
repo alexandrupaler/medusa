@@ -81,10 +81,10 @@ if __name__ == '__main__':
             for e_i in range(len(ncs)):
                 e = ncs[e_i]
                 error_mod = error_mods[e_i]
-                d = logical_error_scaling(e, error_mod)
+                d = np.ceil(logical_error_scaling(e, error_mod))
                 surface_q_count = 2*d**2-1
                 total_qubits = data_count + (flag_count * surface_q_count)
-                plt.scatter(circuit_size, total_qubits, color=colors[e_i])
+                plt.scatter(error_mod, total_qubits, color=colors[e_i])
 
     p1 = mpatches.Patch(color=colors[0], label=str(ncs[0]))
     p2 = mpatches.Patch(color=colors[1], label=str(ncs[1]))
@@ -92,8 +92,8 @@ if __name__ == '__main__':
     p4 = mpatches.Patch(color=colors[3], label=str(ncs[3]))
 
     plt.legend(handles=[p1, p2, p3, p4])
-    #plt.xlabel("flag error mod")
-    plt.xlabel("circuit size")
+    plt.xlabel("flag error mod")
+    #plt.xlabel("circuit size")
     plt.ylabel("total qubits")
     print(plot_fname)
     plt.savefig(plot_fname)
