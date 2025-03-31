@@ -54,7 +54,9 @@ if __name__ == '__main__':
                 e = ncs[e_i]
                 mod = error_mods[e_i]
                 d = logical_error_scaling(e, mod)
-                plt.scatter(mod, d, color=colors[e_i])
+                #plt.scatter(mod, d, color=colors[e_i])
+                plt.scatter(mod, (2*d**2-1), color=colors[e_i])
+
 
     reds = mpatches.Patch(color='red', label=str(ncs[0]))
     blues = mpatches.Patch(color='blue', label=str(ncs[1]))
@@ -63,5 +65,6 @@ if __name__ == '__main__':
 
     plt.legend(handles=[reds, blues, greens, oranges])
     plt.xlabel("flag error mod")
-    plt.ylabel("surface code distance")
+    #plt.ylabel("surface code distance")
+    plt.ylabel("surface code total qubits")
     plt.savefig(plot_fname)
