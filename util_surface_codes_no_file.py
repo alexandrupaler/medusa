@@ -30,14 +30,15 @@ if __name__ == '__main__':
 
     ncs = np.array([0.0001, 0.0003, 0.0005, 0.0007, 0.001])
     colors = ['red', 'blue', 'green', 'orange', 'purple']      
-    error_mods = np.logspace(0.001, 1, 50)
+    error_mods = np.logspace(-3, 0, 50) # base 10
 
     # find corresponding surface code distance for each error rate
     for e_i in range(len(ncs)):
         e = ncs[e_i]
-        d = logical_error_scaling(e, error_mods)
-        #plt.loglog(error_mods, (2*d**2-1), color=colors[e_i])
-        plt.loglog(error_mods, d, color=colors[e_i])
+        d = np.ceil(logical_error_scaling(e, error_mods))
+        #d = logical_error_scaling(e, error_mods)
+        plt.semilogx(error_mods, (2*d**2-1), color=colors[e_i])
+        #plt.semilogx(error_mods, d, color=colors[e_i])
 
 
     p1 = mpatches.Patch(color=colors[0], label=str(ncs[0]))
@@ -48,6 +49,6 @@ if __name__ == '__main__':
 
     plt.legend(handles=[p1, p2, p3, p4, p5])
     plt.xlabel("flag error mod")
-    plt.ylabel("surface code distance")
-    #plt.ylabel("surface code total qubits")
+    #plt.ylabel("surface code distance")
+    plt.ylabel("surface code total qubits")
     plt.savefig(plot_fname)
