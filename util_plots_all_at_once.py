@@ -7,13 +7,13 @@ import numpy as np
 
 if __name__ == '__main__':
 
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 4:
         CRED = '\033[91m'
         CEND = '\033[0m'
         print(CRED + "Will run only if provided three parameters:\n\t this_script [folder_path] [chosen_circuit_type] [plot_file_name_base]" + CEND)
         exit(1)
 
-    elif len(sys.argv) == 3:
+    elif len(sys.argv) == 4:
         folder_path = sys.argv[1]
         chosen_circuit_type = sys.argv[2]
         plot_file_name_base = sys.argv[3]
@@ -54,38 +54,50 @@ if __name__ == '__main__':
             icm_small = last_values["small_icm_failure_rate"]
             error_mod = last_values["error_mod"]
 
+            circuit_size_array = np.full(len(error_rates), int(circuit_size))
+
             # flag and icm error plotted together
-            ax1.scatter(int(circuit_size), res, color='red')
-            ax1.scatter(int(circuit_size), icm_small, color='blue')
-            ax1.ylabel("logical error rate")
+            ax1.scatter(circuit_size_array, res, color='red')
+            ax1.scatter(circuit_size_array, icm_small, color='blue')
+            ax1.set_ylabel("logical error rate")
+            ax1.set_xlabel("circuit size")
+
 
             # difference between flag and icm error
-            ax2.scatter(int(circuit_size), (res - icm_small), color='red')
-            ax2.ylabel("logical error rate difference")
+            ax2.scatter(circuit_size_array, (np.array(res) - np.array(icm_small)), color='red')
+            ax2.set_ylabel("logical error rate difference")
+            ax2.set_xlabel("circuit size")
 
             # flag error mod
             colors = ['blue', 'green', 'orange', 'red']
             for e in range(len(error_rates)):
                 ax3.scatter(int(circuit_size), float(error_mod[e]), color=colors[e])
-            ax3.ylabel("flag error mod")
+            ax3.set_ylabel("flag error mod")
+            ax3.set_xlabel("circuit size")
 
             # qubit amounts
+            ns_of_q = np.zeros(10)
+            ns_of_dq = np.zeros(10)
+            ns_of_fq = np.zeros(10)
             for circuit_sample in range(10):
                 try:
                     circuit_file_name = f"fc_{circuit_type}_{circuit_size}_{circuit_sample}"
                     flag_circuit: cirq.Circuit = cirq.read_json(f"{circuits_path}/{circuit_file_name}")
+                    print(flag_circuit)
                     all_qs = flag_circuit.all_qubits()
                     fqs = list(filter(lambda q: 'f' in q.name, all_qs))
-                    n_of_q = len(all_qs)
-                    n_of_fq = len(fqs)
-                    n_of_dq = n_of_q - n_of_fq
+                    ns_of_q[circuit_sample] = len(all_qs)
+                    ns_of_fq[circuit_sample] = len(fqs)
+                    ns_of_dq[circuit_sample] = ns_of_q[circuit_sample] - ns_of_fq[circuit_sample]
                 except:
-                    print("no more circuit samples")
-        
-            ax4.scatter(circuit_size, n_of_dq, c='red')
-            ax4.scatter(circuit_size, n_of_fq, c='blue')
-            ax4.scatter(circuit_size, n_of_q, c='green')
-            ax4.xticks(np.arange(5, 40, 5)) # assumption! for formatting
+                    print("")
+            ax4.scatter(circuit_size, np.mean(ns_of_dq), c='red')
+            ax4.scatter(circuit_size, np.mean(ns_of_fq), c='blue')
+            ax4.scatter(circuit_size, np.mean(ns_of_q), c='green')
+            ax4.set_xticks(np.arange(5, 40, 5)) # assumption! for formatting
+            ax4.set_ylabel("qubits")
+            ax4.set_xlabel("circuit size")
+
 
     fig1.tight_layout()
     fig2.tight_layout()
