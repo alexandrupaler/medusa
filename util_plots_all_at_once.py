@@ -1,6 +1,7 @@
 import os
 import sys
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 import cirq
 import json
 import numpy as np
@@ -74,6 +75,11 @@ if __name__ == '__main__':
                 ax3.scatter(int(circuit_size), float(error_mod[e]), color=colors[e])
             ax3.set_ylabel("flag error mod")
             ax3.set_xlabel("circuit size")
+            custom_lines = [Line2D([0], [0], color='blue', lw=4),
+                Line2D([0], [0], color='green', lw=4),
+                Line2D([0], [0], color='orange', lw=4),
+                Line2D([0], [0], color='red', lw=4)]
+            ax3.legend(custom_lines, ['1e-4', '5e-4', '7e-4', '10e-4'])
 
             # qubit amounts
             ns_of_q = np.zeros(10)
@@ -97,7 +103,6 @@ if __name__ == '__main__':
             ax4.set_xticks(np.arange(5, 40, 5)) # assumption! for formatting
             ax4.set_ylabel("qubits")
             ax4.set_xlabel("circuit size")
-
 
     fig1.tight_layout()
     fig2.tight_layout()
