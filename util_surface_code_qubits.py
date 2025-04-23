@@ -60,8 +60,10 @@ if __name__ == '__main__':
             elif qubit_setting == "all_unique":
                 flag_count = data_count
             # all flags 5x-5
-            elif qubit_setting == "log":
+            elif qubit_setting == "3log":
                 flag_count = round(3 * np.log2(circuit_size))
+            elif qubit_setting == "5log":
+                flag_count = round(5 * np.log2(circuit_size))
 
             # calculates surface code distance which corresponds to certain error mod
             def logical_error_scaling(p_phys, mod):
@@ -82,9 +84,13 @@ if __name__ == '__main__':
                 e = ncs[e_i]
                 error_mod = error_mods[e_i]
                 d = np.ceil(logical_error_scaling(e, error_mod))
+                # round to next odd integer
+                if d % 2 == 0:
+                    d += 1
                 surface_q_count = 2*d**2-1
                 total_qubits = data_count + (flag_count * surface_q_count)
-                plt.scatter(error_mod, total_qubits, color=colors[e_i])
+                #plt.scatter(error_mod, total_qubits, color=colors[e_i])
+                plt.scatter(circuit_size, total_qubits, color=colors[e_i])
 
     p1 = mpatches.Patch(color=colors[0], label=str(ncs[0]))
     p2 = mpatches.Patch(color=colors[1], label=str(ncs[1]))
@@ -92,8 +98,8 @@ if __name__ == '__main__':
     p4 = mpatches.Patch(color=colors[3], label=str(ncs[3]))
 
     plt.legend(handles=[p1, p2, p3, p4])
-    plt.xlabel("flag error mod")
-    #plt.xlabel("circuit size")
+    #plt.xlabel("flag error mod")
+    plt.xlabel("circuit size")
     plt.ylabel("total qubits")
     print(plot_fname)
     plt.savefig(plot_fname)

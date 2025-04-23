@@ -11,7 +11,7 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         CRED = '\033[91m'
         CEND = '\033[0m'
-        print(CRED + "Will run only if provided two parameters:\n\t this_script [plot_file_name]" + CEND)
+        print(CRED + "Will run only if provided one parameter:\n\t this_script [plot_file_name]" + CEND)
         exit(1)
 
     elif len(sys.argv) == 2:
@@ -36,6 +36,8 @@ if __name__ == '__main__':
     for e_i in range(len(ncs)):
         e = ncs[e_i]
         d = np.ceil(logical_error_scaling(e, error_mods))
+        # round to next odd integer
+        d[d % 2 == 0] = d[d % 2 == 0] + 1
         #d = logical_error_scaling(e, error_mods)
         plt.semilogx(error_mods, (2*d**2-1), color=colors[e_i])
         #plt.semilogx(error_mods, d, color=colors[e_i])
