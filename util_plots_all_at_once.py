@@ -87,9 +87,8 @@ if __name__ == '__main__':
             ns_of_fq = np.zeros(10)
             for circuit_sample in range(10):
                 try:
-                    circuit_file_name = f"fc_{circuit_type}_{circuit_size}_{circuit_sample}"
+                    circuit_file_name = f"fc_{circuit_type}_{circuit_size}_{circuit_sample}.json"
                     flag_circuit: cirq.Circuit = cirq.read_json(f"{circuits_path}/{circuit_file_name}")
-                    print(flag_circuit)
                     all_qs = flag_circuit.all_qubits()
                     fqs = list(filter(lambda q: 'f' in q.name, all_qs))
                     ns_of_q[circuit_sample] = len(all_qs)
