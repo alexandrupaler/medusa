@@ -878,3 +878,13 @@ def calculate_logical_error_from_csv(number_of_error_rates, number_of_runs, numb
         results_icm[e] = error_occured / (number_of_runs * number_of_input_states)
     
     return results, results_icm
+
+def get_flag_stabilizers_from_icm(flag_circuit: cirq.Circuit, icm_stabilizers):
+    flags = list(filter(lambda q: 'f' in q.name, flag_circuit.all_qubits()))
+    n_of_f = len(flags)
+    flag_paulis = "_" * n_of_f
+    flag_stabilizers = []
+    for icm_stabilizer in icm_stabilizers:
+        flag_stabilizer = stim.PauliString(icm_stabilizer.__str__()[0] + flag_paulis + icm_stabilizer.__str__()[1:])
+        flag_stabilizers.extend([flag_stabilizer])
+    return flag_stabilizers
