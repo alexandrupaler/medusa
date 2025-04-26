@@ -60,3 +60,8 @@ if __name__ == '__main__':
         # the problem is the order of the qubits; assuming the qubit order is not revered in the string, 
         # the flag qubits come before the data qubits
         # -> need to add "___" to the beginning of the strings"
+
+        flag_stabilizers_new = evaluate.get_flag_stabilizers_from_icm(flag_circuit, icm_stabilizers)
+        print(flag_stabilizers_new[0])
+        print(flag_stabilizers[0])
+        print(icm_stabilizers[0])
