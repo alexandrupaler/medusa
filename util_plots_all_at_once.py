@@ -110,9 +110,9 @@ if __name__ == '__main__':
                     ns_of_dq[circuit_sample] = ns_of_q[circuit_sample] - ns_of_fq[circuit_sample]
                 except:
                     print("")
-            ax4.scatter(circuit_size, np.mean(ns_of_dq), c='red')
-            ax4.scatter(circuit_size, np.mean(ns_of_fq), c='blue')
-            ax4.scatter(circuit_size, np.mean(ns_of_q), c='green')
+            ax4.scatter(circuit_size, np.mean(ns_of_dq[np.nonzero(ns_of_dq)]), c='red')
+            ax4.scatter(circuit_size, np.mean(ns_of_fq[np.nonzero(ns_of_fq)]), c='blue')
+            ax4.scatter(circuit_size, np.mean(ns_of_q[np.nonzero(ns_of_q)]), c='green')
             ax4.set_xticks(np.arange(5, 40, 5)) # assumption! for formatting
             ax4.set_ylabel("qubits")
             ax4.set_xlabel("circuit size")
