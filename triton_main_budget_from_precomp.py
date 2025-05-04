@@ -24,13 +24,13 @@ if __name__ == '__main__':
     # triton cpus:
     # - lots :)
 
-    number_of_runs = 100 #10000
+    number_of_runs = 10000
     base_error = 0.0001
     error_rates = [1, 3, 5, 7, 10] 
     epsilon_target = 0.0005
     n_of_circuit_samples = 10 # benchmark samples
-    min_q = 5
-    max_q = 10
+    min_q = 6 #5 ?
+    max_q = 40
     circuit_types = ["b1"]
     chosen_flags = -5
 
@@ -38,7 +38,7 @@ if __name__ == '__main__':
         Create backups and logs
     """
     bkp_folder_name = datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
-    config = {"circuits": f"precomputed/{chosen_flags}/circuits/", "logs": f"{bkp_folder_name}/logs/"}
+    config = {"circuits": f"precomputed_unique/{chosen_flags}/circuits/", "logs": f"{bkp_folder_name}/logs/", "precomps": f"precomputed_unique/{chosen_flags}/logs/"}
     # Create the logs folder
     Path(config["logs"]).mkdir(parents=True, exist_ok=True)
     # Copy the main script into the backup folder
@@ -60,9 +60,9 @@ if __name__ == '__main__':
         # }
 
         filename = f"report_{circuit_type}_{circuit_size}_{error_rates}.json"
-        logs_path = config["circuits"]
+        logs_path = config["precomps"]
 
-        with open(f"{logs_path}/{filename}", "r") as report:
+        with open(f"{logs_path}{filename}", "r") as report:
                 last_values = json.load(report)
         
         icm_failure_rate = last_values["averages"]["icm_failure_rate"]
@@ -141,7 +141,7 @@ if __name__ == '__main__':
                         # Save the last values for later analysis
                         last_values["large_fc_failure_rate"][sample_id, e] = large_fc_failure_rate[0]
                         last_values["large_icm_failure_rate"][sample_id, e] = large_icm_failure_rate[0]
-                        last_values["small_icm_failure_rate"][sample_id, e] = small_icm_failure_rate[0]
+                        last_values["small_icm_failure_rate"][sample_id, e] = small_icm_failure_rate #[0]
                         last_values["error_mod"][sample_id, e] = error_mod
 
                     elif diff < 0:
