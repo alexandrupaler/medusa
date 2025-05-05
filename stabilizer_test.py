@@ -24,13 +24,21 @@ if __name__ == '__main__':
         icm_circuit: cirq.Circuit = cirq.read_json(f"{circuits_path}/{icm_file_name}")
         flag_circuit: cirq.Circuit = cirq.read_json(f"{circuits_path}/{flag_file_name}")
 
-        print(flag_circuit)
+        """
+        qubit1 = cirq.NamedQubit("1")
+        qubit0 = cirq.NamedQubit("0")
+
+        moment1 = cirq.Moment([cirq.CNOT(qubit1, qubit0)])
+        flag_circuit = cirq.Circuit((moment1))
+        """
+
+        #print(flag_circuit)
 
         input_state = evaluate.generate_input_strings(icm_circuit, number_of_input_states)
         print(input_state)
 
-        icm_circuit = evaluate.prepare_circuit_from_string(icm_circuit, input_state)
-        flag_circuit = evaluate.prepare_circuit_from_string(flag_circuit, input_state)
+        icm_circuit = evaluate.prepare_circuit_from_string(icm_circuit, input_state[0])
+        flag_circuit = evaluate.prepare_circuit_from_string(flag_circuit, input_state[0])
         
         # find stabilizer of icm & flag circuit circuit and compare
         stim_icm = stimcirq.cirq_circuit_to_stim_circuit(icm_circuit)
@@ -46,7 +54,9 @@ if __name__ == '__main__':
         simulator.do_circuit(stim_flag)
         flag_stabilizers = simulator.canonical_stabilizers()
 
+        print("icm")
         print(icm_stabilizers)
+        print("flag")
         print(flag_stabilizers)    
 
         # test if shorter stabilizer is ok
@@ -65,3 +75,5 @@ if __name__ == '__main__':
         print(flag_stabilizers_new[0])
         print(flag_stabilizers[0])
         print(icm_stabilizers[0])
+
+        #print(flag_circuit)
