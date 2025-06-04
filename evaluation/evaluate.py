@@ -487,6 +487,10 @@ def stabilizers_robustness_and_logical_error(flag_circuit: cirq.Circuit, icm_cir
     results_rob = np.zeros((len(error_rates),))
     results_rob_icm = np.zeros((len(error_rates),))
     acceptance = np.zeros((len(error_rates),))
+    res_missed_flags = np.zeros((len(error_rates),))
+    res_no_flag = np.zeros((len(error_rates),))
+    res_false_flags = np.zeros((len(error_rates),))
+    res_correct_flags = np.zeros((len(error_rates),))
 
     number_of_input_states = 100
     input_states = generate_input_strings(icm_circuit, number_of_input_states)
@@ -515,18 +519,14 @@ def stabilizers_robustness_and_logical_error(flag_circuit: cirq.Circuit, icm_cir
             state = input_states[s]
 
             # the expected results 
-            # for flag circuit
-            prepared_circuit = prepare_circuit_from_string(flag_circuit, state)
-            expected_stim = stimcirq.cirq_circuit_to_stim_circuit(prepared_circuit)
-            simulator_expected = stim.TableauSimulator()
-            simulator_expected.do_circuit(expected_stim)
-            stabilizers = simulator_expected.canonical_stabilizers()
             # for icm circuit
             prepared_circuit_icm = prepare_circuit_from_string(icm_circuit, state)
             expected_stim_icm = stimcirq.cirq_circuit_to_stim_circuit(prepared_circuit_icm)
             simulator_expected_icm = stim.TableauSimulator()
             simulator_expected_icm.do_circuit(expected_stim_icm)
             stabilizers_icm = simulator_expected_icm.canonical_stabilizers()
+            # for flag circuit
+            stabilizers = get_flag_stabilizers_from_icm(flag_circuit, stabilizers_icm)
 
             # add noise to circuits
             # for flag circuit
@@ -591,6 +591,10 @@ def stabilizers_robustness_and_logical_error(flag_circuit: cirq.Circuit, icm_cir
         results_rob[e] = faulty_stabilizers / (len(stabilizers) * (no_flag + missed_flags))
         results_rob_icm[e] = faulty_stabilizers_icm / (len(stabilizers_icm) * (number_of_runs) * len(input_states))
         acceptance[e] = (no_flag + missed_flags) / (number_of_runs * len(input_states))
+        res_missed_flags[e] = missed_flags
+        res_no_flag[e] = no_flag
+        res_false_flags[e] = false_flags
+        res_correct_flags[e] = correct_flags
 
 
     if plotting:
@@ -616,7 +620,7 @@ def stabilizers_robustness_and_logical_error(flag_circuit: cirq.Circuit, icm_cir
         filename = "res_results_robustness_" + plot_title.replace(" ", "") + ".png"
         plt.savefig(filename)
         plt.close()
-    return results, results_icm, results_rob, results_rob_icm, acceptance
+    return results, results_icm, acceptance, res_missed_flags, res_no_flag, res_false_flags, res_correct_flags
 
 # used to analyze the measurement results from the above function
 def analyze_results_from_csv(error_rates, number_of_runs, number_of_input_states):
