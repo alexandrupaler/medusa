@@ -17,7 +17,7 @@ from preparation import compiler, test_circuits
 from evaluation import evaluate
 import numpy as np
 
-from util_generator import generate_circuits
+from util.util_generator import generate_circuits
 
 if __name__ == '__main__':
 
@@ -32,9 +32,9 @@ if __name__ == '__main__':
     epsilon_target = 0.0005
     n_of_circuit_samples = 0 # benchmark samples
     min_q = 5
-    max_q = 10
+    max_q = 40
     circuit_types = ["adder"]
-    chosen_flags = -1
+    chosen_flags = -5
 
     """
         Create backups and logs
@@ -150,7 +150,7 @@ if __name__ == '__main__':
     procs = len(paramlist) + 1
 
     # max number of processes
-    maxprocs = 10
+    maxprocs = 100
     pool = Pool(processes=min(procs, maxprocs))
     pool.map(parallel_simulation, paramlist)
     pool.close()

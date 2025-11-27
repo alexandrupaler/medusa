@@ -16,7 +16,7 @@ from evaluation import evaluate
 import numpy as np
 import matplotlib.pyplot as plt
 
-from util_generator import generate_circuits
+from util.util_generator import generate_circuits
 
 if __name__ == '__main__':
 

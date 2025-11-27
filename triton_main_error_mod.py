@@ -12,7 +12,7 @@ from multiprocessing import Pool
 from evaluation import evaluate
 import numpy as np
 
-from util_generator import generate_circuits
+from util.util_generator import generate_circuits
 
 if __name__ == '__main__':
 
